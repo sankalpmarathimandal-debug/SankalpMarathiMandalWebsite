@@ -71,8 +71,12 @@ Domains & Routes → Add → Custom Domain**, e.g. `admin.sankalpmarathi.org`.
 Cloudflare handles the DNS/SSL for you if your domain's nameservers are on
 Cloudflare; otherwise add the CNAME it gives you at your registrar.
 
-Until you do this, the `workers.dev` URL from Step 5 works fine — just keep
-it private (don't link it from the public site).
+Until you do this, the `workers.dev` URL from Step 5 works fine.
+
+**Note:** The site footer now links to `https://admin.sankalpmarathi.org`, so
+this custom domain step is no longer optional — complete it, or update the
+footer link on all pages to your actual `workers.dev` URL instead. Since the
+admin link is now public, make sure `ADMIN_PASSWORD` is strong.
 
 ## What the dashboard can do
 
