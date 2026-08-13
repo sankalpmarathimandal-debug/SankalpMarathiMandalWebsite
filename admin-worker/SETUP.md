@@ -93,10 +93,17 @@ strong.
   Community Pride Wall logos, homepage highlight photos, and showcase PDFs.
   Event images are organized by year in the repo (`assets/images/events/2026/…`),
   so that card has a Year field — fill it in before uploading.
+- **Flyer Builder** (`🎨 Flyer Builder` link, opens in a new tab at `/flyer`) —
+  a point-and-click tool for making an event flyer: click to edit the text,
+  swap the background color or image, add a hero photo, up to 5 sponsor
+  logos, and an optional payment/RSVP QR code. "Download PDF" exports a
+  ready-to-share single-page flyer; "Save Editable Copy" downloads an HTML
+  file that can be reopened and edited later. This tool runs entirely in the
+  browser — nothing it does is committed to GitHub or touches the live site.
 
-Every change is a real Git commit (authored as you, via the token), so
-nothing is lost — you can always see history on GitHub or revert a commit if
-needed.
+Every change made via the Excel/image/PDF sections above is a real Git
+commit (authored as you, via the token), so nothing is lost — you can always
+see history on GitHub or revert a commit if needed.
 
 ## Things to know
 
