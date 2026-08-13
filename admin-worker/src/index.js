@@ -39,6 +39,13 @@ const SINGLE_DOCS = [
   { path: "docs/constitution.pdf", label: "Constitution PDF", desc: "Constitution page", accept: "application/pdf" },
 ];
 
+// Small hand-edited JSON config files (not xlsx, not a folder of uploads) —
+// each gets a dedicated form in the admin UI instead of the generic
+// spreadsheet/upload card. Currently just the homepage marquee banner.
+const SIMPLE_JSON_FILES = [
+  { path: "data/marquee.json", label: "Homepage Announcement Marquee" },
+];
+
 const FOLDERS = [
   { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below", xlsxRef: "data/home-events.xlsx / data/timeline.xlsx" },
   { path: "assets/images/team", label: "Team Photos", accept: "image/*", xlsxRef: "data/team.xlsx" },
@@ -1129,11 +1136,33 @@ function byPath(list, path) {
   return list.find((x) => x.path === path);
 }
 
+function marqueeCardHtml() {
+  return `<div class="card" data-path="data/marquee.json">
+    <h3 style="margin-bottom:2px">Announcement Marquee <span class="note">Scrolling banner under the homepage nav</span></h3>
+    <p class="desc" style="margin-bottom:12px">For occasional announcements (admissions open, an upcoming event, etc.). Turn it off between announcements — it disappears from the homepage entirely, not just blank.</p>
+    <div class="row" style="margin-bottom:10px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+        <input type="checkbox" id="marquee-active"> Show this banner on the homepage
+      </label>
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+      <input type="text" id="marquee-text" placeholder="Announcement text, e.g. Marathi Shala Admissions open now" style="flex:1;min-width:260px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+      <input type="text" id="marquee-link" placeholder="Page to open when clicked, e.g. shala.html (optional)" style="flex:1;min-width:260px;padding:8px;border:1px solid #ccc;border-radius:6px;">
+    </div>
+    <button onclick="saveMarquee(this)">Save</button>
+    <div class="status" id="marquee-status"></div>
+  </div>`;
+}
+
 function pageSectionHtml(page, idx) {
   const xlsxCards = (page.xlsx || []).map((p) => fileCardHtml(byPath(XLSX_FILES, p))).join("\n");
   const docCards = (page.docs || []).map((p) => fileCardHtml(byPath(SINGLE_DOCS, p))).join("\n");
   const folderCards = (page.folders || []).map((p) => folderCardHtml(byPath(FOLDERS, p))).join("\n");
+  const marqueeCard = page.key === "home" ? marqueeCardHtml() : "";
   return `<section class="page-section${idx === 0 ? " active" : ""}" id="page-${page.key}">
+    ${marqueeCard}
     ${xlsxCards || docCards ? `<h2 class="section">Content</h2>${xlsxCards}${docCards}` : ""}
     ${folderCards ? `<h2 class="section">Images &amp; Documents</h2>${folderCards}` : ""}
   </section>`;
@@ -1770,5 +1799,6 @@ function isAllowedPath(path) {
   if (!path || typeof path !== "string") return false;
   if (XLSX_FILES.some((f) => f.path === path)) return true;
   if (SINGLE_DOCS.some((f) => f.path === path)) return true;
+  if (SIMPLE_JSON_FILES.some((f) => f.path === path)) return true;
   return FOLDERS.some((f) => path === f.path || path.startsWith(f.path + "/"));
 }
