@@ -127,6 +127,21 @@ async function ghCommitFile(env, path, base64Content, message) {
   return res.json();
 }
 
+async function ghListCommits(env, perPage = 40) {
+  const url = `https://api.github.com/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/commits?sha=${env.GITHUB_BRANCH}&per_page=${perPage}`;
+  const res = await fetch(url, { headers: ghHeaders(env) });
+  if (!res.ok) throw new Error(`GitHub list commits failed: ${res.status} ${await res.text()}`);
+  const list = await res.json();
+  return list.map((c) => ({
+    sha: c.sha,
+    shortSha: c.sha.slice(0, 7),
+    message: c.commit.message,
+    date: c.commit.author?.date || c.commit.committer?.date || null,
+    authorName: c.commit.author?.name || "unknown",
+    url: c.html_url,
+  }));
+}
+
 async function ghDeleteFile(env, path, message) {
   const sha = await ghGetSha(env, path);
   if (!sha) throw new Error(`File not found: ${path}`);
@@ -297,11 +312,27 @@ function pageSectionHtml(page, idx) {
   </section>`;
 }
 
+function logSectionHtml() {
+  return `<section class="page-section" id="page-log">
+    <h2 class="section">Activity Log</h2>
+    <p style="font-size:13px;color:#6b6558;margin:0 0 14px;">Every change made here (or by anyone else pushing to the repo) is a real GitHub commit — this list is pulled live from GitHub, not a separate log file, so it can never fall out of sync. Click a row to see the exact before/after diff on GitHub.</p>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="table-wrap" style="max-height:520px;">
+        <table class="xlsx-table" style="width:100%;">
+          <thead><tr><th>When</th><th>Change</th><th></th></tr></thead>
+          <tbody id="log-tbody"><tr><td colspan="3" style="padding:14px;color:#999;">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px;"><button class="secondary" onclick="loadLogs()">Refresh</button></div>
+  </section>`;
+}
+
 function adminPage() {
   const tabs = PAGES.map(
     (p, i) => `<button class="page-tab${i === 0 ? " active" : ""}" data-page="${p.key}" onclick="showPage('${p.key}')">${p.label}</button>`
-  ).join("\n");
-  const sections = PAGES.map(pageSectionHtml).join("\n");
+  ).join("\n") + `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`;
+  const sections = PAGES.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml();
   const allFolderPaths = JSON.stringify(FOLDERS.map((f) => f.path));
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -621,7 +652,52 @@ function adminPage() {
     }
   }
 
+  // ---- activity log ---------------------------------------------------------
+
+  async function loadLogs() {
+    const tbody = document.getElementById('log-tbody');
+    tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;color:#999;">Loading…</td></tr>';
+    try {
+      const res = await fetch('/api/logs');
+      const items = await res.json();
+      if (!res.ok) throw new Error((items && items.error) || 'Failed to load log');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;color:#999;">No commits yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      items.forEach(function(c) {
+        const tr = document.createElement('tr');
+
+        const whenTd = document.createElement('td');
+        whenTd.style.whiteSpace = 'nowrap';
+        whenTd.textContent = c.date ? new Date(c.date).toLocaleString() : '—';
+
+        const msgTd = document.createElement('td');
+        msgTd.textContent = (c.message || '').split('\\n')[0];
+
+        const linkTd = document.createElement('td');
+        linkTd.style.whiteSpace = 'nowrap';
+        const a = document.createElement('a');
+        a.href = c.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.fontSize = '12px';
+        a.textContent = 'View on GitHub';
+        linkTd.appendChild(a);
+
+        tr.appendChild(whenTd);
+        tr.appendChild(msgTd);
+        tr.appendChild(linkTd);
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="3" style="padding:14px;color:#a33;">' + e.message + '</td></tr>';
+    }
+  }
+
   JSON.parse('${allFolderPaths}').forEach(loadFolder);
+  loadLogs();
   </script>
   </body></html>`;
 }
@@ -698,6 +774,12 @@ export default {
           if (!isAllowedPath(body.path)) return json({ error: "Path not allowed" }, 400);
           const result = await ghCommitFile(env, body.path, body.contentBase64, body.message || `Admin update: ${body.path}`);
           return json({ ok: true, commit: result.commit?.sha });
+        }
+
+        if (url.pathname === "/api/logs" && request.method === "GET") {
+          const perPage = Math.min(Number(url.searchParams.get("per_page")) || 40, 100);
+          const commits = await ghListCommits(env, perPage);
+          return json(commits);
         }
 
         if (url.pathname === "/api/delete" && request.method === "POST") {
