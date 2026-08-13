@@ -13,7 +13,7 @@ Read this section before touching anything if you're new to maintaining this sit
 |---|---|---|---|
 | **GitHub** | Hosts the code and (via GitHub Pages) the live site | github.com/sankalpmarathimandal-debug/SankalpMarathiMandalWebsite | Anyone maintaining content/code needs collaborator access (repo **Settings → Collaborators**). This is a personal GitHub account (`sankalpmarathimandal-debug`), not an organization — whoever controls that account's login controls everything. |
 | **GitHub Pages** | Serves the site publicly from this repo | Repo **Settings → Pages** | Currently building from the `main` branch. |
-| **Cloudflare Workers** | Hosts the private Admin panel (upload Excel/images/PDFs without using git) | dash.cloudflare.com → Workers & Pages → `sankalp-admin` | Whoever has the Cloudflare account login. Full setup/rotation steps: `admin-worker/SETUP.md`. |
+| **Cloudflare Workers** | Hosts the private Admin panel (upload Excel/images/PDFs without using git, plus a point-and-click Event Flyer Builder) | dash.cloudflare.com → Workers & Pages → `sankalp-admin` | Whoever has the Cloudflare account login. Full setup/rotation steps: `admin-worker/SETUP.md`. |
 | **GitHub fine-grained token** | Lets the Admin panel commit files into this repo on your behalf | Created at github.com/settings/tokens?type=beta, stored as the Cloudflare secret `GITHUB_TOKEN` (never in code) | Must stay scoped to `SankalpMarathiMandalWebsite` only, Contents: Read & write, and should have an expiration date set (rotate before it lapses). |
 | **Web3Forms** | Delivers Join Us / Become a Sponsor submissions by email | web3forms.com — key lives in `assets/js/main.js` (`CONFIG.WEB3FORMS_ACCESS_KEY`) | No login required; it's a free access-key relay. The key being visible in the JS is expected — that's how Web3Forms works, it's not a secret. |
 | **Google Forms / Tally / etc.** | Whatever individual sign-up forms are listed in `data/forms.xlsx` | Each row's `Link` column points at a form built by whoever created that specific sign-up | Not centralized — every form's owner is whoever built it in their own Google/Tally account. If that person leaves, that specific link may need rebuilding. |
@@ -200,7 +200,23 @@ Double-click **Start Local Preview.command** — it opens the site in your brows
 2. Repo **Settings → Pages → Custom domain** → enter `www.sankalpmarathi.org` → Save, enable "Enforce HTTPS".
 3. At your domain registrar, add a DNS CNAME record: `www` → `sankalpmarathimandal-debug.github.io`
 
+## Admin panel — Flyer Builder
+
+The admin panel (`admin-worker/`, deployed as the `sankalp-admin` Cloudflare
+Worker) now includes a **🎨 Flyer Builder** tab, served at `/flyer` behind
+the same login as the rest of the dashboard. It's a point-and-click tool for
+making an event flyer — click to edit text, swap the background color or
+image, add a hero photo, up to 5 sponsor logos, and an optional payment/RSVP
+QR code — then "Download PDF" for a ready-to-share flyer, or "Save Editable
+Copy" to keep an HTML version to reopen later. It runs entirely in the
+browser (no GitHub commits, doesn't touch the live site). See
+`admin-worker/SETUP.md` for details.
+
 ## Still to do
+
+See `ROADMAP.md` for the running list of planned enhancements (currently:
+cutting the custom domain over from Google Sites, plus a handful of smaller
+cleanup items).
 
 - **Cut the custom domain over from the old Google Sites site** — see the "Handoff guide" section near the top; this is the biggest outstanding item.
 - ~~Add the missing GitHub Action for highlights/logo-variants automation~~ — done, see `.github/workflows/update-manifests.yml`. Keep an eye on the repo's **Actions** tab the first few times a photo is uploaded to either folder, just to confirm it's running cleanly.
