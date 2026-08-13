@@ -1,0 +1,46 @@
+name: Update auto-generated manifests
+
+# Regenerates data/highlights.json and data/logo-variants.json whenever
+# images are added, renamed, or removed in the two folders that are
+# documented (README.md) as "fully automatic" — the homepage highlight
+# slider and the Community Pride Wall. Without this workflow, uploading a
+# photo to either folder (including via the admin panel) does nothing
+# until someone manually runs the matching script in scripts/ and commits
+# the result.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/images/highlights/**'
+      - 'assets/images/branding/logo-variants/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history, needed for per-file commit dates)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Regenerate manifests
+        run: |
+          python3 scripts/generate_highlights.py
+          python3 scripts/generate_logo_variants.py
+
+      - name: Commit changes if the manifests differ
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- data/highlights.json data/logo-variants.json; then
+            git add data/highlights.json data/logo-variants.json
+            git commit -m "Auto-update highlights/logo-variants manifest [skip ci]"
+            git push
+          else
+            echo "Manifests already up to date — nothing to commit."
+          fi
