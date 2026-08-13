@@ -1,15 +1,15 @@
-Subject: New Sankalp website — going live on sankalpmarathi.org in 2 weeks
+Subject: New Sankalp website — coming soon to sankalpmarathi.org
 
 Namaskar all,
 
-Over the past few weeks the Sankalp Web Team has rebuilt our website from the ground up, moving it off Google Sites onto a new setup that's faster, fully in our control, and — most importantly — one that any of us can update without needing to be "technical." We're targeting **production go-live within the next 2 weeks**, so wanted to walk the core team through what's changed, why it's better for us long-term, and what's coming next.
+Over the past few weeks the Sankalp Web Team has rebuilt our website from the ground up, moving it off Google Sites onto a new setup that's faster, fully in our control, and — most importantly — one that any of us can update without needing to be "technical." We're working toward production go-live, so wanted to walk the core team through what's changed, why it's better for us long-term, and what's coming next.
 
 ## Where things stand right now
 
 Our domain (sankalpmarathi.org) still points at the **old Google Sites version**. The new site is fully built, tested, and already being actively used by the team (uploading photos, editing event details, etc.) at a temporary address:
 https://sankalpmarathimandal-debug.github.io/SankalpMarathiMandalWebsite/
 
-Within the next 2 weeks we'll repoint sankalpmarathi.org so it serves the new site directly — nothing changes for visitors except everything gets better. Take a look at the temporary link above whenever you'd like a preview of what's coming.
+Once we repoint sankalpmarathi.org, it'll serve the new site directly — nothing changes for visitors except everything gets better. Take a look at the temporary link above whenever you'd like a preview of what's coming.
 
 ## Old site vs. new site
 
@@ -64,9 +64,9 @@ GitHub is just the storage system that hosts our website files for free and keep
 1. Whoever wants to make deeper structural changes to the site itself (design, new page types, etc.).
 2. Account continuity — see the punch list below, this is one of the items we want cleared before/around go-live.
 
-## What's coming next (target: production in 2 weeks)
+## What's coming next
 
-**The big one — going live on sankalpmarathi.org.** This is the last real step: repointing our domain from the old Google Sites to the new site. Needs whoever manages our domain registrar account to add one DNS record; everything on our side is already built and waiting. This is our target for the next 2 weeks.
+**The big one — going live on sankalpmarathi.org.** This is the last real step: repointing our domain from the old Google Sites to the new site. Needs whoever manages our domain registrar account to add one DNS record; everything on our side is already built and waiting.
 
 Alongside that, a short punch list we're clearing before/around go-live:
 
