@@ -6,7 +6,7 @@ compatibility_date = "2024-11-01"
 # are set separately with `wrangler secret put`, see SETUP.md.
 [vars]
 GITHUB_OWNER = "sankalpmarathimandal-debug"
-GITHUB_REPO = "Sankalp_SJ"
+GITHUB_REPO = "SankalpMarathiMandalWebsite"
 GITHUB_BRANCH = "main"
 
 # Optional: once deployed you can map this Worker to a subdomain, e.g.

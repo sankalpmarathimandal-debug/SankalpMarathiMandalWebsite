@@ -2,7 +2,7 @@
 
 This gives you a private webpage (e.g. `admin.sankalpmarathi.org`) where you
 log in with a password and upload replacement Excel files, images, or PDFs.
-It commits them straight to the `Sankalp_SJ` GitHub repo, and GitHub Pages
+It commits them straight to the `SankalpMarathiMandalWebsite` GitHub repo, and GitHub Pages
 redeploys the live site automatically — no GitHub account needed for whoever
 is uploading.
 
@@ -20,7 +20,7 @@ This lets the admin panel commit files on your behalf.
 3. Name it `sankalp-admin`, set an expiration (e.g. 1 year — you'll need to
    regenerate it when it expires).
 4. Under **Repository access**, choose **Only select repositories** →
-   `Sankalp_SJ`.
+   `SankalpMarathiMandalWebsite`.
 5. Under **Permissions → Repository permissions**, set **Contents** to
    **Read and write**.
 6. Click **Generate token** and copy it immediately (you won't see it again).

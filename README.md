@@ -1,14 +1,14 @@
 # संकल्प - आपलं मराठी मंडळ (Sankalp Marathi Mandal)
 
 Official website for Sankalp Marathi Mandal, Massachusetts.
-Live at: https://sankalpmarathimandal-debug.github.io/Sankalp_SJ/ (custom domain: [sankalpmarathi.org](https://www.sankalpmarathi.org))
+Live at: https://sankalpmarathimandal-debug.github.io/SankalpMarathiMandalWebsite/ (custom domain: [sankalpmarathi.org](https://www.sankalpmarathi.org))
 
 **How it works:** every page reads its content from an Excel workbook in `data/`. Edit the workbook → commit → the site updates. No Google Sheets dependency.
 
 ## Folder structure
 
 ```
-Sankalp_SJ/
+SankalpMarathiMandalWebsite/
 ├── index.html          Home page
 ├── events.html         Event timeline (by year)
 ├── team.html           Our Team
