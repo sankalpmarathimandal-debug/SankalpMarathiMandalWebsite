@@ -75,7 +75,7 @@ SankalpMarathiMandalWebsite/
 │   ├── shala-calendar.xlsx Shala Calendar page (Year, Month, Day, Title, Type, Time, Notes)
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
 │   ├── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
-│   ├── programs.xlsx       Book a Performance program menu (Title, Description, ImageURL, InstagramURL, Active, Order)
+│   ├── programs.xlsx       Book a Performance program menu (Title, Description, ImageURL, InstagramURL, PriceType, PriceDetails, Active, Order)
 │   └── program-participants.xlsx  Book a Performance participants (Program, Name, Role, Order)
 │
 ├── assets/
@@ -200,9 +200,11 @@ If there are no active rows, the page shows "Nothing to show yet."
 
 **Two workbooks drive this page:**
 
-- `data/programs.xlsx` — one row per program. Columns: `Title, Description, ImageURL, InstagramURL, Active, Order`.
+- `data/programs.xlsx` — one row per program. Columns: `Title, Description, ImageURL, InstagramURL, PriceType, PriceDetails, Active, Order`.
   - `ImageURL` is the program's logo/photo, saved into `assets/images/programs/` — leave blank to show a generic music icon instead.
   - `InstagramURL` is optional — if filled in, the card shows a "View on Instagram" link.
+  - `PriceType` — `Free` or `Paid`, shown as a badge next to the title (blank/anything else defaults to `Free`).
+  - `PriceDetails` — optional, only shown when `PriceType` is `Paid`, e.g. `$100` or `Suggested donation`.
   - `Active` — set to `Yes` to publish, `No` to hide it (and its dropdown option) without deleting the row.
   - `Order` — lower numbers show first.
 - `data/program-participants.xlsx` — one row per person. Columns: `Program, Name, Role, Order`.

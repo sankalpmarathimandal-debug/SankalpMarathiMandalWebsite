@@ -1504,7 +1504,20 @@ main { flex: 1; }
 .program-media i { font-size: 48px; color: #d1d5db; }
 
 .program-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+.program-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .program-title { font-size: 18px; font-weight: 700; }
+
+.program-price-badge {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 980px;
+  white-space: nowrap;
+}
+.program-price-badge.free { background: #e6f6ec; color: #1e7a3d; }
+.program-price-badge.paid { background: #fdf0e2; color: var(--accent-orange); }
 
 .program-insta-link {
   font-size: 13px;

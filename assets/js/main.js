@@ -35,7 +35,8 @@
                                  Ordered by priority within and across groups.
      data/programs.xlsx       → Book a Performance page — the program menu
                                  (Title, Description, ImageURL, InstagramURL,
-                                 Active, Order). Logo/photo images live in
+                                 PriceType [Free/Paid], PriceDetails, Active,
+                                 Order). Logo/photo images live in
                                  assets/images/programs/.
      data/program-participants.xlsx → Participants for each program (Program,
                                  Name, Role, Order). "Program" must match a
@@ -672,6 +673,13 @@ function closeShowcaseImage() {
    form ("Request This Program" pre-selects the dropdown and
    scrolls down to it).
    ===================================================== */
+function programPriceBadgeHtml(p) {
+  const isPaid = (p.PriceType || '').trim().toLowerCase() === 'paid';
+  const details = (p.PriceDetails || '').trim();
+  const label = isPaid ? (details ? `Paid · ${escapeHtml(details)}` : 'Paid') : 'Free';
+  return `<span class="program-price-badge ${isPaid ? 'paid' : 'free'}">${label}</span>`;
+}
+
 function programCardHtml(p, participants) {
   const media = p.ImageURL && p.ImageURL.trim()
     ? `<img src="${p.ImageURL}" alt="${escapeHtml(p.Title)}" loading="lazy">`
@@ -682,7 +690,10 @@ function programCardHtml(p, participants) {
     <div class="program-card">
       <div class="program-media">${media}</div>
       <div class="program-body">
-        <div class="program-title">${escapeHtml(p.Title)}</div>
+        <div class="program-title-row">
+          <div class="program-title">${escapeHtml(p.Title)}</div>
+          ${programPriceBadgeHtml(p)}
+        </div>
         ${p.InstagramURL && p.InstagramURL.trim() ? `<a class="program-insta-link" href="${p.InstagramURL}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> View on Instagram</a>` : ''}
         ${p.Description ? `<p class="program-desc">${escapeHtml(p.Description)}</p>` : ''}
         ${participants.length ? `
