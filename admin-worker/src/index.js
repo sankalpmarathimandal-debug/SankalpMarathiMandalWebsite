@@ -38,14 +38,27 @@ const SINGLE_DOCS = [
 ];
 
 const FOLDERS = [
-  { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below" },
-  { path: "assets/images/team", label: "Team Photos", accept: "image/*" },
+  { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below", xlsxRef: "data/home-events.xlsx / data/timeline.xlsx" },
+  { path: "assets/images/team", label: "Team Photos", accept: "image/*", xlsxRef: "data/team.xlsx" },
   { path: "assets/images/shala", label: "Shala Images", accept: "image/*" },
-  { path: "assets/images/showcase", label: "Showcase Photos", accept: "image/*" },
-  { path: "assets/images/partners", label: "Partner Logos", accept: "image/*" },
-  { path: "assets/images/branding/logo-variants", label: "Community Pride Wall Logos", accept: "image/*", note: "Auto-updates homepage — no xlsx edit needed" },
-  { path: "assets/images/highlights", label: "Homepage Highlight Photos", accept: "image/*", note: "Auto-updates homepage slider — no xlsx edit needed" },
-  { path: "docs/showcase", label: "Showcase Documents (PDFs)", accept: "application/pdf" },
+  { path: "assets/images/showcase", label: "Showcase Photos", accept: "image/*", xlsxRef: "data/showcase.xlsx" },
+  { path: "assets/images/partners", label: "Partner Logos", accept: "image/*", xlsxRef: "data/partners.xlsx" },
+  {
+    path: "assets/images/branding/logo-variants",
+    label: "Community Pride Wall Logos",
+    accept: "image/*",
+    note: "Auto-updates homepage — no xlsx edit needed",
+    autoManifest: true,
+  },
+  {
+    path: "assets/images/highlights",
+    label: "Homepage Highlight Photos",
+    accept: "image/*",
+    note: "Auto-updates homepage slider — no xlsx edit needed",
+    autoManifest: true,
+    namingHint: "Filename becomes the caption shown on the homepage slider. Use the format “YYYY - Title”, e.g. “2026 - Summer Picnic” — not a camera/screenshot default name.",
+  },
+  { path: "docs/showcase", label: "Showcase Documents (PDFs)", accept: "application/pdf", xlsxRef: "data/showcase.xlsx" },
 ];
 
 // Groups everything above by the actual page on the live site it affects —
@@ -142,6 +155,17 @@ async function ghListCommits(env, perPage = 40) {
   }));
 }
 
+// Contents API has no native "rename" — recreate at the new path with the
+// same bytes, then delete the old path. Two commits, same effect.
+async function ghRenameFile(env, oldPath, newPath, message) {
+  const existing = await ghGetFile(env, oldPath);
+  if (!existing) throw new Error(`File not found: ${oldPath}`);
+  const clash = await ghGetSha(env, newPath);
+  if (clash) throw new Error(`A file already exists at ${newPath}`);
+  await ghCommitFile(env, newPath, existing.contentBase64, message);
+  await ghDeleteFile(env, oldPath, message);
+}
+
 async function ghDeleteFile(env, path, message) {
   const sha = await ghGetSha(env, path);
   if (!sha) throw new Error(`File not found: ${path}`);
@@ -224,6 +248,14 @@ const BASE_STYLE = `
   .thumb .name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .thumb button { margin-top:4px; padding:2px 6px; font-size:10px; }
   .note { display:inline-block; background:#f1e6c8; color:#6b5a10; font-size:11px; padding:2px 8px; border-radius:10px; margin-left:8px; }
+  .naming-hint { font-size:12px; color:#8c2f39; background:#fbeef0; border:1px solid #f0d5d8; border-radius:6px; padding:8px 10px; margin:0 0 12px; }
+  .pending-list { margin-top:10px; }
+  .pending-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #f0ede6; font-size:13px; }
+  .pending-row:last-child { border-bottom:none; }
+  .pending-row .orig-name { color:#999; font-size:11px; flex-shrink:0; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pending-row input[type=text] { flex:1; padding:6px 8px; border:1px solid #ccc; border-radius:6px; font-size:13px; }
+  .pending-row .ext { color:#6b6558; font-size:12px; flex-shrink:0; }
+  .thumb .rename-btn { margin-top:4px; padding:2px 6px; font-size:10px; }
   h2.section { margin:28px 0 6px; font-size:16px; color:#8c2f39; }
   .login-box { max-width:340px; margin:80px auto; background:#fff; border-radius:10px; padding:28px; border:1px solid #e4e0d8; }
   .login-box input { width:100%; padding:10px; margin:10px 0; border:1px solid #ccc; border-radius:6px; font-size:14px; }
@@ -285,14 +317,16 @@ function folderCardHtml(f) {
   const yearInput = f.yearFolders
     ? `<input type="text" class="year-input" placeholder="Year (e.g. ${new Date().getFullYear()})" style="width:130px;padding:8px;border:1px solid #ccc;border-radius:6px;" value="${new Date().getFullYear()}">`
     : "";
-  return `<div class="card" data-folder="${f.path}">
+  return `<div class="card" data-folder="${f.path}" data-auto="${f.autoManifest ? "1" : "0"}" data-xlsx-ref="${f.xlsxRef || ""}">
     <h3>${f.label} ${f.note ? `<span class="note">${f.note}</span>` : ""}</h3>
     <p class="desc"><code>${f.path}/</code></p>
+    ${f.namingHint ? `<p class="naming-hint">${f.namingHint}</p>` : ""}
+    ${f.xlsxRef ? `<p class="naming-hint">Filenames here are referenced by <code>${f.xlsxRef}</code> — if you rename an existing file, update that row's filename too, or the site will show a broken image.</p>` : ""}
     <div class="row">
       ${yearInput}
-      <input type="file" accept="${f.accept}" multiple>
-      <button onclick="uploadToFolder(this, '${f.path}', ${!!f.yearFolders})">Upload</button>
+      <input type="file" accept="${f.accept}" multiple onchange="onFilesSelected(this, '${f.path}', ${!!f.yearFolders})">
     </div>
+    <div class="pending-list" id="pending-${cssId(f.path)}"></div>
     <div class="status"></div>
     <div class="thumbs" id="thumbs-${cssId(f.path)}">Loading current files…</div>
   </div>`;
@@ -544,23 +578,80 @@ function adminPage() {
 
   // ---- image / doc folders --------------------------------------------------
 
-  async function uploadToFolder(btn, folder, hasYear) {
-    const card = btn.closest('.card');
-    const input = card.querySelector('input[type=file]');
+  // Splits "IMG_4821 copy.jpeg" into a suggested clean base name and the
+  // original extension, so the admin edits a readable name but can't
+  // accidentally break the file type.
+  function suggestName(fileName) {
+    const dot = fileName.lastIndexOf('.');
+    const base = dot > 0 ? fileName.slice(0, dot) : fileName;
+    const ext = dot > 0 ? fileName.slice(dot) : '';
+    const cleaned = base.replace(/_+/g, ' ').replace(/\\s+/g, ' ').trim();
+    return { base: cleaned, ext: ext };
+  }
+
+  // Selecting files doesn't upload immediately — it shows one editable name
+  // field per file so the admin can standardize naming before anything is
+  // committed. This is the main defense against random screenshot/camera
+  // filenames ending up as page content (see the naming-hint text on
+  // folders like Homepage Highlights, where the filename becomes a caption).
+  function onFilesSelected(input, folder, hasYear) {
+    const card = input.closest('.card');
+    const container = document.getElementById('pending-' + folder.replace(/[^a-zA-Z0-9]/g, '-'));
+    container.innerHTML = '';
+    setStatus(card, '', true);
     const files = Array.from(input.files);
-    if (!files.length) { setStatus(card, 'Choose file(s) first.', false); return; }
+    if (!files.length) return;
+
+    const rows = [];
+    files.forEach(function(file) {
+      const suggestion = suggestName(file.name);
+      const row = document.createElement('div');
+      row.className = 'pending-row';
+
+      const orig = document.createElement('span');
+      orig.className = 'orig-name';
+      orig.title = 'Original filename: ' + file.name;
+      orig.textContent = file.name;
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.value = suggestion.base;
+
+      const extSpan = document.createElement('span');
+      extSpan.className = 'ext';
+      extSpan.textContent = suggestion.ext;
+
+      row.appendChild(orig);
+      row.appendChild(nameInput);
+      row.appendChild(extSpan);
+      container.appendChild(row);
+      rows.push({ file: file, nameInput: nameInput, ext: suggestion.ext });
+    });
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = 'Confirm names & Upload';
+    confirmBtn.style.marginTop = '8px';
+    confirmBtn.onclick = function() { confirmPendingUpload(confirmBtn, folder, hasYear, rows, card, input); };
+    container.appendChild(confirmBtn);
+  }
+
+  async function confirmPendingUpload(btn, folder, hasYear, rows, card, input) {
     let subfolder = '';
     if (hasYear) {
       const yearInput = card.querySelector('.year-input');
       subfolder = (yearInput.value || '').trim();
       if (!subfolder) { setStatus(card, 'Enter a year first.', false); return; }
     }
+    for (const row of rows) {
+      if (!row.nameInput.value.trim()) { setStatus(card, 'Give every file a name before uploading.', false); return; }
+    }
     btn.disabled = true;
-    for (const file of files) {
-      setStatus(card, 'Uploading ' + file.name + '…', true);
+    for (const row of rows) {
+      const finalName = row.nameInput.value.trim() + row.ext;
+      setStatus(card, 'Uploading ' + finalName + '…', true);
       try {
-        const contentBase64 = await fileToBase64(file);
-        const path = folder + (subfolder ? '/' + subfolder : '') + '/' + file.name;
+        const contentBase64 = await fileToBase64(row.file);
+        const path = folder + (subfolder ? '/' + subfolder : '') + '/' + finalName;
         const res = await fetch('/api/commit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -569,13 +660,14 @@ function adminPage() {
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Upload failed');
       } catch (e) {
-        setStatus(card, file.name + ': ' + e.message, false);
+        setStatus(card, finalName + ': ' + e.message, false);
         btn.disabled = false;
         return;
       }
     }
     setStatus(card, 'Uploaded. Live in a minute or two.', true);
     input.value = '';
+    document.getElementById('pending-' + folder.replace(/[^a-zA-Z0-9]/g, '-')).innerHTML = '';
     btn.disabled = false;
     loadFolder(folder);
   }
@@ -596,9 +688,42 @@ function adminPage() {
     }
   }
 
+  async function renameInFolder(oldPath, folder, warnXlsxRef) {
+    const slash = oldPath.lastIndexOf('/');
+    const dir = oldPath.slice(0, slash);
+    const fileName = oldPath.slice(slash + 1);
+    const dot = fileName.lastIndexOf('.');
+    const base = dot > 0 ? fileName.slice(0, dot) : fileName;
+    const ext = dot > 0 ? fileName.slice(dot) : '';
+    const promptMsg = warnXlsxRef
+      ? 'Rename "' + fileName + '" to (extension stays "' + ext + '"). Remember: ' + warnXlsxRef + ' references this filename — update that row too, or the site will show a broken image.'
+      : 'Rename "' + fileName + '" to (extension stays "' + ext + '"):';
+    const newBase = prompt(promptMsg, base);
+    if (newBase === null) return;
+    const trimmed = newBase.trim();
+    if (!trimmed) { alert('Name cannot be empty.'); return; }
+    const newPath = dir + '/' + trimmed + ext;
+    if (newPath === oldPath) return;
+    try {
+      const res = await fetch('/api/rename', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPath: oldPath, newPath: newPath, message: 'Admin: rename ' + oldPath + ' -> ' + newPath })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Rename failed');
+      loadFolder(folder);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
   async function loadFolder(folder) {
     const container = document.getElementById('thumbs-' + folder.replace(/[^a-zA-Z0-9]/g, '-'));
     if (!container) return;
+    const card = container.closest('.card');
+    const isAuto = card && card.dataset.auto === '1';
+    const xlsxRef = card ? card.dataset.xlsxRef : '';
     try {
       const res = await fetch('/api/list?folder=' + encodeURIComponent(folder));
       const items = await res.json();
@@ -634,6 +759,12 @@ function adminPage() {
         nameEl.title = displayName;
         nameEl.textContent = displayName;
         wrap.appendChild(nameEl);
+
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'secondary rename-btn';
+        renameBtn.textContent = 'Rename';
+        renameBtn.onclick = function() { renameInFolder(it.path, folder, isAuto ? null : xlsxRef); };
+        wrap.appendChild(renameBtn);
 
         const delBtn = document.createElement('button');
         delBtn.className = 'danger';
@@ -780,6 +911,15 @@ export default {
           const perPage = Math.min(Number(url.searchParams.get("per_page")) || 40, 100);
           const commits = await ghListCommits(env, perPage);
           return json(commits);
+        }
+
+        if (url.pathname === "/api/rename" && request.method === "POST") {
+          const body = await request.json();
+          if (!isAllowedPath(body.oldPath) || !isAllowedPath(body.newPath)) {
+            return json({ error: "Path not allowed" }, 400);
+          }
+          await ghRenameFile(env, body.oldPath, body.newPath, body.message || `Admin: rename ${body.oldPath} -> ${body.newPath}`);
+          return json({ ok: true });
         }
 
         if (url.pathname === "/api/delete" && request.method === "POST") {
