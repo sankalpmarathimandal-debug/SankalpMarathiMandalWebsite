@@ -1,0 +1,44 @@
+name: Bump CSS/JS cache-busting version
+
+# Whenever assets/css/style.css or assets/js/main.js changes, updates the
+# ?v=... query string on every *.html page's <link>/<script> tag so visitors
+# with a cached copy of the old file actually fetch the new one, instead of
+# silently keeping stale CSS/JS until their browser cache expires on its own.
+#
+# Runs scripts/bump_cache_version.py, which was already documented as doing
+# this "automatically via GitHub Actions" — this workflow is what makes that
+# true. Without it, style/JS changes can go live on GitHub Pages but be
+# invisible to returning visitors for an unpredictable amount of time.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/css/style.css'
+      - 'assets/js/main.js'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bump cache-busting version in every HTML page
+        run: python3 scripts/bump_cache_version.py
+
+      - name: Commit changes if any page's version tag changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- '*.html'; then
+            git add '*.html'
+            git commit -m "Bump CSS/JS cache-busting version [skip ci]"
+            git push
+          else
+            echo "Version tags already current — nothing to commit."
+          fi

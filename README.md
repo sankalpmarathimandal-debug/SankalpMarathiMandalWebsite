@@ -79,9 +79,9 @@ SankalpMarathiMandalWebsite/
 │   └── program-participants.xlsx  Book a Performance participants (Program, Name, Role, Order)
 │
 ├── assets/
-│   ├── css/style.css          All styling
+│   ├── css/style.css          All styling — editing this auto-bumps the `?v=` cache-busting tag on every page via `.github/workflows/bump-cache-version.yml`, so visitors don't get stuck with a stale cached copy
 │   ├── css/style-guide.html   Living style guide — open in a browser to see every color, font, button, and card style rendered for real (loads the actual style.css, always in sync)
-│   ├── js/main.js             All logic (reads the workbooks)
+│   ├── js/main.js             All logic (reads the workbooks) — same auto cache-bust as style.css applies here
 │   └── images/                Site images (branding, events, team, highlights, showcase, programs…)
 │
 ├── docs/
