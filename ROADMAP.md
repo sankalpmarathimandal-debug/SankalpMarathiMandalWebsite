@@ -23,3 +23,4 @@ Owner: whoever has access to the domain registrar (not yet identified — see RE
 - Confirm the Diwali date discrepancy (Nov 8 vs Nov 15, 2026) and correct `data/shala-calendar.xlsx` if needed.
 - `data/forms.xlsx` ships with one inactive example row — replace or delete once real forms are added.
 - `data/showcase.xlsx` ships with two inactive example rows (Event grouping + document card demo) — replace or delete once real content is added.
+- `data/programs.xlsx` / `data/program-participants.xlsx` (Book a Performance page) ship with two inactive example rows ("Geet Ramayan", "Abhangvani") — replace the placeholder description/participants, add a logo photo to `assets/images/programs/`, and set `Active` to `Yes` to publish each one.

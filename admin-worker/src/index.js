@@ -31,6 +31,8 @@ const XLSX_FILES = [
   { path: "data/shala-calendar.xlsx", label: "Shala Calendar", desc: "Shala Calendar page + download button" },
   { path: "data/forms.xlsx", label: "Forms & Sign-ups", desc: "Forms & Sign-ups page" },
   { path: "data/showcase.xlsx", label: "Showcase", desc: "Showcase page entries" },
+  { path: "data/programs.xlsx", label: "Performance Programs", desc: "Book a Performance page — the program menu" },
+  { path: "data/program-participants.xlsx", label: "Performance Participants", desc: "Book a Performance page — singers/directors/etc per program (Program column must match a Title in Performance Programs exactly)" },
 ];
 
 const SINGLE_DOCS = [
@@ -59,6 +61,7 @@ const FOLDERS = [
     namingHint: "Filename becomes the caption shown on the homepage slider. Use the format “YYYY - Title”, e.g. “2026 - Summer Picnic” — not a camera/screenshot default name.",
   },
   { path: "docs/showcase", label: "Showcase Documents (PDFs)", accept: "application/pdf", xlsxRef: "data/showcase.xlsx" },
+  { path: "assets/images/programs", label: "Performance Program Logos/Photos", accept: "image/*", xlsxRef: "data/programs.xlsx" },
 ];
 
 // Groups everything above by the actual page on the live site it affects —
@@ -72,6 +75,7 @@ const PAGES = [
   { key: "faq", label: "FAQ Page", xlsx: ["data/faq.xlsx"], folders: [] },
   { key: "forms", label: "Forms & Sign-ups", xlsx: ["data/forms.xlsx"], folders: [] },
   { key: "showcase", label: "Showcase Page", xlsx: ["data/showcase.xlsx"], folders: ["assets/images/showcase", "docs/showcase"] },
+  { key: "performances", label: "Book a Performance", xlsx: ["data/programs.xlsx", "data/program-participants.xlsx"], folders: ["assets/images/programs"] },
   { key: "constitution", label: "Constitution Page", xlsx: [], folders: [], docs: ["docs/constitution.pdf"] },
 ];
 

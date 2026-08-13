@@ -59,6 +59,7 @@ SankalpMarathiMandalWebsite/
 ├── faq.html            FAQs
 ├── showcase.html       Showcase — videos, photos & documents, event-grouped (see below)
 ├── forms.html           Forms & Sign-ups (self-service — see below)
+├── book-a-performance.html  Book a Performance — program menu + request form (see below)
 ├── constitution.html   Constitution (embedded PDF)
 │
 ├── data/               ← ALL SITE CONTENT (edit these to update the site)
@@ -73,13 +74,15 @@ SankalpMarathiMandalWebsite/
 │   ├── shala-faq.xlsx      Shala page FAQs
 │   ├── shala-calendar.xlsx Shala Calendar page (Year, Month, Day, Title, Type, Time, Notes)
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
-│   └── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
+│   ├── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
+│   ├── programs.xlsx       Book a Performance program menu (Title, Description, ImageURL, InstagramURL, Active, Order)
+│   └── program-participants.xlsx  Book a Performance participants (Program, Name, Role, Order)
 │
 ├── assets/
 │   ├── css/style.css          All styling
 │   ├── css/style-guide.html   Living style guide — open in a browser to see every color, font, button, and card style rendered for real (loads the actual style.css, always in sync)
 │   ├── js/main.js             All logic (reads the workbooks)
-│   └── images/                Site images (branding, events, team, highlights, showcase…)
+│   └── images/                Site images (branding, events, team, highlights, showcase, programs…)
 │
 ├── docs/
 │   ├── constitution.pdf        The constitution document
@@ -110,6 +113,7 @@ SankalpMarathiMandalWebsite/
 | Join Us / Become a Sponsor forms | `join.html` / `sponsor.html` — see "Setting up form delivery" below |
 | Forms & Sign-ups (event RSVPs, surveys, etc.) | `data/forms.xlsx` — no coding, see "Updating Forms & Sign-ups" below |
 | Showcase videos, photos & documents | `data/showcase.xlsx` — no coding, see "Updating the Showcase" below |
+| Book a Performance — program menu | `data/programs.xlsx` + `data/program-participants.xlsx` — no coding, see "Updating Book a Performance" below |
 | Announcement banner | marquee text in `index.html` |
 
 Keep the header row of each workbook intact, and keep images web-friendly (≤1200px, JPG preferred).
@@ -190,6 +194,28 @@ Use the `Event` column to group rows together — every row with the same `Event
 
 If there are no active rows, the page shows "Nothing to show yet."
 
+### Updating Book a Performance (no coding required)
+
+`book-a-performance.html` lists the living-room performance programs (Geet Ramayan, Abhangvani, and any future ones) as a menu of cards, with a request form below where someone picks a program, a date, and adds special instructions — submitted the same way as Join Us / Become a Sponsor (via Web3Forms, straight to your inbox).
+
+**Two workbooks drive this page:**
+
+- `data/programs.xlsx` — one row per program. Columns: `Title, Description, ImageURL, InstagramURL, Active, Order`.
+  - `ImageURL` is the program's logo/photo, saved into `assets/images/programs/` — leave blank to show a generic music icon instead.
+  - `InstagramURL` is optional — if filled in, the card shows a "View on Instagram" link.
+  - `Active` — set to `Yes` to publish, `No` to hide it (and its dropdown option) without deleting the row.
+  - `Order` — lower numbers show first.
+- `data/program-participants.xlsx` — one row per person. Columns: `Program, Name, Role, Order`.
+  - `Program` must match a `Title` in `data/programs.xlsx` **exactly** — that's how a participant lands on the right card.
+  - `Role` is free text (`Singer`, `Director`, `Harmonium`, etc.).
+  - `Order` controls the order participants are listed within their program.
+
+The site ships with two inactive example rows ("Geet Ramayan (example)" and "Abhangvani (example)") demonstrating the format — replace their placeholder text, add a logo, and set `Active` to `Yes` to publish, or delete them once real programs are added.
+
+**Adding a new program later** — just add a new row to `programs.xlsx` (and any participant rows to `program-participants.xlsx`); no code or page changes needed, it appears in the menu and the request form's dropdown automatically.
+
+**Request form fields:** Program (dropdown, auto-filled from `programs.xlsx`), Full Name, Email, Phone, Preferred Date, and Special Instructions. Clicking **"Request This Program"** on any card scrolls down and pre-selects that program in the dropdown. Submissions email the same way Join Us / Become a Sponsor do — see "Setting up form delivery" above; no separate setup needed since it reuses the same `CONFIG.WEB3FORMS_ACCESS_KEY`.
+
 ## Previewing changes
 
 Double-click **Start Local Preview.command** — it opens the site in your browser with data loading correctly. (Opening an .html file directly won't load data; browsers block that.)
@@ -225,3 +251,4 @@ cleanup items).
 - Confirm the Diwali date discrepancy noted above (Nov 8 vs Nov 15, 2026) and correct `data/shala-calendar.xlsx` if needed
 - `data/forms.xlsx` ships with one inactive example row — replace or delete once real forms are added
 - `data/showcase.xlsx` ships with two inactive example rows demonstrating Event grouping and a document card (`DocumentURL`/`ImageURL` point at placeholder files that don't exist yet) — replace or delete once real content is added
+- `data/programs.xlsx` / `data/program-participants.xlsx` (Book a Performance page) ship with two inactive example rows ("Geet Ramayan", "Abhangvani") — replace the placeholder description/participants, add a logo photo, and set `Active` to `Yes` to publish each one

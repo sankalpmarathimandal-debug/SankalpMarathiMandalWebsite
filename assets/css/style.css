@@ -1467,7 +1467,86 @@ main { flex: 1; }
 }
 
 /* =====================================================
-   FORMS (join.html + sponsor.html)
+   BOOK A PERFORMANCE PAGE (book-a-performance.html)
+   ===================================================== */
+.program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+.program-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.program-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-card-hover); }
+
+.program-media {
+  height: 200px;
+  background: var(--apple-light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.program-media img { width: 100%; height: 100%; object-fit: cover; }
+.program-media i { font-size: 48px; color: #d1d5db; }
+
+.program-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.program-title { font-size: 18px; font-weight: 700; }
+
+.program-insta-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-orange);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+.program-insta-link:hover { text-decoration: underline; }
+
+.program-desc { font-size: 14px; color: var(--apple-gray); line-height: 1.6; }
+
+.program-participants {
+  border-top: 1px solid #eee6d8;
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.program-participants-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--apple-gray);
+  margin-bottom: 6px;
+}
+.program-participants ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.program-participants li { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.program-participant-name { font-weight: 600; color: var(--apple-dark); }
+.program-participant-role { color: var(--apple-gray); }
+
+.program-request-btn {
+  width: auto;
+  align-self: flex-start;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+/* =====================================================
+   FORMS (join.html + sponsor.html + book-a-performance.html)
    ===================================================== */
 .form-page-section {
   max-width: 720px;
@@ -1505,6 +1584,7 @@ main { flex: 1; }
 .form-field input[type="text"],
 .form-field input[type="email"],
 .form-field input[type="tel"],
+.form-field input[type="date"],
 .form-field select,
 .form-field textarea {
   font-family: var(--font-family);

@@ -81,18 +81,19 @@ strong.
 
 ## What the dashboard can do
 
-- **Excel data files** — replace any of the 11 workbooks (`home-events.xlsx`,
+- **Excel data files** — replace any of the 13 workbooks (`home-events.xlsx`,
   `timeline.xlsx`, `testimonials.xlsx`, `partners.xlsx`, `team.xlsx`,
   `shala-team.xlsx`, `faq.xlsx`, `shala-faq.xlsx`, `shala-calendar.xlsx`,
-  `forms.xlsx`, `showcase.xlsx`). Upload a file with the exact same name to
-  replace it — same as the current "drag a new file into GitHub" workflow,
-  just without needing GitHub access.
+  `forms.xlsx`, `showcase.xlsx`, `programs.xlsx`, `program-participants.xlsx`).
+  Upload a file with the exact same name to replace it — same as the current
+  "drag a new file into GitHub" workflow, just without needing GitHub access.
 - **Constitution PDF** — replace `docs/constitution.pdf`.
 - **Image/PDF folders** — upload new files or delete existing ones in:
   event images, team photos, shala images, showcase photos, partner logos,
-  Community Pride Wall logos, homepage highlight photos, and showcase PDFs.
-  Event images are organized by year in the repo (`assets/images/events/2026/…`),
-  so that card has a Year field — fill it in before uploading.
+  Community Pride Wall logos, homepage highlight photos, showcase PDFs, and
+  performance program logos/photos. Event images are organized by year in
+  the repo (`assets/images/events/2026/…`), so that card has a Year field —
+  fill it in before uploading.
 - **Flyer Builder** (`🎨 Flyer Builder` link, opens in a new tab at `/flyer`) —
   a point-and-click tool for making an event flyer: click to edit the text,
   swap the background color or image, add a hero photo, up to 5 sponsor
