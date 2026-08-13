@@ -73,10 +73,11 @@ Cloudflare; otherwise add the CNAME it gives you at your registrar.
 
 Until you do this, the `workers.dev` URL from Step 5 works fine.
 
-**Note:** The site footer now links to `https://admin.sankalpmarathi.org`, so
-this custom domain step is no longer optional — complete it, or update the
-footer link on all pages to your actual `workers.dev` URL instead. Since the
-admin link is now public, make sure `ADMIN_PASSWORD` is strong.
+**Note:** The site footer currently links to
+`https://sankalp-admin.sankalpsj.workers.dev`. If you map a custom domain
+later (e.g. `admin.sankalpmarathi.org`), update the footer link on all pages
+to match. Since the admin link is now public, make sure `ADMIN_PASSWORD` is
+strong.
 
 ## What the dashboard can do
 
