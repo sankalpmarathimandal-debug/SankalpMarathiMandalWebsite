@@ -74,9 +74,10 @@ SankalpMarathiMandalWebsite/
 │   └── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
 │
 ├── assets/
-│   ├── css/style.css       All styling
-│   ├── js/main.js          All logic (reads the workbooks)
-│   └── images/             Site images (branding, events, team, highlights, showcase…)
+│   ├── css/style.css          All styling
+│   ├── css/style-guide.html   Living style guide — open in a browser to see every color, font, button, and card style rendered for real (loads the actual style.css, always in sync)
+│   ├── js/main.js             All logic (reads the workbooks)
+│   └── images/                Site images (branding, events, team, highlights, showcase…)
 │
 ├── docs/
 │   ├── constitution.pdf        The constitution document

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Style Guide — Sankalp Marathi Mandal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Loads the site's real, live stylesheet -- this page always reflects the current CSS, nothing here is hand-copied. -->
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Styling for THIS reference page only -- none of this affects the live site. */
+  .sg-page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 100px; }
+  .sg-header { text-align: center; padding: 32px 20px 40px; }
+  .sg-header h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; margin-bottom: 10px; }
+  .sg-header p { color: var(--apple-gray); max-width: 640px; margin: 0 auto; }
+  .sg-nav { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 0 20px 40px; }
+  .sg-nav a {
+    font-size: 13px; font-weight: 600; text-decoration: none; color: var(--apple-dark);
+    background: #fff; border: 1px solid #e5e0d5; padding: 6px 14px; border-radius: 980px;
+  }
+  .sg-nav a:hover { background: var(--apple-dark); color: #fff; border-color: var(--apple-dark); }
+  .sg-section { margin-bottom: 64px; scroll-margin-top: 20px; }
+  .sg-section h2 {
+    font-size: 24px; font-weight: 700; margin-bottom: 6px;
+    padding-bottom: 12px; border-bottom: 2px solid #eee;
+  }
+  .sg-section > p.sg-desc { color: var(--apple-gray); font-size: 14px; margin: 10px 0 24px; }
+  .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .sg-swatch { border-radius: 12px; overflow: hidden; border: 1px solid #eee; }
+  .sg-swatch-color { height: 80px; }
+  .sg-swatch-label { padding: 10px 12px; background: #fff; }
+  .sg-swatch-name { font-size: 13px; font-weight: 700; font-family: monospace; }
+  .sg-swatch-hex { font-size: 12px; color: var(--apple-gray); font-family: monospace; }
+  .sg-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+  .sg-type-sample { margin-bottom: 20px; }
+  .sg-type-sample .sg-meta { font-size: 12px; color: var(--apple-gray); font-family: monospace; margin-top: 6px; }
+  .sg-box-demo { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+  .sg-radius-box {
+    width: 100px; height: 100px; background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; text-align: center;
+  }
+  .sg-shadow-box {
+    width: 140px; height: 100px; background: #fff; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--apple-gray);
+  }
+  .sg-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .sg-mini-card { transform: scale(1); }
+  .sg-btn-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .sg-btn-row .cta-button { width: auto; }
+  .sg-code-label { font-size: 12px; font-family: monospace; color: var(--apple-gray); margin-top: 8px; }
+  .sg-nav-demo, .sg-footer-demo { border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+  .sg-badge-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sg-form-demo { max-width: 480px; }
+</style>
+</head>
+<body>
+<div class="sg-page">
+
+  <div class="sg-header">
+    <h1>Sankalp Website — Style Guide</h1>
+    <p>Live reference for every color, font, and reusable component defined in <code>style.css</code>. This page loads the real stylesheet, so if the CSS changes, this page updates automatically — nothing here is a copy. Open this file directly in a browser any time to check what's available before styling a new page.</p>
+  </div>
+
+  <div class="sg-nav">
+    <a href="#colors">Colors</a>
+    <a href="#typography">Typography</a>
+    <a href="#radius-shadow">Radius &amp; Shadow</a>
+    <a href="#buttons">Buttons</a>
+    <a href="#badges">Badges</a>
+    <a href="#cards">Cards</a>
+    <a href="#forms">Forms</a>
+    <a href="#nav-footer">Nav &amp; Footer</a>
+  </div>
+
+  <!-- ===================== COLORS ===================== -->
+  <section class="sg-section" id="colors">
+    <h2>Colors</h2>
+    <p class="sg-desc">Every color variable lives in <code>:root</code> at the top of style.css. Use the variable name in CSS (e.g. <code>var(--brand-gradient-start)</code>) — never hardcode a hex value that matches one of these.</p>
+    <div class="sg-swatches">
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--apple-blue)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--apple-blue</div><div class="sg-swatch-hex">#0071e3</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--apple-dark)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--apple-dark</div><div class="sg-swatch-hex">#1d1d1f</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--apple-gray)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--apple-gray</div><div class="sg-swatch-hex">#86868b</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--apple-light-gray)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--apple-light-gray</div><div class="sg-swatch-hex">#f5f5f7</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--apple-white); border-bottom:1px solid #eee"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--apple-white</div><div class="sg-swatch-hex">#fbfbfd</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--brand-gradient-start)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--brand-gradient-start</div><div class="sg-swatch-hex">#B5171D</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--brand-gradient-end)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--brand-gradient-end</div><div class="sg-swatch-hex">#56127D</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--accent-orange)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--accent-orange</div><div class="sg-swatch-hex">#E36C18</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--accent-orange-bright)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--accent-orange-bright</div><div class="sg-swatch-hex">#ff6b35</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--accent-purple)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--accent-purple</div><div class="sg-swatch-hex">#764ba2</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--ivory); border-bottom:1px solid #eee"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--ivory</div><div class="sg-swatch-hex">#FDFAF4</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--ivory-deep)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--ivory-deep</div><div class="sg-swatch-hex">#F8F2E7</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--gold)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--gold</div><div class="sg-swatch-hex">#E9BF28</div></div></div>
+      <div class="sg-swatch"><div class="sg-swatch-color" style="background:var(--saffron)"></div><div class="sg-swatch-label"><div class="sg-swatch-name">--saffron</div><div class="sg-swatch-hex">#E36C18</div></div></div>
+    </div>
+    <p class="sg-desc" style="margin-top:24px;">The <strong>saree-border</strong> gradient (used on the nav underline, footer top border, and form card accent):</p>
+    <div style="height:16px; border-radius:8px; background:var(--saree-border);"></div>
+    <div class="sg-code-label">--saree-border: linear-gradient(90deg, gold → saffron → brand-gradient-start → brand-gradient-end)</div>
+  </section>
+
+  <!-- ===================== TYPOGRAPHY ===================== -->
+  <section class="sg-section" id="typography">
+    <h2>Typography</h2>
+    <p class="sg-desc">Two font families, both loaded via Google Fonts in style.css itself — no extra link tag needed on any page.</p>
+
+    <div class="sg-type-sample">
+      <div style="font-family: var(--font-family); font-size: 40px; font-weight: 700;">Inter — the default site font</div>
+      <div class="sg-meta">--font-family · used for all body text, buttons, cards</div>
+    </div>
+    <div class="sg-type-sample">
+      <div style="font-family: var(--font-family); font-size: 17px; font-weight: 400;">Inter Regular — body copy renders at this weight by default across the site.</div>
+    </div>
+    <div class="sg-type-sample">
+      <div style="font-family: var(--font-devanagari); font-size: 32px; font-weight: 700;">संकल्प - आपलं मराठी मंडळ</div>
+      <div class="sg-meta">--font-devanagari (Tiro Devanagari Marathi) · used for the nav brand name and footer tagline</div>
+    </div>
+
+    <p class="sg-desc" style="margin-top:24px;">Reusable gradient heading styles:</p>
+    <div class="section-title" style="font-size:32px;">.section-title — gradient text</div>
+    <div class="sg-code-label">Used for "Our Events", "Community Voices", etc.</div>
+  </section>
+
+  <!-- ===================== RADIUS & SHADOW ===================== -->
+  <section class="sg-section" id="radius-shadow">
+    <h2>Radius &amp; Shadow</h2>
+    <p class="sg-desc">Two corner-radius sizes and two card shadow depths cover the entire site — don't introduce a third without a reason.</p>
+    <div class="sg-box-demo">
+      <div>
+        <div class="sg-radius-box" style="border-radius: var(--radius-lg);">radius-lg<br>20px</div>
+      </div>
+      <div>
+        <div class="sg-radius-box" style="border-radius: var(--radius-md);">radius-md<br>12px</div>
+      </div>
+      <div>
+        <div class="sg-shadow-box" style="box-shadow: var(--shadow-card);">shadow-card<br>(resting)</div>
+      </div>
+      <div>
+        <div class="sg-shadow-box" style="box-shadow: var(--shadow-card-hover);">shadow-card-hover<br>(on hover/lift)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BUTTONS ===================== -->
+  <section class="sg-section" id="buttons">
+    <h2>Buttons</h2>
+    <p class="sg-desc">Real button classes, straight from the site — hover them to see the actual transition.</p>
+    <div class="sg-btn-row">
+      <a href="#" class="cta-button cta-primary" onclick="return false;">Join Us</a>
+      <div class="sg-code-label">.cta-button.cta-primary</div>
+    </div>
+    <div class="sg-btn-row" style="margin-top:16px;">
+      <a href="#" class="cta-button cta-secondary" onclick="return false;">Become a Sponsor</a>
+      <div class="sg-code-label">.cta-button.cta-secondary</div>
+    </div>
+    <div class="sg-btn-row" style="margin-top:16px;">
+      <a href="#" class="timeline-button" onclick="return false;">View Timeline</a>
+      <div class="sg-code-label">.timeline-button</div>
+    </div>
+  </section>
+
+  <!-- ===================== BADGES ===================== -->
+  <section class="sg-section" id="badges">
+    <h2>Status Badges</h2>
+    <p class="sg-desc">Used on event cards to mark past / current / upcoming events.</p>
+    <div class="sg-badge-row">
+      <span class="event-badge badge-previous" style="position:static;">Previous</span>
+      <span class="event-badge badge-current" style="position:static;">Current</span>
+      <span class="event-badge badge-future" style="position:static;">Future</span>
+    </div>
+  </section>
+
+  <!-- ===================== CARDS ===================== -->
+  <section class="sg-section" id="cards">
+    <h2>Cards</h2>
+    <p class="sg-desc">Every card style used across the site, all built on the same radius/shadow tokens above.</p>
+    <div class="sg-card-grid">
+
+      <div>
+        <div class="testimonial-card sg-mini-card">
+          <div class="testimonial-profile">
+            <div style="width:64px;height:64px;border-radius:50%;margin-right:16px;background:linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">AK</div>
+            <div class="testimonial-name">Community Member</div>
+          </div>
+          <p class="testimonial-text">"An example testimonial quote goes here to preview line height and italics."</p>
+        </div>
+        <div class="sg-code-label">.testimonial-card</div>
+      </div>
+
+      <div>
+        <div class="team-card sg-mini-card">
+          <div class="team-avatar">SM</div>
+          <div class="team-name">Name Surname</div>
+          <div class="team-role">Committee Role</div>
+          <div class="team-bio">Short bio text preview line for a team member card.</div>
+        </div>
+        <div class="sg-code-label">.team-card</div>
+      </div>
+
+      <div>
+        <div class="info-card sg-mini-card">
+          <div class="about-icon"><i class="fas fa-star"></i></div>
+          <h4>Info Card Title</h4>
+          <p>Used on the Shala page for admissions/schedule info blocks.</p>
+        </div>
+        <div class="sg-code-label">.info-card (with .about-icon)</div>
+      </div>
+
+      <div>
+        <div class="showcase-card sg-mini-card">
+          <div class="showcase-media"><i class="fas fa-image"></i></div>
+          <div class="showcase-body">
+            <div class="showcase-title">Showcase Item</div>
+            <div class="showcase-meta">Category</div>
+            <div class="showcase-desc">Preview description text for a showcase card.</div>
+          </div>
+        </div>
+        <div class="sg-code-label">.showcase-card</div>
+      </div>
+
+      <div>
+        <div class="faq-item open sg-mini-card">
+          <div class="faq-question">Sample question? <span></span></div>
+          <div class="faq-answer" style="max-height:100px;">
+            <div class="faq-answer-inner">Sample answer text shown when a FAQ item is expanded.</div>
+          </div>
+        </div>
+        <div class="sg-code-label">.faq-item</div>
+      </div>
+
+      <div>
+        <div class="about-card sg-mini-card">
+          <div class="about-icon"><i class="fas fa-heart"></i></div>
+          <h4>About Card</h4>
+          <p>Used for Mission / Vision / Values blocks on the homepage.</p>
+        </div>
+        <div class="sg-code-label">.about-card</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== FORMS ===================== -->
+  <section class="sg-section" id="forms">
+    <h2>Form Elements</h2>
+    <p class="sg-desc">Used on Join Us and Become a Sponsor.</p>
+    <div class="form-card sg-form-demo">
+      <form class="site-form" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Name <span class="required">*</span></label>
+            <input type="text" placeholder="Your name">
+          </div>
+          <div class="form-field">
+            <label>Email <span class="required">*</span></label>
+            <input type="email" placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Message</label>
+          <textarea placeholder="Type here..."></textarea>
+        </div>
+        <div class="checkbox-group">
+          <label class="checkbox-option"><input type="checkbox"> Option A</label>
+          <label class="checkbox-option"><input type="checkbox"> Option B</label>
+        </div>
+        <button type="submit" class="cta-button cta-primary form-submit-btn">Submit</button>
+      </form>
+    </div>
+    <div class="sg-code-label">.form-card / .site-form / .form-field / .checkbox-option</div>
+  </section>
+
+  <!-- ===================== NAV & FOOTER ===================== -->
+  <section class="sg-section" id="nav-footer">
+    <h2>Navigation &amp; Footer</h2>
+    <p class="sg-desc">These appear identically at the top/bottom of every page — copy the markup exactly when adding a new page, don't recreate it by hand.</p>
+
+    <div class="sg-nav-demo">
+      <nav class="site-nav" aria-label="Main navigation demo">
+        <div class="nav-inner">
+          <a href="#" class="nav-brand" onclick="return false;">
+            <span class="nav-brand-text">संकल्प <span class="nav-brand-sub">- आपलं मराठी मंडळ</span></span>
+          </a>
+          <ul class="nav-links">
+            <li><a href="#" class="active" onclick="return false;">Home</a></li>
+            <li><a href="#" onclick="return false;">Event Timeline</a></li>
+            <li><a href="#" onclick="return false;">Our Team</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="sg-code-label" style="margin-bottom:24px;">.site-nav</div>
+
+    <div class="sg-footer-demo">
+      <footer style="margin-top:0;">
+        <div class="footer-inner">
+          <p class="footer-tagline">एक संकल्प मराठी जपण्याचा</p>
+          <nav class="footer-nav" aria-label="Footer navigation demo">
+            <a href="#" onclick="return false;">Home</a>
+            <a href="#" onclick="return false;">Forms</a>
+            <a href="#" onclick="return false;">Admin</a>
+          </nav>
+          <p class="footer-copyright">Copyright © 2026 Sankalp - All Rights Reserved.</p>
+        </div>
+      </footer>
+    </div>
+    <div class="sg-code-label">footer / .footer-nav / .footer-social</div>
+  </section>
+
+</div>
+</body>
+</html>
