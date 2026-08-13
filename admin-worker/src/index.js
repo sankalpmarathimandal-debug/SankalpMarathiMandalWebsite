@@ -328,6 +328,10 @@ function folderCardHtml(f) {
     </div>
     <div class="pending-list" id="pending-${cssId(f.path)}"></div>
     <div class="status"></div>
+    <div class="row" style="margin-top:14px;">
+      <strong style="font-size:12px;color:#6b6558;">Current files</strong>
+      <button class="secondary" style="margin-left:auto;font-size:11px;padding:4px 10px;" onclick="loadFolder('${f.path}')">Refresh list</button>
+    </div>
     <div class="thumbs" id="thumbs-${cssId(f.path)}">Loading current files…</div>
   </div>`;
 }
@@ -628,11 +632,25 @@ function adminPage() {
       rows.push({ file: file, nameInput: nameInput, ext: suggestion.ext });
     });
 
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;margin-top:8px;';
+
     const confirmBtn = document.createElement('button');
     confirmBtn.textContent = 'Confirm names & Upload';
-    confirmBtn.style.marginTop = '8px';
     confirmBtn.onclick = function() { confirmPendingUpload(confirmBtn, folder, hasYear, rows, card, input); };
-    container.appendChild(confirmBtn);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'secondary';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.onclick = function() {
+      container.innerHTML = '';
+      input.value = '';
+      setStatus(card, '', true);
+    };
+
+    btnRow.appendChild(confirmBtn);
+    btnRow.appendChild(cancelBtn);
+    container.appendChild(btnRow);
   }
 
   async function confirmPendingUpload(btn, folder, hasYear, rows, card, input) {
@@ -669,7 +687,7 @@ function adminPage() {
     input.value = '';
     document.getElementById('pending-' + folder.replace(/[^a-zA-Z0-9]/g, '-')).innerHTML = '';
     btn.disabled = false;
-    loadFolder(folder);
+    reloadFolderSoon(folder);
   }
 
   async function deleteFromFolder(path, folder) {
@@ -682,7 +700,7 @@ function adminPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Delete failed');
-      loadFolder(folder);
+      reloadFolderSoon(folder);
     } catch (e) {
       alert(e.message);
     }
@@ -712,10 +730,18 @@ function adminPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Rename failed');
-      loadFolder(folder);
+      reloadFolderSoon(folder);
     } catch (e) {
       alert(e.message);
     }
+  }
+
+  // GitHub's list-directory API can briefly lag right after a commit, so a
+  // single immediate reload sometimes still shows the old state. Reload now
+  // and again shortly after — on top of the manual "Refresh list" button.
+  function reloadFolderSoon(folder) {
+    loadFolder(folder);
+    setTimeout(function() { loadFolder(folder); }, 1800);
   }
 
   async function loadFolder(folder) {
