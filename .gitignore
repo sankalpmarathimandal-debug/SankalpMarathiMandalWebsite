@@ -1,0 +1,12 @@
+# Dependencies (regenerate with `npm install` inside admin-worker/)
+node_modules/
+
+# Cloudflare Wrangler local state
+.wrangler/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
