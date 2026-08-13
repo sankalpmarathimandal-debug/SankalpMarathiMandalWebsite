@@ -1672,8 +1672,67 @@ function adminPage() {
     }
   }
 
+  // ---- homepage announcement marquee ---------------------------------------
+
+  function utf8ToBase64(str) {
+    return arrayBufferToBase64(new TextEncoder().encode(str).buffer);
+  }
+
+  function base64ToUtf8(b64) {
+    return new TextDecoder('utf-8').decode(base64ToArrayBuffer(b64));
+  }
+
+  async function loadMarquee() {
+    const statusEl = document.getElementById('marquee-status');
+    try {
+      const res = await fetch('/api/file?path=' + encodeURIComponent('data/marquee.json'));
+      if (res.status === 404) return; // never saved yet — leave the form at its defaults
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load');
+      const cfg = JSON.parse(base64ToUtf8(data.contentBase64) || '{}');
+      document.getElementById('marquee-active').checked = !!cfg.active;
+      document.getElementById('marquee-text').value = cfg.text || '';
+      document.getElementById('marquee-link').value = cfg.link || '';
+    } catch (e) {
+      if (statusEl) { statusEl.textContent = 'Could not load current banner: ' + e.message; statusEl.className = 'status err'; }
+    }
+  }
+
+  async function saveMarquee(btn) {
+    const statusEl = document.getElementById('marquee-status');
+    const active = document.getElementById('marquee-active').checked;
+    const text = document.getElementById('marquee-text').value.trim();
+    const link = document.getElementById('marquee-link').value.trim();
+    if (active && !text) {
+      statusEl.textContent = 'Add announcement text before turning the banner on.';
+      statusEl.className = 'status err';
+      return;
+    }
+    btn.disabled = true;
+    statusEl.textContent = 'Saving…';
+    statusEl.className = 'status ok';
+    try {
+      const payload = JSON.stringify({ active: active, text: text, link: link }, null, 2);
+      const res = await fetch('/api/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: 'data/marquee.json', contentBase64: utf8ToBase64(payload), message: 'Admin: update homepage marquee' })
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Save failed');
+      statusEl.textContent = 'Saved. Live on the homepage in a minute or two.';
+      statusEl.className = 'status ok';
+    } catch (e) {
+      statusEl.textContent = e.message;
+      statusEl.className = 'status err';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   JSON.parse('${allFolderPaths}').forEach(loadFolder);
   loadLogs();
+  loadMarquee();
   </script>
   </body></html>`;
 }

@@ -61,16 +61,9 @@
   </div>
 </nav>
 
-<!-- MARQUEE BANNER -->
-<div class="marquee-banner" role="marquee" aria-label="Announcements" onclick="window.location.href='shala.html'">
-  <div class="marquee-track">
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-    <span class="marquee-item">Marathi Shala Admissions open now</span><span class="marquee-dot"></span>
-  </div>
+<!-- MARQUEE BANNER — populated from data/marquee.json by main.js; hidden entirely when inactive or absent -->
+<div class="marquee-banner" id="marquee-banner" role="marquee" aria-label="Announcements" style="display:none;">
+  <div class="marquee-track" id="marquee-track"></div>
 </div>
 
 <main>

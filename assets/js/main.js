@@ -58,6 +58,7 @@ const CONFIG = {
   TESTIMONIALS_CSV: 'data/testimonials.xlsx',
   HIGHLIGHTS_JSON: 'data/highlights.json',
   LOGO_VARIANTS_JSON: 'data/logo-variants.json',
+  MARQUEE_JSON: 'data/marquee.json',
   PARTNERS_CSV: 'data/partners.xlsx',
   TEAM_CSV: 'data/team.xlsx',
   SHALA_TEAM_CSV: 'data/shala-team.xlsx',
@@ -96,6 +97,41 @@ function initNav() {
   document.querySelectorAll('.nav-links a').forEach(a => {
     if (a.getAttribute('href') === here) a.classList.add('active');
   });
+}
+
+/* =====================================================
+   ANNOUNCEMENT MARQUEE — homepage only, controlled from the admin panel
+   (data/marquee.json: { active, text, link }). Hidden by default in the
+   HTML; only shown here if active is true and text is non-empty, so an
+   admin can flip it off between announcements with zero code changes.
+   ===================================================== */
+function initMarquee() {
+  const banner = document.getElementById('marquee-banner');
+  const track = document.getElementById('marquee-track');
+  if (!banner || !track) return; // only present on index.html
+
+  fetch(CONFIG.MARQUEE_JSON)
+    .then(res => res.ok ? res.json() : null)
+    .then(cfg => {
+      if (!cfg || !cfg.active || !cfg.text) return; // stays hidden (default state)
+      track.innerHTML = '';
+      // Repeated so the CSS marquee animation (translateX -50%) loops seamlessly.
+      for (let i = 0; i < 6; i++) {
+        const span = document.createElement('span');
+        span.className = 'marquee-item';
+        span.textContent = cfg.text;
+        track.appendChild(span);
+        const dot = document.createElement('span');
+        dot.className = 'marquee-dot';
+        track.appendChild(dot);
+      }
+      if (cfg.link) {
+        banner.style.cursor = 'pointer';
+        banner.addEventListener('click', () => { window.location.href = cfg.link; });
+      }
+      banner.style.display = '';
+    })
+    .catch(() => { /* no marquee.json yet, or a network hiccup — stays hidden */ });
 }
 
 /* =====================================================
@@ -1050,6 +1086,7 @@ function initFaqAccordion(scope) {
    ===================================================== */
 document.addEventListener('DOMContentLoaded', function() {
   initNav();
+  initMarquee();
   initBackToTop();
   initReveal();
   fileProtocolNotice();

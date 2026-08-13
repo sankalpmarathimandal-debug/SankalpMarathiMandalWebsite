@@ -114,7 +114,7 @@ SankalpMarathiMandalWebsite/
 | Forms & Sign-ups (event RSVPs, surveys, etc.) | `data/forms.xlsx` — no coding, see "Updating Forms & Sign-ups" below |
 | Showcase videos, photos & documents | `data/showcase.xlsx` — no coding, see "Updating the Showcase" below |
 | Book a Performance — program menu | `data/programs.xlsx` + `data/program-participants.xlsx` — no coding, see "Updating Book a Performance" below |
-| Announcement banner | marquee text in `index.html` |
+| Announcement banner | `data/marquee.json` — or the "Announcement Marquee" card on the Home Page tab in the admin panel (no coding) |
 
 Keep the header row of each workbook intact, and keep images web-friendly (≤1200px, JPG preferred).
 
@@ -137,11 +137,27 @@ The calendar is loaded from the 2026-2027 detailed schedule (weekly online class
 
 The homepage shows a "Community Pride Wall" section (right before About Us) — two rows of community-made logo art flowing across the screen in opposite directions. It's fully automatic: the site reads whatever image files are sitting in `assets/images/branding/logo-variants/`, no spreadsheet or code edit involved.
 
-**To add a new one:** drop the image file into `assets/images/branding/logo-variants/` (any filename works — no renaming needed) and push, or upload it via GitHub's website (**Add file → Upload files** on that folder, **Commit changes**). A GitHub Action (`.github/workflows/update-logo-variants.yml`) automatically regenerates `data/logo-variants.json` within about a minute of the push, and the homepage picks it up on the next page load — nothing else to touch.
+**To add a new one:** drop the image file into `assets/images/branding/logo-variants/` (any filename works — no renaming needed) and push, or upload it via GitHub's website (**Add file → Upload files** on that folder, **Commit changes**). A GitHub Action (`.github/workflows/update-manifests.yml`) automatically regenerates `data/logo-variants.json` within about a minute of the push, and the homepage picks it up on the next page load — nothing else to touch.
 
 **To remove one:** delete the image file from that folder the same way; the manifest updates automatically.
 
 Naming convention for the current set: `variant-01.png` through `variant-19.png`, standardized from the original `Sankalp_Logo` folder. New uploads don't need to follow this pattern — any image filename is picked up automatically — but keeping the `variant-NN` style is a nice-to-have for tidiness if you're adding several at once.
+
+### Updating the Announcement Marquee (homepage, no coding required)
+
+The scrolling banner just under the homepage navigation (e.g. "Marathi Shala Admissions open now") is meant for occasional announcements, not a permanent fixture — it's driven entirely by `data/marquee.json` and defaults to **hidden** when that file is missing or turned off, not blank/empty.
+
+**Easiest way:** open the admin panel, go to the **Home Page** tab, and use the "Announcement Marquee" card at the top — a checkbox to show/hide it, a text field for the announcement, and an optional link (e.g. `shala.html`) for what page it opens when clicked. Click Save; it's live in a minute or two.
+
+**Manually:** `data/marquee.json` looks like:
+```json
+{
+  "active": true,
+  "text": "Marathi Shala Admissions open now",
+  "link": "shala.html"
+}
+```
+Set `active` to `false` to hide the banner entirely without losing the saved text (handy for turning it back on later with one click). `link` can be left as an empty string if the banner shouldn't be clickable.
 
 ### Setting up form delivery (Join Us / Become a Sponsor)
 
