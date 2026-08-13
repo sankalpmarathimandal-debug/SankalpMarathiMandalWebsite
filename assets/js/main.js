@@ -33,12 +33,20 @@
                                  — Aarti & Documents" vs "Ganpati 2026 — Competition") —
                                  leave Event blank for the default ungrouped section.
                                  Ordered by priority within and across groups.
+     data/programs.xlsx       → Book a Performance page — the program menu
+                                 (Title, Description, ImageURL, InstagramURL,
+                                 Active, Order). Logo/photo images live in
+                                 assets/images/programs/.
+     data/program-participants.xlsx → Participants for each program (Program,
+                                 Name, Role, Order). "Program" must match a
+                                 Title in data/programs.xlsx exactly — rows are
+                                 grouped onto that program's card.
 
    Images live in assets/images/. Add new images there
    and reference them by relative path in the workbooks.
 
-   join.html / sponsor.html use native <form> submissions sent
-   to Web3Forms (no Google Forms, no backend). Set
+   join.html / sponsor.html / book-a-performance.html use native <form>
+   submissions sent to Web3Forms (no Google Forms, no backend). Set
    CONFIG.WEB3FORMS_ACCESS_KEY below with a free key from
    https://web3forms.com for submissions to be delivered.
    ===================================================== */
@@ -57,6 +65,8 @@ const CONFIG = {
   SHALA_CALENDAR_CSV: 'data/shala-calendar.xlsx',
   FORMS_CSV: 'data/forms.xlsx',
   SHOWCASE_CSV: 'data/showcase.xlsx',
+  PROGRAMS_CSV: 'data/programs.xlsx',
+  PROGRAM_PARTICIPANTS_CSV: 'data/program-participants.xlsx',
 
   SLIDER_INTERVAL: 4000,
 
@@ -655,6 +665,82 @@ function closeShowcaseImage() {
 }
 
 /* =====================================================
+   BOOK A PERFORMANCE (book-a-performance.html)
+   Program menu (data/programs.xlsx) + participants
+   (data/program-participants.xlsx, grouped by matching
+   "Program" == programs.xlsx "Title") + a Web3Forms request
+   form ("Request This Program" pre-selects the dropdown and
+   scrolls down to it).
+   ===================================================== */
+function programCardHtml(p, participants) {
+  const media = p.ImageURL && p.ImageURL.trim()
+    ? `<img src="${p.ImageURL}" alt="${escapeHtml(p.Title)}" loading="lazy">`
+    : `<i class="fas fa-music"></i>`;
+  const safeTitle = String(p.Title || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+  return `
+    <div class="program-card">
+      <div class="program-media">${media}</div>
+      <div class="program-body">
+        <div class="program-title">${escapeHtml(p.Title)}</div>
+        ${p.InstagramURL && p.InstagramURL.trim() ? `<a class="program-insta-link" href="${p.InstagramURL}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> View on Instagram</a>` : ''}
+        ${p.Description ? `<p class="program-desc">${escapeHtml(p.Description)}</p>` : ''}
+        ${participants.length ? `
+        <div class="program-participants">
+          <div class="program-participants-label">Participants</div>
+          <ul>
+            ${participants.map(pr => `<li><span class="program-participant-name">${escapeHtml(pr.Name)}</span>${pr.Role ? `<span class="program-participant-role">${escapeHtml(pr.Role)}</span>` : ''}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+        <button type="button" class="cta-button cta-secondary program-request-btn" onclick="selectProgramForRequest('${safeTitle}')">Request This Program</button>
+      </div>
+    </div>`;
+}
+
+function selectProgramForRequest(title) {
+  const select = document.getElementById('programSelect');
+  if (select) select.value = title;
+  document.getElementById('performance-request-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderPrograms() {
+  const grid = document.getElementById('program-grid');
+  const select = document.getElementById('programSelect');
+  if (!grid && !select) return;
+
+  loadSheet(CONFIG.PROGRAMS_CSV, programs => {
+      const active = programs
+        .filter(p => p.Title && p.Title.trim())
+        .filter(p => !p.Active || p.Active.toLowerCase() !== 'no')
+        .sort((a, b) => parseInt(a.Order || 0) - parseInt(b.Order || 0));
+
+      if (select) {
+        select.innerHTML = '<option value="" disabled selected>Choose a program…</option>'
+          + active.map(p => `<option value="${escapeHtml(p.Title)}">${escapeHtml(p.Title)}</option>`).join('');
+      }
+
+      if (!grid) return;
+
+      if (!active.length) {
+        grid.innerHTML = `<p style="text-align:center;color:var(--apple-gray);padding:40px 24px;">No programs are listed yet — check back soon!</p>`;
+        return;
+      }
+
+      const buildGrid = participantRows => {
+        const byProgram = title => participantRows
+          .filter(pr => pr.Name && pr.Name.trim() && pr.Program === title)
+          .sort((a, b) => parseInt(a.Order || 0) - parseInt(b.Order || 0));
+        grid.innerHTML = `<div class="program-grid">${active.map(p => programCardHtml(p, byProgram(p.Title))).join('')}</div>`;
+      };
+
+      loadSheet(CONFIG.PROGRAM_PARTICIPANTS_CSV, buildGrid, () => buildGrid([]));
+  }, () => {
+      if (grid) grid.innerHTML = `<p style="text-align:center;color:var(--apple-gray);padding:40px 24px;">Programs could not be loaded right now.</p>`;
+      if (select) select.innerHTML = '<option value="" disabled selected>Could not load programs</option>';
+  });
+}
+
+/* =====================================================
    SHALA CALENDAR (calendar.html)
    ===================================================== */
 const CALENDAR_TYPE_COLORS = {
@@ -969,8 +1055,10 @@ document.addEventListener('DOMContentLoaded', function() {
   renderShowcase();
   loadShalaCalendar();
   renderForms();
+  renderPrograms();
   initWeb3Form('joinForm');
   initWeb3Form('sponsorForm');
+  initWeb3Form('performanceRequestForm');
 
   const modal = document.getElementById('modal');
   modal?.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
