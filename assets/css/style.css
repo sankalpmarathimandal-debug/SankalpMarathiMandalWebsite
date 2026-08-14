@@ -347,11 +347,12 @@ main { flex: 1; }
 .hero2-ctas .cta-button { width: auto; padding: 12px 24px; font-size: 14.5px; }
 
 .hero2-trust {
-  display: flex; gap: 18px; flex-wrap: wrap;
+  display: flex; flex-direction: column; gap: 10px;
   font-family: var(--font-family); font-size: 12.5px; color: var(--apple-gray);
 }
-.hero2-trust span { display: flex; align-items: center; gap: 6px; }
-.hero2-trust i { color: var(--accent-orange); font-size: 13px; }
+.hero2-trust span { display: flex; align-items: flex-start; gap: 8px; }
+.hero2-trust i { color: var(--accent-orange); font-size: 13px; margin-top: 2px; }
+.hero2-trust b { color: var(--apple-dark); }
 
 @keyframes heroFadeUp {
   from { opacity: 0; transform: translateY(28px); }
@@ -778,30 +779,44 @@ main { flex: 1; }
 .popup img    { max-width: 90%; max-height: 90%; border-radius: 10px; }
 
 /* =====================================================
-   PARTNERS
+   COMMUNITY VOICES + IMPACT STORIES (homepage, combined band)
+   Two former full-width sections shown side by side in one band —
+   still reads from the same data/testimonials.xlsx and
+   data/highlights.json, only the layout changed.
    ===================================================== */
-.partners-section { padding: 60px 20px; background: var(--ivory-deep); overflow: hidden; }
-.partners-container { max-width: 1200px; margin: 0 auto; }
-
-.logos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
-
-.logo-item {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+.community-combined {
+  max-width: 1200px; margin: 0 auto; padding: 8px 20px 60px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+}
+@media (max-width: 860px) {
+  .community-combined { grid-template-columns: 1fr; }
 }
 
-.logo-item:hover { transform: translateY(-6px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
-.logo-item-image { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; }
-.logo-item-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.logo-item-name { font-size: 15px; font-weight: 600; text-align: center; }
+/* =====================================================
+   PARTNERS — a slim, muted logo strip (secondary info for a
+   first-time visitor) instead of a full heading + card grid.
+   ===================================================== */
+.partners-slim {
+  max-width: 1100px; margin: 0 auto; padding: 32px 20px 40px;
+  text-align: center;
+}
+.partners-slim-label {
+  display: block; font-family: var(--font-family); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--apple-gray);
+  margin-bottom: 18px;
+}
+.logos-grid {
+  display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;
+}
+.logo-item {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 0.6; filter: grayscale(1);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+.logo-item:hover { opacity: 1; filter: grayscale(0); }
+.logo-item-image { height: 32px; display: flex; align-items: center; justify-content: center; }
+.logo-item-image img { max-height: 100%; max-width: 140px; object-fit: contain; }
+.logo-item-name { font-size: 11.5px; font-weight: 600; color: var(--apple-dark); }
 
 /* =====================================================
    CULTURE ICON RIBBON (homepage, right after the hero)
@@ -1888,9 +1903,8 @@ footer {
   .event-image      { height: 200px; }
   .event-name       { font-size: 18px; }
   .slider-wrapper   { height: 400px; }
-  .about-cards-wrapper { grid-template-columns: 1fr; }
-  .logos-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
-  .logo-item-image { height: 90px; }
+  .logos-grid { gap: 24px; }
+  .logo-item-image { height: 26px; }
 }
 
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
