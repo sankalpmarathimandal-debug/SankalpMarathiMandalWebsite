@@ -202,7 +202,13 @@ main { flex: 1; }
 }
 
 .marquee-track { display: inline-block; animation: marquee 22s linear infinite; }
-.marquee-track:hover { animation-play-state: paused; }
+/* Pause-on-hover only for devices with a real mouse — on touch devices,
+   :hover can get "stuck" after a tap (no mouse-leave event ever fires),
+   which would otherwise freeze the animation permanently until the user
+   taps somewhere else. */
+@media (hover: hover) and (pointer: fine) {
+  .marquee-track:hover { animation-play-state: paused; }
+}
 
 @keyframes marquee {
   0%   { transform: translateX(0); }
@@ -834,7 +840,9 @@ main { flex: 1; }
   animation: icon-strip-scroll 50s linear infinite;
 }
 
-.icon-strip-row:hover .icon-strip-track { animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) {
+  .icon-strip-row:hover .icon-strip-track { animation-play-state: paused; }
+}
 
 @keyframes icon-strip-scroll {
   from { transform: translateX(0); }
@@ -887,7 +895,9 @@ main { flex: 1; }
 }
 
 .pride-row.reverse .pride-track { animation-name: pride-scroll-right; }
-.pride-row:hover .pride-track { animation-play-state: paused; }
+@media (hover: hover) and (pointer: fine) {
+  .pride-row:hover .pride-track { animation-play-state: paused; }
+}
 
 @keyframes pride-scroll-left {
   from { transform: translateX(0); }
