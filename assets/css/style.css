@@ -1211,7 +1211,30 @@ main { flex: 1; }
 .showcase-media img { width: 100%; height: 100%; object-fit: cover; }
 .showcase-media i { font-size: 48px; color: #d1d5db; }
 
+/* Distinct box treatment per media type — dark tile for video, plain for
+   photo, light icon tile for documents. Type is auto-detected in main.js
+   from which URL column is filled; no new spreadsheet column needed. */
+.showcase-card.type-video .showcase-media { background: #1d1d1f; }
+.showcase-card.type-video .showcase-media img { opacity: 0.82; }
+
 .showcase-body { padding: 20px 24px 24px; }
+
+.showcase-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 980px;
+  background: rgba(227,108,24,0.1);
+  color: var(--accent-orange);
+  margin-bottom: 10px;
+}
+.showcase-type-badge i { font-size: 10px; }
+
 .showcase-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
 .showcase-meta  { font-size: 13px; color: var(--accent-orange); font-weight: 600; margin-bottom: 10px; }
 .showcase-desc  { font-size: 14px; color: var(--apple-gray); line-height: 1.6; }

@@ -607,6 +607,14 @@ function extractYouTubeId(url) {
   return m ? m[1] : null;
 }
 
+// Media type is derived automatically from which URL column is filled in
+// data/showcase.xlsx — no separate "Type" column to keep in sync.
+function showcaseType(v) {
+  if (extractYouTubeId(v.YouTubeURL)) return { key: 'video', label: 'Video', icon: 'fa-play' };
+  if (v.ImageURL && v.ImageURL.trim()) return { key: 'photo', label: 'Photo', icon: 'fa-image' };
+  return { key: 'doc', label: 'Document', icon: 'fa-file-lines' };
+}
+
 function showcaseMediaHtml(v) {
   const videoId = extractYouTubeId(v.YouTubeURL);
   if (videoId) {
@@ -631,10 +639,12 @@ function showcaseMediaHtml(v) {
 }
 
 function showcaseCardHtml(v) {
+  const t = showcaseType(v);
   return `
-    <div class="showcase-card">
+    <div class="showcase-card type-${t.key}">
       ${showcaseMediaHtml(v)}
       <div class="showcase-body">
+        <span class="showcase-type-badge"><i class="fas ${t.icon}"></i>${t.label}</span>
         ${v.Category ? `<div class="showcase-meta">${escapeHtml(v.Category)}</div>` : ''}
         <div class="showcase-title">${escapeHtml(v.Title)}</div>
         ${v.Description ? `<p class="showcase-desc">${escapeHtml(v.Description)}</p>` : ''}
