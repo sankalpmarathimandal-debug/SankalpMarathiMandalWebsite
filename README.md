@@ -32,15 +32,16 @@ As of this writing, `www.sankalpmarathi.org` serves the **old Google Sites site*
 
 Until all four are done, any updates made in this repo (new events, admin uploads, etc.) are invisible to anyone visiting sankalpmarathi.org — they're still seeing the old site. See "Custom domain" below for the exact steps once you're ready to cut over.
 
-### The "automatic" GitHub Action for highlights / Community Pride Wall
+### The "automatic" GitHub Action for highlights / Community Pride Wall / culture icon ribbon
 
-`data/logo-variants.json` (Community Pride Wall) and `data/highlights.json` (homepage slider) are regenerated automatically by `.github/workflows/update-manifests.yml` whenever a file is added, renamed, or removed in `assets/images/highlights/` or `assets/images/branding/logo-variants/` — including uploads through the admin panel, since those are real commits to those folders. The workflow runs the same two scripts below and pushes the result back within about a minute.
+`data/logo-variants.json` (Community Pride Wall), `data/highlights.json` (homepage slider), and `data/culture-icons.json` (homepage culture icon ribbon, right below the hero) are regenerated automatically by `.github/workflows/update-manifests.yml` whenever a file is added, renamed, or removed in `assets/images/highlights/`, `assets/images/branding/logo-variants/`, or `assets/images/culture-icons/` — including uploads through the admin panel, since those are real commits to those folders. The workflow runs the same three scripts below and pushes the result back within about a minute.
 
-**Note for context:** this workflow was missing for a while (the two scripts existed and were documented as "automatic" but nothing actually ran them) — if a photo you uploaded to either folder still isn't showing up after a couple minutes, check the **Actions** tab on GitHub to confirm the workflow ran and didn't fail, or regenerate by hand as a fallback:
+**Note for context:** this workflow was missing for a while (the scripts existed and were documented as "automatic" but nothing actually ran them) — if a photo you uploaded to any of these folders still isn't showing up after a couple minutes, check the **Actions** tab on GitHub to confirm the workflow ran and didn't fail, or regenerate by hand as a fallback:
 
 ```
 python3 scripts/generate_logo_variants.py
 python3 scripts/generate_highlights.py
+python3 scripts/generate_culture_icons.py
 ```
 
 then commit the updated JSON files. (`Start Local Preview.command` already runs `generate_highlights.py` automatically for local preview — that's unrelated to the live site and unaffected by any of this.)
@@ -67,6 +68,7 @@ SankalpMarathiMandalWebsite/
 │   ├── timeline.xlsx       Events page timeline
 │   ├── testimonials.xlsx   Homepage "Community Voices"
 │   ├── highlights.json     Homepage slider (auto-generated — don't edit)
+│   ├── culture-icons.json  Homepage culture icon ribbon (auto-generated — don't edit)
 │   ├── partners.xlsx       Homepage partner logos
 │   ├── team.xlsx           Team page members
 │   ├── shala-team.xlsx     Shala page team
