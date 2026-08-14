@@ -106,6 +106,7 @@ SankalpMarathiMandalWebsite/
 | Testimonials | `data/testimonials.xlsx` |
 | Highlight photos | just add/remove photos in `assets/images/highlights/` and push — updates automatically |
 | Community Pride Wall (homepage) | just add/remove image files in `assets/images/branding/logo-variants/` and push — updates automatically, see "Updating the Community Pride Wall" below |
+| Culture icon ribbon (homepage, below the hero) | just add/remove image files in `assets/images/culture-icons/` and push — updates automatically, no captions shown |
 | Partner logos | `data/partners.xlsx` + logo in `assets/images/partners/` |
 | Team members | `data/team.xlsx` + photo in `assets/images/team/` |
 | Shala team / FAQs | `data/shala-team.xlsx` / `data/shala-faq.xlsx` |
