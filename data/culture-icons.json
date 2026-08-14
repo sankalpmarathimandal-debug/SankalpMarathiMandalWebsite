@@ -1,8 +1,5 @@
 [
   {
-    "src": "assets/images/culture-icons/01_crescent_ornament.png"
-  },
-  {
     "src": "assets/images/culture-icons/02_diya.png"
   },
   {
@@ -42,16 +39,10 @@
     "src": "assets/images/culture-icons/14_shivaji_on_horseback.png"
   },
   {
-    "src": "assets/images/culture-icons/15_male_folk_dancer.png"
-  },
-  {
     "src": "assets/images/culture-icons/16_female_folk_dancer.png"
   },
   {
     "src": "assets/images/culture-icons/17_namaste.png"
-  },
-  {
-    "src": "assets/images/culture-icons/18_lotus_flower.png"
   },
   {
     "src": "assets/images/culture-icons/19_paduka.png"
@@ -64,9 +55,6 @@
   },
   {
     "src": "assets/images/culture-icons/22_rangoli_design.png"
-  },
-  {
-    "src": "assets/images/culture-icons/23_jai_maharashtra_text.png"
   },
   {
     "src": "assets/images/culture-icons/24_om_symbol.png"
