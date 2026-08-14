@@ -60,6 +60,14 @@ const FOLDERS = [
     autoManifest: true,
   },
   {
+    path: "assets/images/culture-icons",
+    label: "Homepage Culture Icon Ribbon",
+    accept: "image/*",
+    note: "Auto-updates homepage — no xlsx edit needed",
+    autoManifest: true,
+    namingHint: "No captions are shown for these — file names are just for your own organization, upload/delete freely.",
+  },
+  {
     path: "assets/images/highlights",
     label: "Homepage Highlight Photos",
     accept: "image/*",
@@ -74,7 +82,7 @@ const FOLDERS = [
 // Groups everything above by the actual page on the live site it affects —
 // this drives the "which page do you want to change?" selector.
 const PAGES = [
-  { key: "home", label: "Home Page", xlsx: ["data/home-events.xlsx", "data/testimonials.xlsx", "data/partners.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/partners"] },
+  { key: "home", label: "Home Page", xlsx: ["data/home-events.xlsx", "data/testimonials.xlsx", "data/partners.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
   { key: "events", label: "Events Page", xlsx: ["data/timeline.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
   { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx"], folders: ["assets/images/shala"] },

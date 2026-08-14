@@ -1,12 +1,12 @@
 name: Update auto-generated manifests
 
-# Regenerates data/highlights.json and data/logo-variants.json whenever
-# images are added, renamed, or removed in the two folders that are
-# documented (README.md) as "fully automatic" — the homepage highlight
-# slider and the Community Pride Wall. Without this workflow, uploading a
-# photo to either folder (including via the admin panel) does nothing
-# until someone manually runs the matching script in scripts/ and commits
-# the result.
+# Regenerates data/highlights.json, data/logo-variants.json, and
+# data/culture-icons.json whenever images are added, renamed, or removed in
+# the three folders that are documented (README.md) as "fully automatic" —
+# the homepage highlight slider, the Community Pride Wall, and the homepage
+# culture icon ribbon. Without this workflow, uploading a photo to any of
+# these folders (including via the admin panel) does nothing until someone
+# manually runs the matching script in scripts/ and commits the result.
 
 on:
   push:
@@ -14,6 +14,7 @@ on:
     paths:
       - 'assets/images/highlights/**'
       - 'assets/images/branding/logo-variants/**'
+      - 'assets/images/culture-icons/**'
   workflow_dispatch: {}
 
 permissions:
@@ -32,14 +33,15 @@ jobs:
         run: |
           python3 scripts/generate_highlights.py
           python3 scripts/generate_logo_variants.py
+          python3 scripts/generate_culture_icons.py
 
       - name: Commit changes if the manifests differ
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet -- data/highlights.json data/logo-variants.json; then
-            git add data/highlights.json data/logo-variants.json
-            git commit -m "Auto-update highlights/logo-variants manifest [skip ci]"
+          if ! git diff --quiet -- data/highlights.json data/logo-variants.json data/culture-icons.json; then
+            git add data/highlights.json data/logo-variants.json data/culture-icons.json
+            git commit -m "Auto-update highlights/logo-variants/culture-icons manifest [skip ci]"
             git push
           else
             echo "Manifests already up to date — nothing to commit."

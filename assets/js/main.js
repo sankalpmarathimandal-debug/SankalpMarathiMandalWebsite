@@ -58,6 +58,7 @@ const CONFIG = {
   TESTIMONIALS_CSV: 'data/testimonials.xlsx',
   HIGHLIGHTS_JSON: 'data/highlights.json',
   LOGO_VARIANTS_JSON: 'data/logo-variants.json',
+  CULTURE_ICONS_JSON: 'data/culture-icons.json',
   MARQUEE_JSON: 'data/marquee.json',
   PARTNERS_CSV: 'data/partners.xlsx',
   TEAM_CSV: 'data/team.xlsx',
@@ -455,6 +456,31 @@ function loadImpactSlider() {
       startAutoSlide();
     })
     .catch(err => console.error('Failed to load highlights', err));
+}
+
+/* =====================================================
+   CULTURE ICON RIBBON (homepage, right after the hero)
+   Auto-loads from data/culture-icons.json, which GitHub Actions
+   regenerates whenever a file is added to or removed from
+   assets/images/culture-icons/. No coding needed — just drop an
+   image in that folder (or use the admin panel) and it flows in
+   automatically. Deliberately no captions under the icons.
+   ===================================================== */
+function renderCultureIconRibbon() {
+  const track = document.getElementById('icon-strip-track');
+  if (!track) return;
+  if (location.protocol === 'file:') return;
+  fetch(CONFIG.CULTURE_ICONS_JSON)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(items => {
+      const srcs = items.map(i => i.src).filter(Boolean);
+      if (!srcs.length) return;
+      const doubled = [...srcs, ...srcs]; // duplicate so the marquee loops seamlessly
+      track.innerHTML = doubled.map(src =>
+        `<div class="icon-strip-item"><img src="${escapeHtml(src)}" alt="" loading="lazy"></div>`
+      ).join('');
+    })
+    .catch(err => console.error('Failed to load culture icons', err));
 }
 
 /* =====================================================
@@ -1104,6 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
   loadTestimonials();
   loadImpactSlider();
   renderPartnerLogos();
+  renderCultureIconRibbon();
   renderLogoPride();
   loadTimeline();
   renderTeamGrid(CONFIG.TEAM_CSV, 'team-container');
