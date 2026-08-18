@@ -64,8 +64,10 @@ SankalpMarathiMandalWebsite/
 ├── constitution.html   Constitution (embedded PDF)
 │
 ├── data/               ← ALL SITE CONTENT (edit these to update the site)
-│   ├── home-events.xlsx    Homepage event cards
-│   ├── timeline.xlsx       Events page timeline
+│   ├── events.xlsx         Homepage event cards + Events page timeline +
+│   │                       homepage "Book a Performance" teaser — one sheet
+│   │                       (Type/Event Type columns control where each row
+│   │                       shows up; see the header comment in main.js)
 │   ├── testimonials.xlsx   Homepage "Community Voices"
 │   ├── highlights.json     Homepage slider (auto-generated — don't edit)
 │   ├── culture-icons.json  Homepage culture icon ribbon (auto-generated — don't edit)
@@ -101,8 +103,9 @@ SankalpMarathiMandalWebsite/
 
 | To change | Edit |
 |---|---|
-| Homepage event cards | `data/home-events.xlsx` |
-| Event timeline | `data/timeline.xlsx` |
+| Homepage event cards | `data/events.xlsx` — needs a `Type` (previous/current/future) to show as one of the 3 featured cards |
+| Event timeline | `data/events.xlsx` — every row with Event Type = Event shows here, grouped by Year |
+| Homepage "Book a Performance" teaser | `data/events.xlsx` — rows with Event Type = Performance |
 | Testimonials | `data/testimonials.xlsx` |
 | Highlight photos | just add/remove photos in `assets/images/highlights/` and push — updates automatically |
 | Community Pride Wall (homepage) | just add/remove image files in `assets/images/branding/logo-variants/` and push — updates automatically, see "Updating the Community Pride Wall" below |

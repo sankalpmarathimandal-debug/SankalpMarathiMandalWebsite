@@ -20,8 +20,7 @@
 // ---------------------------------------------------------------------------
 
 const XLSX_FILES = [
-  { path: "data/home-events.xlsx", label: "Homepage Events", desc: "Homepage event cards" },
-  { path: "data/timeline.xlsx", label: "Event Timeline", desc: "Events page timeline" },
+  { path: "data/events.xlsx", label: "Events & Performances", desc: "One sheet: homepage event cards, Event Timeline page, and the homepage Book a Performance teaser. Set 'Event Type' to Event or Performance; Event rows also need a Type (previous/current/future) to appear as one of the 3 featured homepage cards — leave Type blank for timeline-only events." },
   { path: "data/testimonials.xlsx", label: "Testimonials", desc: "Homepage “Community Voices”" },
   { path: "data/partners.xlsx", label: "Partners", desc: "Homepage partner logos list" },
   { path: "data/team.xlsx", label: "Team", desc: "Our Team page" },
@@ -47,7 +46,7 @@ const SIMPLE_JSON_FILES = [
 ];
 
 const FOLDERS = [
-  { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below", xlsxRef: "data/home-events.xlsx / data/timeline.xlsx" },
+  { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below", xlsxRef: "data/events.xlsx" },
   { path: "assets/images/team", label: "Team Photos", accept: "image/*", xlsxRef: "data/team.xlsx" },
   { path: "assets/images/shala", label: "Shala Images", accept: "image/*" },
   { path: "assets/images/showcase", label: "Showcase Photos", accept: "image/*", xlsxRef: "data/showcase.xlsx" },
@@ -82,8 +81,8 @@ const FOLDERS = [
 // Groups everything above by the actual page on the live site it affects —
 // this drives the "which page do you want to change?" selector.
 const PAGES = [
-  { key: "home", label: "Home Page", xlsx: ["data/home-events.xlsx", "data/testimonials.xlsx", "data/partners.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
-  { key: "events", label: "Events Page", xlsx: ["data/timeline.xlsx"], folders: ["assets/images/events"] },
+  { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/partners.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
+  { key: "events", label: "Events Page", xlsx: ["data/events.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
   { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx"], folders: ["assets/images/shala"] },
   { key: "calendar", label: "Shala Calendar", xlsx: ["data/shala-calendar.xlsx"], folders: [] },
@@ -1107,7 +1106,7 @@ function fileCardHtml(f) {
       ${isXlsx ? `<button class="secondary editor-toggle" onclick="toggleEditor(this, '${f.path}')">View / Edit Data</button>` : ""}
     </div>
 
-    ${isXlsx ? `<div class="xlsx-editor" id="editor-${cssId(f.path)}"></div>` : ""}
+    ${isXlsx ? `<div class="xlsx-editor"></div>` : ""}
 
     <div class="row" style="margin-top:14px;padding-top:14px;border-top:1px solid #eee;">
       <input type="file" accept="${f.accept || ".xlsx"}">
@@ -1295,8 +1294,9 @@ function adminPage() {
 
   async function toggleEditor(btn, path) {
     const card = btn.closest('.card');
-    const editorId = 'editor-' + path.replace(/[^a-zA-Z0-9]/g, '-');
-    const editor = document.getElementById(editorId);
+    // Scoped to this card (not a global ID lookup) since the same file — e.g.
+    // the unified events sheet — can be listed on more than one page tab.
+    const editor = card.querySelector('.xlsx-editor');
     const isOpen = editor.style.display === 'block';
     if (isOpen) { editor.style.display = 'none'; btn.textContent = 'View / Edit Data'; return; }
     editor.style.display = 'block';

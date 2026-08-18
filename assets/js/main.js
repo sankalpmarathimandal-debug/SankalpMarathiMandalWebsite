@@ -6,8 +6,16 @@
    To update content, edit the .xlsx files in /data —
    the site reads them directly in the browser (SheetJS):
 
-     data/home-events.xlsx            → homepage event cards
-     data/timeline.xlsx               → Event Timeline page
+     data/events.xlsx                 → ONE sheet for homepage event cards,
+                                 Event Timeline page, AND the homepage
+                                 "Book a Performance" teaser. "Event Type"
+                                 column = Event or Performance. Event rows
+                                 with a Type (previous/current/future) show
+                                 as the 3 featured homepage cards; ALL Event
+                                 rows show on the Timeline page (grouped by
+                                 Year); Performance rows show in the
+                                 homepage teaser. See README for full column
+                                 list.
      data/testimonials.xlsx  → homepage Community Voices
      data/highlights.json    → homepage slider (AUTO — just
                                add photos to assets/images/highlights/)
@@ -53,8 +61,7 @@
    ===================================================== */
 
 const CONFIG = {
-  EVENTS_CSV: 'data/home-events.xlsx',
-  TIMELINE_CSV: 'data/timeline.xlsx',
+  EVENTS_DB: 'data/events.xlsx',
   TESTIMONIALS_CSV: 'data/testimonials.xlsx',
   HIGHLIGHTS_JSON: 'data/highlights.json',
   LOGO_VARIANTS_JSON: 'data/logo-variants.json',
@@ -167,7 +174,7 @@ function initBackToTop() {
 function viewFullSize(imageUrl) { window.open(imageUrl, '_blank'); }
 
 function badgeText(t) {
-  return t === 'previous' ? 'Previous' : t === 'current' ? 'Happening Now' : 'Upcoming';
+  return t === 'previous' ? 'Previous' : t === 'current' ? 'Upcoming' : 'Future';
 }
 
 function escapeHtml(s) {
@@ -308,45 +315,88 @@ document.addEventListener('keydown', e => {
 /* =====================================================
    EVENTS GRID (homepage)
    ===================================================== */
+function ev3CardHtml(e, t, cssClass) {
+  return `
+    <article class="ev3-card ${cssClass}" tabindex="0" role="button" aria-label="View details for ${escapeHtml(e.Name)}">
+      <div class="ev3-media">
+        ${e.ImageURL ? `<img src="${e.ImageURL}" alt="${escapeHtml(e.Name)} event image" loading="lazy">` : ''}
+        <div class="ev3-footer">
+          <span class="ev3-footer-date">${escapeHtml(e.Month)} ${escapeHtml(e.Date || '')}${e.Date ? ',' : ''} ${escapeHtml(e.Year)}</span>
+          <span class="event-badge badge-${t}">${badgeText(t)}</span>
+        </div>
+      </div>
+      <div class="ev3-body">
+        <div class="ev3-name">${escapeHtml(e.Name)}</div>
+        ${e.Venue    ? `<div class="event-venue-info"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="venue-icon location-building"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>${escapeHtml(e.Venue)}</span></div>` : ''}
+        ${e.Location ? `<div class="event-venue-info"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="venue-icon venue-pin"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span>${escapeHtml(e.Location)}</span></div>` : ''}
+        <p class="event-description">${escapeHtml(e.Summary || e.Description || '')}</p>
+      </div>
+    </article>`;
+}
+
 function loadEvents() {
   const grid = document.getElementById('events-grid');
   if (!grid) return;
   grid.innerHTML = '<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>';
 
-  loadSheet(CONFIG.EVENTS_CSV, rows => {
+  loadSheet(CONFIG.EVENTS_DB, rows => {
       grid.innerHTML = '';
-      rows
-        .filter(e => e.Name && e.Name.trim())
-        .sort((a, b) => ({previous:0,current:1,future:2}[a.Type] - {previous:0,current:1,future:2}[b.Type]))
+      const featured = rows.filter(e =>
+        e.Name && e.Name.trim() &&
+        (e['Event Type'] || 'Event').trim() !== 'Performance' &&
+        e.Type && e.Type.trim()
+      );
+
+      const order = { previous: 0, current: 1, future: 2 };
+      const areaClass = { previous: 'ev3-previous', current: 'ev3-upcoming', future: 'ev3-future' };
+      featured
+        .filter(e => order[e.Type] !== undefined)
+        .sort((a, b) => order[a.Type] - order[b.Type])
         .forEach(e => {
-          const t = e.Type || deriveType(e);
-          const card = document.createElement('article');
-          card.className = `event-card ${t}`;
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('role', 'button');
-          card.setAttribute('aria-label', `View details for ${e.Name}`);
-          card.innerHTML = `
-            <div class="event-badge badge-${t}">${badgeText(t)}</div>
-            <div class="event-image">
-              ${e.ImageURL ? `<img src="${e.ImageURL}" alt="${escapeHtml(e.Name)} event image" loading="lazy">` : ''}
-              <div class="date-overlay">
-                <div class="date-month">${escapeHtml(e.Month)}</div>
-                <div class="date-day">${escapeHtml(e.Date)}</div>
-                <div class="date-year">${escapeHtml(e.Year)}</div>
-              </div>
-            </div>
-            <div class="event-content">
-              <h2 class="event-name">${escapeHtml(e.Name)}</h2>
-              ${e.Venue    ? `<div class="event-venue-info"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="venue-icon location-building"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>${escapeHtml(e.Venue)}</span></div>` : ''}
-              ${e.Location ? `<div class="event-venue-info"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="venue-icon venue-pin"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg><span>${escapeHtml(e.Location)}</span></div>` : ''}
-              <p class="event-description">${escapeHtml(e.Summary || e.Description || '')}</p>
-            </div>`;
-          card.addEventListener('click', function() { openModal(e, this); });
-          card.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openModal(e, this); } });
-          grid.appendChild(card);
+          const card = document.createElement('div');
+          card.innerHTML = ev3CardHtml(e, e.Type, areaClass[e.Type]);
+          const el = card.firstElementChild;
+          el.addEventListener('click', function() { openModal(e, this); });
+          el.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openModal(e, this); } });
+          grid.appendChild(el);
         });
     },
     () => { grid.innerHTML = '<p style="text-align:center;color:var(--apple-gray);grid-column:1/-1;">Events could not be loaded right now.</p>'; }
+  );
+}
+
+/* =====================================================
+   BOOK A PERFORMANCE — homepage teaser (Performance rows
+   from the same unified data/events.xlsx sheet)
+   ===================================================== */
+function perfPromoCardHtml(p) {
+  const media = p.ImageURL && p.ImageURL.trim()
+    ? `<img src="${p.ImageURL}" alt="${escapeHtml(p.Name)}" loading="lazy">`
+    : `<i class="fas fa-music"></i>`;
+  return `
+    <div class="program-card">
+      <div class="program-media">${media}</div>
+      <div class="program-body">
+        <div class="program-title-row">
+          <div class="program-title">${escapeHtml(p.Name)}</div>
+          ${programPriceBadgeHtml({ PriceType: p['Price Type'], PriceDetails: p['Price Details'] })}
+        </div>
+        ${p['Instagram URL'] && p['Instagram URL'].trim() ? `<a class="program-insta-link" href="${p['Instagram URL']}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> View on Instagram</a>` : ''}
+        ${p.Description ? `<p class="program-desc">${escapeHtml(p.Description)}</p>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderPerfPromo() {
+  const grid = document.getElementById('perf-promo-grid');
+  if (!grid) return;
+
+  loadSheet(CONFIG.EVENTS_DB, rows => {
+      const performances = rows.filter(e => e.Name && e.Name.trim() && (e['Event Type'] || '').trim() === 'Performance');
+      if (!performances.length) { document.getElementById('perf-promo')?.remove(); return; }
+      grid.innerHTML = performances.map(perfPromoCardHtml).join('');
+    },
+    () => { document.getElementById('perf-promo')?.remove(); }
   );
 }
 
@@ -360,10 +410,12 @@ function loadTimeline() {
   if (!timeline) return;
   const loading = document.getElementById('timeline-loading');
 
-  loadSheet(CONFIG.TIMELINE_CSV, rows => {
+  loadSheet(CONFIG.EVENTS_DB, rows => {
       timelineData = {};
       rows.forEach(e => { if (!e.Name && e.Title) e.Name = e.Title; });
-      rows.filter(e => e.Name && e.Name.trim()).forEach(e => {
+      rows
+        .filter(e => e.Name && e.Name.trim() && (e['Event Type'] || 'Event').trim() !== 'Performance')
+        .forEach(e => {
         const y = e.Year || 'Other';
         (timelineData[y] = timelineData[y] || []).push(e);
       });
@@ -1127,6 +1179,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initReveal();
   fileProtocolNotice();
   loadEvents();
+  renderPerfPromo();
   loadTestimonials();
   loadImpactSlider();
   renderPartnerLogos();

@@ -81,8 +81,8 @@ strong.
 
 ## What the dashboard can do
 
-- **Excel data files** — replace any of the 13 workbooks (`home-events.xlsx`,
-  `timeline.xlsx`, `testimonials.xlsx`, `partners.xlsx`, `team.xlsx`,
+- **Excel data files** — replace any of the 12 workbooks (`events.xlsx`,
+  `testimonials.xlsx`, `partners.xlsx`, `team.xlsx`,
   `shala-team.xlsx`, `faq.xlsx`, `shala-faq.xlsx`, `shala-calendar.xlsx`,
   `forms.xlsx`, `showcase.xlsx`, `programs.xlsx`, `program-participants.xlsx`).
   Upload a file with the exact same name to replace it — same as the current
