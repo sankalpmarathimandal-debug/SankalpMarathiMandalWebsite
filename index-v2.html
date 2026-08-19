@@ -18,12 +18,18 @@
 <!-- Dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=14def84">
+<link rel="stylesheet" href="assets/css/style.css?v=de9f19f">
 
 <!-- PREVIEW-ONLY style for this page's one experiment: the original hero
      (.hero2, untouched) with the culture icon ribbon nested inside the same
      card as a third grid row, instead of living in a separate section below. -->
 <style>
+  /* Card must clip its own contents — otherwise the scrolling ribbon row
+     (which is wider than the card and animates via transform) can visually
+     poke past the rounded corners on narrow/mobile widths, since the row's
+     flat right edge sits inside the border-radius curve. */
+  .hero2 { overflow: hidden; }
+
   .hero2-ribbon {
     grid-column: 1 / -1;
     margin-top: 8px;
@@ -33,6 +39,12 @@
   .hero2-ribbon .icon-strip-label {
     text-align: center; font-family: var(--font-devanagari); font-size: 14px; font-weight: 700;
     color: var(--apple-dark); margin-bottom: 16px;
+  }
+  /* Give the fade-out mask a bit more room to fully fade before the row's
+     edge, so no icon is ever left half-visible right at the card boundary. */
+  .hero2-ribbon .icon-strip-row {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
   }
   @media (max-width: 860px) { .hero2-ribbon { margin-top: 4px; padding-top: 24px; } }
 </style>
@@ -301,6 +313,6 @@
 
 <button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 
-<script src="assets/js/main.js?v=14def84" defer></script>
+<script src="assets/js/main.js?v=de9f19f" defer></script>
 </body>
 </html>

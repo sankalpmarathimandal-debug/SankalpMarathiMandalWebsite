@@ -280,7 +280,7 @@ main { flex: 1; }
    site (--font-family / --font-devanagari / --radius-lg / brand gradient) —
    this is a layout change, not a new theme.
    ===================================================== */
-.hero2-wrap { max-width: 1200px; margin: 40px auto 64px; padding: 0 20px; }
+.hero2-wrap { max-width: 1040px; margin: 40px auto 64px; padding: 0 24px; }
 
 .hero2 {
   display: grid;
@@ -413,7 +413,7 @@ main { flex: 1; }
 /* =====================================================
    SECTION TITLES
    ===================================================== */
-.section-divider { padding: 60px 20px 40px; text-align: center; }
+.section-divider { padding: 60px 24px 40px; text-align: center; }
 
 .section-divider::after {
   content: '';
@@ -830,8 +830,8 @@ main { flex: 1; }
 /* =====================================================
    PARTNERS
    ===================================================== */
-.partners-section { padding: 60px 20px; background: var(--ivory-deep); overflow: hidden; }
-.partners-container { max-width: 1040px; margin: 0 auto; }
+.partners-section { padding: 60px 0; background: var(--ivory-deep); overflow: hidden; }
+.partners-container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
 .logos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
 
@@ -989,8 +989,8 @@ main { flex: 1; }
 /* =====================================================
    ABOUT
    ===================================================== */
-.about-section { padding: 20px 20px 60px; }
-.about-container { max-width: 1040px; margin: 0 auto; }
+.about-section { padding: 20px 0 60px; }
+.about-container { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
 .about-intro {
   color: var(--apple-gray);
