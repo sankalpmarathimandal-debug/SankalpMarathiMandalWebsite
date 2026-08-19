@@ -655,12 +655,18 @@ function renderSponsors() {
           sponsorContactRow('fa-at', s.SocialLabel, s.SocialURL || ''),
         ].join('');
 
-        const tags = (s.Tags || '').split(',').map(t => t.trim()).filter(Boolean)
-          .map(t => `<span class="sponsor-tag">${escapeHtml(t)}</span>`).join('');
+        // Cap visible tags so a sponsor with a long tag list doesn't blow
+        // out the card's height — show the first 5 plus a "+N more" chip.
+        // Keeps this data-agnostic (no need to trim the admin's real data).
+        const tagList = (s.Tags || '').split(',').map(t => t.trim()).filter(Boolean);
+        const visibleTags = tagList.slice(0, 5);
+        const extraTagCount = tagList.length - visibleTags.length;
+        const tags = visibleTags.map(t => `<span class="sponsor-tag">${escapeHtml(t)}</span>`).join('')
+          + (extraTagCount > 0 ? `<span class="sponsor-tag sponsor-tag-more">+${extraTagCount} more</span>` : '');
 
         const pills = [
-          s.Tier ? `<span class="sponsor-tier">${escapeHtml(s.Tier)}</span>` : '',
           s.Category ? `<span class="sponsor-category">${escapeHtml(s.Category)}</span>` : '',
+          s.Tier ? `<span class="sponsor-tier">${escapeHtml(s.Tier)}</span>` : '',
         ].join('');
 
         return `
