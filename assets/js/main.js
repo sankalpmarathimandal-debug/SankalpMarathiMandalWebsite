@@ -658,9 +658,13 @@ function renderSponsors() {
         const tags = (s.Tags || '').split(',').map(t => t.trim()).filter(Boolean)
           .map(t => `<span class="sponsor-tag">${escapeHtml(t)}</span>`).join('');
 
+        const pills = [
+          s.Tier ? `<span class="sponsor-tier">${escapeHtml(s.Tier)}</span>` : '',
+          s.Category ? `<span class="sponsor-category">${escapeHtml(s.Category)}</span>` : '',
+        ].join('');
+
         return `
           <div class="sponsor-card"${style}>
-            <div class="sponsor-card-bar"></div>
             <div class="sponsor-card-body">
               <div class="sponsor-card-head">
                 <div class="sponsor-avatar">${avatar}</div>
@@ -669,19 +673,20 @@ function renderSponsors() {
                   ${s.Role ? `<div class="sponsor-role">${escapeHtml(s.Role)}</div>` : ''}
                 </div>
               </div>
-              <div style="text-align:center;">
-                <div class="sponsor-icon-badge">${middleBadge}</div>
-                ${s.BusinessName ? `<div class="sponsor-business-name">${escapeHtml(s.BusinessName)}</div>` : ''}
-                ${s.Tagline ? `<div class="sponsor-tagline">${escapeHtml(s.Tagline)}</div>` : ''}
-              </div>
               <hr class="sponsor-divider">
-              ${s.Tier ? `<div class="sponsor-tier">${escapeHtml(s.Tier)}</div><br>` : ''}
-              ${s.Category ? `<div class="sponsor-category">${escapeHtml(s.Category)}</div>` : ''}
+              <div class="sponsor-brand-row">
+                <div class="sponsor-icon-badge">${middleBadge}</div>
+                <div>
+                  ${s.BusinessName ? `<div class="sponsor-business-name">${escapeHtml(s.BusinessName)}</div>` : ''}
+                  ${s.Tagline ? `<div class="sponsor-tagline">${escapeHtml(s.Tagline)}</div>` : ''}
+                </div>
+              </div>
+              ${pills ? `<div class="sponsor-pills">${pills}</div>` : ''}
               ${s.Description ? `<p class="sponsor-description">${escapeHtml(s.Description)}</p>` : ''}
               ${tags ? `<div class="sponsor-tags">${tags}</div>` : ''}
-              ${contactRows ? `<div class="sponsor-contact">${contactRows}</div>` : ''}
-              ${s.CTAText ? `<a class="sponsor-cta" href="${escapeHtml(s.CTALink || websiteHref || '#')}" target="_blank" rel="noopener">${escapeHtml(s.CTAText)} →</a>` : ''}
+              ${contactRows ? `<hr class="sponsor-contact-divider"><div class="sponsor-contact">${contactRows}</div>` : ''}
             </div>
+            <div class="sponsor-card-bar"></div>
           </div>`;
       }).join('');
 
