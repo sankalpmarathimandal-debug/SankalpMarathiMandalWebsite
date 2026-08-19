@@ -520,7 +520,7 @@ main { flex: 1; }
 .event-description { font-size: 13px; line-height: 1.55; color: #6b7280; margin-top: 8px; }
 
 /* ================= BOOK A PERFORMANCE — homepage teaser (photo left, performance list right) ================= */
-.perf-promo { max-width: 1280px; margin: 8px auto 64px; padding: 0 24px; }
+.perf-promo { max-width: 1040px; margin: 8px auto 64px; padding: 0 24px; }
 .perf-promo-grid {
   display: grid; grid-template-columns: 1.3fr 1fr; gap: 0;
   border-radius: 28px; overflow: hidden; background: #1a0d0f;
@@ -711,7 +711,7 @@ main { flex: 1; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 32px;
-  max-width: 1280px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 20px 24px 60px;
 }
@@ -735,7 +735,7 @@ main { flex: 1; }
    IMPACT SLIDER
    ===================================================== */
 .impact-slider-container {
-  max-width: 1200px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 20px;
   background: #fff;
@@ -831,7 +831,7 @@ main { flex: 1; }
    PARTNERS
    ===================================================== */
 .partners-section { padding: 60px 20px; background: var(--ivory-deep); overflow: hidden; }
-.partners-container { max-width: 1200px; margin: 0 auto; }
+.partners-container { max-width: 1040px; margin: 0 auto; }
 
 .logos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
 
@@ -870,7 +870,7 @@ main { flex: 1; }
 }
 
 .icon-strip-label {
-  max-width: 1200px; margin: 0 auto 18px; padding: 0 24px;
+  max-width: 1040px; margin: 0 auto 18px; padding: 0 24px;
   font-family: var(--font-devanagari); font-size: 14px; font-weight: 700;
   color: var(--apple-dark); text-align: center;
 }
@@ -990,7 +990,7 @@ main { flex: 1; }
    ABOUT
    ===================================================== */
 .about-section { padding: 20px 20px 60px; }
-.about-container { max-width: 1100px; margin: 0 auto; }
+.about-container { max-width: 1040px; margin: 0 auto; }
 
 .about-intro {
   color: var(--apple-gray);
