@@ -370,19 +370,19 @@ function loadEvents() {
    from the same unified data/events.xlsx sheet)
    ===================================================== */
 function perfPromoCardHtml(p) {
+  const isPaid = (p['Price Type'] || '').trim().toLowerCase() === 'paid';
+  const details = (p['Price Details'] || '').trim();
+  const badge = isPaid ? (details ? `Paid · ${escapeHtml(details)}` : 'Paid') : 'Free';
   const media = p.ImageURL && p.ImageURL.trim()
     ? `<img src="${p.ImageURL}" alt="${escapeHtml(p.Name)}" loading="lazy">`
     : `<i class="fas fa-music"></i>`;
   return `
-    <div class="program-card">
-      <div class="program-media">${media}</div>
-      <div class="program-body">
-        <div class="program-title-row">
-          <div class="program-title">${escapeHtml(p.Name)}</div>
-          ${programPriceBadgeHtml({ PriceType: p['Price Type'], PriceDetails: p['Price Details'] })}
-        </div>
-        ${p['Instagram URL'] && p['Instagram URL'].trim() ? `<a class="program-insta-link" href="${p['Instagram URL']}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i> View on Instagram</a>` : ''}
-        ${p.Description ? `<p class="program-desc">${escapeHtml(p.Description)}</p>` : ''}
+    <div class="perf-promo-item">
+      <div class="perf-promo-item-img">${media}</div>
+      <div>
+        <div class="perf-promo-item-title">${escapeHtml(p.Name)}</div>
+        ${p.Description ? `<div class="perf-promo-item-desc">${escapeHtml(p.Description)}</div>` : ''}
+        <span class="perf-promo-item-badge">${badge}</span>
       </div>
     </div>`;
 }
