@@ -914,8 +914,15 @@ main { flex: 1; }
   transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
 }
 .sponsor-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.04); transform: translateY(-2px); }
-/* Accent bar sits at the bottom of the card (comes after .sponsor-card-body in the markup) */
-.sponsor-card-bar { height: 4px; background: var(--accent, var(--brand-gradient-start)); }
+/* Accent bar sits at the bottom of the card (comes after .sponsor-card-body in the markup).
+   Explicit bottom corner radius, matching the card's own — relying on the
+   parent's overflow:hidden alone left a hairline gap at the corner in some
+   browsers. */
+.sponsor-card-bar {
+  height: 4px;
+  background: var(--accent, var(--brand-gradient-start));
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
 .sponsor-card-body { padding: 24px 24px 20px; }
 
 .sponsor-card-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
