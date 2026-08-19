@@ -24,17 +24,20 @@
      (.hero2, untouched) with the culture icon ribbon nested inside the same
      card as a third grid row, instead of living in a separate section below. -->
 <style>
-  /* Card must clip its own contents — otherwise the scrolling ribbon row
-     (which is wider than the card and animates via transform) can visually
-     poke past the rounded corners on narrow/mobile widths, since the row's
-     flat right edge sits inside the border-radius curve. */
-  .hero2 { overflow: hidden; }
-
+  /* Clip only the ribbon row itself, not the whole card. Scoping
+     overflow:hidden to .hero2 was clipping the hero image's own
+     fade-in transform animation too — on iOS/WebKit that combo
+     (overflow:hidden ancestor + border-radius + animated transform
+     child) is a known trigger for the child vanishing after the
+     animation settles ("flashes then disappears" on mobile). The
+     ribbon row is the only piece that actually needs clipping. */
   .hero2-ribbon {
     grid-column: 1 / -1;
     margin-top: 8px;
     padding-top: 28px;
     border-top: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    border-radius: 0 0 28px 28px;
   }
   .hero2-ribbon .icon-strip-label {
     text-align: center; font-family: var(--font-devanagari); font-size: 14px; font-weight: 700;
