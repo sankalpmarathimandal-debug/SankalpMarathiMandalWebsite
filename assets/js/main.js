@@ -424,34 +424,41 @@ function loadTimeline() {
         return d !== 0 ? d : (parseInt(a.Date) || 0) - (parseInt(b.Date) || 0);
       }));
 
-      const select = document.getElementById('yearSelect');
-      select.innerHTML = '';
-      Object.keys(timelineData).sort((a, b) => b - a).forEach(y => {
-        const o = document.createElement('option');
-        o.value = y; o.textContent = y;
-        select.appendChild(o);
+      const years = Object.keys(timelineData).sort((a, b) => b - a);
+      const tabs = document.getElementById('yearSelector');
+      const thisYear = String(new Date().getFullYear());
+      const defaultYear = years.includes(thisYear) ? thisYear : years[0];
+
+      tabs.innerHTML = years.map(y =>
+        `<button type="button" class="year-tab${y === defaultYear ? ' active' : ''}" data-year="${escapeHtml(y)}" role="tab" aria-selected="${y === defaultYear}">${escapeHtml(y)}</button>`
+      ).join('');
+      tabs.querySelectorAll('.year-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.classList.contains('active')) return;
+          tabs.querySelectorAll('.year-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+          btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
+          renderTimelineYear(btn.dataset.year);
+        });
       });
-      select.onchange = renderTimelineYear;
 
       if (loading) loading.style.display = 'none';
-      document.getElementById('yearSelector').style.display = 'block';
-      renderTimelineYear();
+      tabs.style.display = 'flex';
+      renderTimelineYear(defaultYear);
     },
     () => { if (loading) loading.textContent = 'Error loading events. Please try again.'; }
   );
 }
 
-function renderTimelineYear() {
-  const year = document.getElementById('yearSelect').value;
+function renderTimelineYear(year) {
   const timeline = document.getElementById('timeline');
   timeline.innerHTML = '';
-  if (!timelineData[year]) return;
+  if (!year || !timelineData[year]) return;
 
   timelineData[year].forEach((e, i) => {
     const t = deriveType(e);
     const item = document.createElement('div');
     item.className = `timeline-item ${t}`;
-    item.style.animationDelay = `${i * 0.1}s`;
+    item.style.animationDelay = `${Math.min(i, 8) * 0.08}s`;
     item.innerHTML = `
       <div class="timeline-marker"></div>
       <div class="timeline-content" tabindex="0" role="button" aria-label="View details for ${escapeHtml(e.Name)}">
