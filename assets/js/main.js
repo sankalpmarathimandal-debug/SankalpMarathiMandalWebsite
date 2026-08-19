@@ -483,7 +483,7 @@ function loadTestimonials() {
         card.className = 'testimonial-card';
         const showPic = t['Show Profile Picture']?.toUpperCase() === 'YES' && t['Profile Image URL'];
         card.innerHTML = `
-          ${showPic ? `<div class="testimonial-profile"><img src="${t['Profile Image URL']}" alt="${escapeHtml(t.Name)}" loading="lazy" onerror="this.style.display='none'"><div class="testimonial-name">${escapeHtml(t.Name)}</div></div>` : `<div style="margin-bottom:16px;"><div class="testimonial-name">${escapeHtml(t.Name)}</div></div>`}
+          ${showPic ? `<div class="testimonial-profile"><img src="${t['Profile Image URL']}" alt="${escapeHtml(t.Name)}" loading="lazy" onerror="this.style.display='none'"><div class="testimonial-name">${escapeHtml(t.Name)}</div></div>` : `<div class="testimonial-name">${escapeHtml(t.Name)}</div>`}
           <p class="testimonial-text">"${escapeHtml(t.Testimonial)}"</p>`;
         container.appendChild(card);
       });
