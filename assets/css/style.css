@@ -607,24 +607,38 @@ main { flex: 1; }
   background: rgba(255,255,255,0.12); padding: 3px 9px; border-radius: 980px;
 }
 
+/* Icon-badge variant of .perf-promo-item-img, for promo lists (like Marathi
+   Shala highlights) that don't have a per-item photo — same footprint,
+   just a centered Font Awesome icon instead of an <img>. */
+.perf-promo-item-icon {
+  width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12);
+}
+.perf-promo-item-icon i { font-size: 19px; color: var(--gold); }
+
 .perf-promo-cta { width: auto; display: inline-block; padding: 14px 28px; margin-top: auto; align-self: flex-start; }
+
+/* Marathi Shala homepage teaser reuses the .perf-promo-grid scaffolding
+   above (same dark side panel, same item-list styling) with the visual
+   panel narrower and swapped to the second column, so the two teaser
+   sections read as a matched pair rather than duplicates. */
+.shala-grid { grid-template-columns: 1fr 0.85fr; }
+.shala-logo-panel {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--apple-light-gray); padding: 40px; min-height: 420px;
+}
+.shala-logo-panel img {
+  width: 220px; height: 220px; border-radius: 28px; object-fit: cover;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+}
 
 .timeline-button-container { text-align: center; padding: 8px 0 16px; }
 
-.timeline-button {
-  display: inline-block;
-  padding: 16px 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 20px rgba(102,126,234,0.4);
-  transition: all 0.3s ease;
-}
-
-.timeline-button:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(102,126,234,0.5); }
+/* Matches the rest of the site's CTA pill treatment (same as
+   "Explore All Performances", "Join Us", etc.) instead of the old
+   one-off blue/purple gradient with a smaller corner radius. */
+.timeline-button-container .cta-button { width: auto; display: inline-block; padding: 16px 40px; }
 
 /* Loading skeleton */
 .skeleton-card {
