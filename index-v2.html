@@ -74,46 +74,49 @@
   .mr-tagline.mr-plain { font-family: var(--font-family); font-size: 16px; color: var(--apple-gray); }
 
   /* =====================================================
-     COMMUNITY VOICES v2 — Apple cleanliness + Maharashtrian editorial
-     type + a subtle paithani/temple border motif (not the big background
-     quote mark from the last round — intentionally quieter).
+     COMMUNITY VOICES v3 — flatter, Apple-style card: no border, near-flat
+     shadow, no decorative strip. A single thin maroon rule under the name
+     is the only "temple motif" left — everything else is plain and quiet.
      ===================================================== */
   #testimonials .testimonials-grid { align-items: start; gap: 20px; }
   #testimonials .testimonial-card {
-    background: #fff;
-    padding: 0 0 20px;
-    border-radius: 14px;
-    box-shadow: 0 2px 10px rgba(120,50,20,0.06);
-    border: 1px solid rgba(120,50,20,0.08);
+    background: var(--apple-light-gray);
+    padding: 22px 22px 20px;
+    border-radius: 18px;
+    box-shadow: none;
+    border: none;
     overflow: hidden;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    transition: background 0.25s ease, transform 0.25s ease;
   }
-  #testimonials .testimonial-card:hover { box-shadow: 0 10px 26px rgba(120,50,20,0.12); transform: translateY(-3px); }
-  /* Thin paithani-inspired zigzag "temple border" strip, gold-on-ivory */
-  #testimonials .testimonial-card::before {
-    content: '';
-    display: block;
-    height: 7px;
-    background-image:
-      linear-gradient(135deg, var(--gold) 25%, transparent 25%),
-      linear-gradient(225deg, var(--gold) 25%, transparent 25%);
-    background-size: 14px 14px;
-    background-position: 0 0;
-    background-color: var(--ivory-deep);
-  }
+  #testimonials .testimonial-card:hover { background: #eeeef0; transform: translateY(-2px); }
+  #testimonials .testimonial-card::before { content: none; } /* drop the zigzag temple strip */
   #testimonials .testimonial-card::after { content: none; } /* remove the old oversized quote mark */
   #testimonials .testimonial-profile,
-  #testimonials .testimonial-name { padding: 18px 22px 0; margin-bottom: 10px; }
+  #testimonials .testimonial-name { padding: 0; margin-bottom: 10px; }
   #testimonials .testimonial-name {
     font-family: var(--font-devanagari);
     font-size: 13px; font-weight: 700; color: var(--brand-gradient-start);
-    background: none; padding-left: 22px; padding-right: 22px;
+    background: none; padding: 0 0 8px; border-bottom: 1px solid rgba(120,50,20,0.14);
+    display: inline-block;
   }
   #testimonials .testimonial-text {
-    padding: 0 22px;
+    padding: 0;
     font-family: var(--font-family);
     font-size: 13.5px; line-height: 1.6; color: var(--apple-dark);
   }
+
+  /* =====================================================
+     LESS "BOXY" PASS — flatten event cards & performance rows toward the
+     Apple reference: fill-color contrast instead of borders/heavy shadows.
+     ===================================================== */
+  .ev3-card {
+    box-shadow: none;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+  .ev3-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.04); transform: translateY(-2px); }
+  .perf-promo-item { border: none; background: rgba(255,255,255,0.06); }
+  .perf-promo-item-badge { background: rgba(255,255,255,0.12); }
 </style>
 
 <!-- Structured data -->
