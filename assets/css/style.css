@@ -626,6 +626,11 @@ main { flex: 1; }
    the second column so the two teasers read as a distinct pair, not
    duplicates of each other. */
 .shala-grid { grid-template-columns: 1fr 0.85fr; }
+/* .shala-grid's own grid-template-columns comes after the .perf-promo-grid
+   mobile collapse rule above, so without this it was winning the cascade
+   at mobile widths too — the two columns stayed side by side and the logo
+   panel got squeezed off-screen instead of stacking underneath the text. */
+@media (max-width: 900px) { .shala-grid { grid-template-columns: 1fr; } }
 .shala-promo .perf-promo-side {
   background: linear-gradient(165deg, var(--saffron) 0%, #5c2c0a 100%);
 }
