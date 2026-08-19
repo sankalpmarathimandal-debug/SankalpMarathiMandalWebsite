@@ -47,6 +47,78 @@
     mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
   }
   @media (max-width: 860px) { .hero2-ribbon { margin-top: 4px; padding-top: 24px; } }
+
+  /* =====================================================
+     DESIGN-LANGUAGE EXPERIMENT — a deliberate cultural signature
+     for section headers, borrowing the "॥ ... ॥" danda-bracket
+     convention from traditional Marathi typesetting (e.g. Dnyaneshwari
+     manuscripts) without literally using scripture typography everywhere.
+     No new fonts introduced — still just Inter + Tiro Devanagari Marathi,
+     the same two fonts already used site-wide, applied more deliberately.
+     ===================================================== */
+  .mr-divider { padding: 56px 24px 34px; text-align: center; }
+  .mr-eyebrow {
+    font-family: var(--font-family); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--apple-gray);
+    margin-bottom: 10px;
+  }
+  .mr-danda {
+    font-weight: 700; letter-spacing: 0.01em; margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  /* Marathi dandas: full weight, Devanagari font, larger */
+  .mr-danda.mr-marathi { font-family: var(--font-devanagari); font-size: clamp(28px, 3.6vw, 40px); }
+  /* English dandas: same bracket convention, set in Inter with tracking so it
+     still reads as a deliberate typographic choice rather than a mismatch */
+  .mr-danda.mr-english { font-family: var(--font-family); font-size: clamp(22px, 2.6vw, 28px); letter-spacing: 0.06em; text-transform: uppercase; }
+  /* On a dark panel (e.g. the Performances section) the gradient text-clip
+     is invisible — fall back to a solid light color instead. */
+  .mr-danda.mr-on-dark { background: none; -webkit-text-fill-color: currentColor; color: #fff; }
+  .mr-tagline { font-family: var(--font-devanagari); font-size: 15px; color: var(--apple-gray); }
+  .mr-tagline.mr-plain { font-family: var(--font-family); font-size: 16px; color: var(--apple-gray); }
+
+  /* =====================================================
+     COMMUNITY VOICES v2 — Apple cleanliness + Maharashtrian editorial
+     type + a subtle paithani/temple border motif (not the big background
+     quote mark from the last round — intentionally quieter).
+     ===================================================== */
+  #testimonials .testimonials-grid { align-items: start; gap: 20px; }
+  #testimonials .testimonial-card {
+    background: #fff;
+    padding: 0 0 20px;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(120,50,20,0.06);
+    border: 1px solid rgba(120,50,20,0.08);
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  #testimonials .testimonial-card:hover { box-shadow: 0 10px 26px rgba(120,50,20,0.12); transform: translateY(-3px); }
+  /* Thin paithani-inspired zigzag "temple border" strip, gold-on-ivory */
+  #testimonials .testimonial-card::before {
+    content: '';
+    display: block;
+    height: 7px;
+    background-image:
+      linear-gradient(135deg, var(--gold) 25%, transparent 25%),
+      linear-gradient(225deg, var(--gold) 25%, transparent 25%);
+    background-size: 14px 14px;
+    background-position: 0 0;
+    background-color: var(--ivory-deep);
+  }
+  #testimonials .testimonial-card::after { content: none; } /* remove the old oversized quote mark */
+  #testimonials .testimonial-profile,
+  #testimonials .testimonial-name { padding: 18px 22px 0; margin-bottom: 10px; }
+  #testimonials .testimonial-name {
+    font-family: var(--font-devanagari);
+    font-size: 13px; font-weight: 700; color: var(--brand-gradient-start);
+    background: none; padding-left: 22px; padding-right: 22px;
+  }
+  #testimonials .testimonial-text {
+    padding: 0 22px;
+    font-family: var(--font-family);
+    font-size: 13.5px; line-height: 1.6; color: var(--apple-dark);
+  }
 </style>
 
 <!-- Structured data -->
@@ -140,9 +212,10 @@
 </div>
 
 <!-- EVENTS -->
-<section class="section-divider" id="events-title">
-  <h2 class="section-title">Our Events</h2>
-  <p class="section-subtitle">Discover our past, present and future events.</p>
+<section class="mr-divider" id="events-title">
+  <div class="mr-eyebrow">Sankalp Marathi Mandal</div>
+  <h2 class="mr-danda mr-english">॥ Our Events ॥</h2>
+  <p class="mr-tagline mr-plain">Discover our past, present and future events.</p>
 </section>
 
 <section class="events-section" id="events">
@@ -160,7 +233,7 @@
     </div>
     <div class="perf-promo-side">
       <span class="hero2-eyebrow">Available to Book</span>
-      <h2 class="perf-promo-title">Sankalp Performances</h2>
+      <h2 class="perf-promo-title mr-danda mr-english mr-on-dark">॥ Sankalp Performances ॥</h2>
       <p class="perf-promo-sub">Bring the spirit of Maharashtra to your celebration with devotional singing, abhang, and traditional cultural programs.</p>
       <div class="perf-promo-list" id="perf-promo-grid"></div>
       <a href="book-a-performance.html" class="cta-button cta-primary perf-promo-cta">Explore All Performances</a>
@@ -184,9 +257,10 @@
 </div>
 
 <!-- TESTIMONIALS -->
-<section class="section-divider" id="voices-title">
-  <h2 class="section-title">Community Voices</h2>
-  <p class="section-subtitle">Shared experiences, shared pride.</p>
+<section class="mr-divider" id="voices-title">
+  <div class="mr-eyebrow">Community Voices</div>
+  <h2 class="mr-danda mr-marathi">॥ संकल्पाचे मनोगत ॥</h2>
+  <p class="mr-tagline">आपल्या माणसांच्या मनातून…</p>
 </section>
 
 <section id="testimonials">
@@ -194,9 +268,10 @@
 </section>
 
 <!-- IMPACT -->
-<section class="section-divider" id="impact-title">
-  <h2 class="section-title">Our Impact Stories</h2>
-  <p class="section-subtitle">Making a difference to preserve culture.</p>
+<section class="mr-divider" id="impact-title">
+  <div class="mr-eyebrow">Sankalp Marathi Mandal</div>
+  <h2 class="mr-danda mr-english">॥ Our Impact Stories ॥</h2>
+  <p class="mr-tagline mr-plain">Making a difference to preserve culture.</p>
 </section>
 
 <section class="events-section" id="impact">
@@ -214,9 +289,10 @@
 </section>
 
 <!-- PARTNERS -->
-<section class="section-divider" id="partners-title">
-  <h2 class="section-title">Our Valued Partners</h2>
-  <p class="section-subtitle">Building success, hand in hand.</p>
+<section class="mr-divider" id="partners-title">
+  <div class="mr-eyebrow">Sankalp Marathi Mandal</div>
+  <h2 class="mr-danda mr-english">॥ Our Valued Partners ॥</h2>
+  <p class="mr-tagline mr-plain">Building success, hand in hand.</p>
 </section>
 
 <section class="partners-section" id="partners">
@@ -226,9 +302,10 @@
 </section>
 
 <!-- COMMUNITY PRIDE WALL -->
-<section class="section-divider" id="pride-title">
-  <h2 class="section-title">Community Pride Wall</h2>
-  <p class="section-subtitle">अभिमान आपल्या मराठी संस्कृतीचा — creative logo art made by our own community.</p>
+<section class="mr-divider" id="pride-title">
+  <div class="mr-eyebrow">Sankalp Marathi Mandal</div>
+  <h2 class="mr-danda mr-english">॥ Community Pride Wall ॥</h2>
+  <p class="mr-tagline">अभिमान आपल्या मराठी संस्कृतीचा — creative logo art made by our own community.</p>
 </section>
 
 <section class="pride-river" id="pride-wall">
@@ -241,9 +318,10 @@
 </section>
 
 <!-- ABOUT -->
-<section class="section-divider" id="about-title">
-  <h2 class="section-title">About Us</h2>
-  <p class="section-subtitle">Passion, Purpose and People at heart</p>
+<section class="mr-divider" id="about-title">
+  <div class="mr-eyebrow">Sankalp Marathi Mandal</div>
+  <h2 class="mr-danda mr-english">॥ About Us ॥</h2>
+  <p class="mr-tagline mr-plain">Passion, Purpose and People at heart</p>
 </section>
 
 
