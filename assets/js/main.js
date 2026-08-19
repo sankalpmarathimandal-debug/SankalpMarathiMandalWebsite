@@ -518,11 +518,11 @@ function loadImpactSlider() {
    image in that folder (or use the admin panel) and it flows in
    automatically. Deliberately no captions under the icons.
    ===================================================== */
-function renderCultureIconRibbon() {
+function renderCultureIconRibbon(isRetry) {
   const track = document.getElementById('icon-strip-track');
   if (!track) return;
   if (location.protocol === 'file:') return;
-  fetch(CONFIG.CULTURE_ICONS_JSON)
+  fetch(CONFIG.CULTURE_ICONS_JSON, { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(items => {
       const srcs = items.map(i => i.src).filter(Boolean);
@@ -532,7 +532,12 @@ function renderCultureIconRibbon() {
         `<div class="icon-strip-item"><img src="${escapeHtml(src)}" alt="" loading="lazy"></div>`
       ).join('');
     })
-    .catch(err => console.error('Failed to load culture icons', err));
+    .catch(err => {
+      console.error('Failed to load culture icons', err);
+      // Flaky mobile connections occasionally drop this fetch — retry once
+      // after a short delay instead of leaving the row permanently empty.
+      if (!isRetry) setTimeout(() => renderCultureIconRibbon(true), 1500);
+    });
 }
 
 /* =====================================================
