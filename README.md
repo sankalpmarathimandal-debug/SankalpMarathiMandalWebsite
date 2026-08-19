@@ -71,7 +71,7 @@ SankalpMarathiMandalWebsite/
 │   ├── testimonials.xlsx   Homepage "Community Voices"
 │   ├── highlights.json     Homepage slider (auto-generated — don't edit)
 │   ├── culture-icons.json  Homepage culture icon ribbon (auto-generated — don't edit)
-│   ├── partners.xlsx       Homepage partner logos
+│   ├── sponsors.xlsx       Homepage Presenting Sponsors cards
 │   ├── team.xlsx           Team page members
 │   ├── shala-team.xlsx     Shala page team
 │   ├── faq.xlsx            FAQ page questions
@@ -110,7 +110,7 @@ SankalpMarathiMandalWebsite/
 | Highlight photos | just add/remove photos in `assets/images/highlights/` and push — updates automatically |
 | Community Pride Wall (homepage) | just add/remove image files in `assets/images/branding/logo-variants/` and push — updates automatically, see "Updating the Community Pride Wall" below |
 | Culture icon ribbon (homepage, below the hero) | just add/remove image files in `assets/images/culture-icons/` and push — updates automatically, no captions shown |
-| Partner logos | `data/partners.xlsx` + logo in `assets/images/partners/` |
+| Presenting Sponsors | `data/sponsors.xlsx` (optional headshot in `assets/images/partners/`) |
 | Team members | `data/team.xlsx` + photo in `assets/images/team/` |
 | Shala team / FAQs | `data/shala-team.xlsx` / `data/shala-faq.xlsx` |
 | Shala calendar | `data/shala-calendar.xlsx` — one row per date (see below) |

@@ -22,7 +22,7 @@
 const XLSX_FILES = [
   { path: "data/events.xlsx", label: "Events & Performances", desc: "One sheet: homepage event cards, Event Timeline page, and the homepage Book a Performance teaser. Set 'Event Type' to Event or Performance; Event rows also need a Type (previous/current/future) to appear as one of the 3 featured homepage cards — leave Type blank for timeline-only events." },
   { path: "data/testimonials.xlsx", label: "Testimonials", desc: "Homepage “Community Voices”" },
-  { path: "data/partners.xlsx", label: "Partners", desc: "Homepage partner logos list" },
+  { path: "data/sponsors.xlsx", label: "Presenting Sponsors", desc: "Homepage sponsor cards. Columns: Active (Yes/No), DisplayOrder, Tier (e.g. Gold Partner — shown as a badge), Name, Role, AvatarURL (optional headshot — leave blank for a generic icon), AccentColor (hex, drives that card's colors), Icon (a Font Awesome solid icon name, e.g. chart-line or house-chimney), BusinessName, Tagline, Category, Description, Tags (comma-separated), Website, Phone, Email, SocialLabel, SocialURL, CTAText, CTALink." },
   { path: "data/team.xlsx", label: "Team", desc: "Our Team page" },
   { path: "data/shala-team.xlsx", label: "Shala Team", desc: "Marathi Shala team section" },
   { path: "data/faq.xlsx", label: "FAQ", desc: "FAQs page" },
@@ -50,7 +50,7 @@ const FOLDERS = [
   { path: "assets/images/team", label: "Team Photos", accept: "image/*", xlsxRef: "data/team.xlsx" },
   { path: "assets/images/shala", label: "Shala Images", accept: "image/*" },
   { path: "assets/images/showcase", label: "Showcase Photos", accept: "image/*", xlsxRef: "data/showcase.xlsx" },
-  { path: "assets/images/partners", label: "Partner Logos", accept: "image/*", xlsxRef: "data/partners.xlsx" },
+  { path: "assets/images/partners", label: "Sponsor Photos", accept: "image/*", xlsxRef: "data/sponsors.xlsx" },
   {
     path: "assets/images/branding/logo-variants",
     label: "Community Pride Wall Logos",
@@ -81,7 +81,7 @@ const FOLDERS = [
 // Groups everything above by the actual page on the live site it affects —
 // this drives the "which page do you want to change?" selector.
 const PAGES = [
-  { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/partners.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
+  { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/sponsors.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
   { key: "events", label: "Events Page", xlsx: ["data/events.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
   { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx"], folders: ["assets/images/shala"] },

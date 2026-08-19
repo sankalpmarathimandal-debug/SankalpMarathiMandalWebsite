@@ -23,7 +23,7 @@
                                add image files to
                                assets/images/branding/logo-variants/, any
                                filename works, no coding needed)
-     data/partners.xlsx        → homepage partner logos
+     data/sponsors.xlsx        → homepage Presenting Sponsors cards
      data/team.xlsx             → Our Team page
      data/shala-team.xlsx        → Marathi Shala team section
      data/faq.xlsx            → FAQs page
@@ -67,7 +67,7 @@ const CONFIG = {
   LOGO_VARIANTS_JSON: 'data/logo-variants.json',
   CULTURE_ICONS_JSON: 'data/culture-icons.json',
   MARQUEE_JSON: 'data/marquee.json',
-  PARTNERS_CSV: 'data/partners.xlsx',
+  SPONSORS_DB: 'data/sponsors.xlsx',
   TEAM_CSV: 'data/team.xlsx',
   SHALA_TEAM_CSV: 'data/shala-team.xlsx',
   FAQS_CSV: 'data/faq.xlsx',
@@ -613,21 +613,75 @@ function openPopup(src) { document.getElementById('popupImg').src = src; documen
 function closePopup() { document.getElementById('popup').classList.remove('active'); startAutoSlide(); }
 
 /* =====================================================
-   PARTNERS (homepage)
+   PRESENTING SPONSORS (homepage)
+   Reads data/sponsors.xlsx (edited via the admin panel). Each sponsor's
+   own brand color drives the card accent — see the CSS block above for
+   how AccentColor is applied via a --accent custom property per card.
    ===================================================== */
-function renderPartnerLogos() {
-  const track = document.getElementById('logos-track');
-  if (!track) return;
-  loadSheet(CONFIG.PARTNERS_CSV, rows => {
-      const active = rows.filter(p => p.Name && (p.Active || '').toLowerCase() === 'yes');
-      track.innerHTML = active.map(logo => `
-        <div class="logo-item">
-          <div class="logo-item-image">
-            <img src="${logo.ImageURL}" alt="${escapeHtml(logo.Name)}" loading="lazy" onerror="this.closest('.logo-item').style.display='none';">
-          </div>
-          <div class="logo-item-name">${escapeHtml(logo.Name)}</div>
-        </div>`).join('');
-  });
+function sponsorContactRow(iconClass, value, href) {
+  if (!value) return '';
+  const inner = href
+    ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(value)}</a>`
+    : `<span>${escapeHtml(value)}</span>`;
+  return `<div class="sponsor-contact-item"><i class="fas ${iconClass}"></i>${inner}</div>`;
+}
+
+function renderSponsors() {
+  const grid = document.getElementById('sponsors-grid');
+  if (!grid) return;
+  loadSheet(CONFIG.SPONSORS_DB, rows => {
+      const active = rows
+        .filter(s => s.Name && (s.Active || '').toLowerCase() === 'yes')
+        .sort((a, b) => (parseInt(a.DisplayOrder) || 0) - (parseInt(b.DisplayOrder) || 0));
+
+      grid.innerHTML = active.map(s => {
+        const accent = (s.AccentColor || '').trim();
+        const style = accent ? ` style="--accent:${escapeHtml(accent)}"` : '';
+        const avatar = s.AvatarURL
+          ? `<img src="${escapeHtml(s.AvatarURL)}" alt="${escapeHtml(s.Name)}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>'">`
+          : `<i class="fas fa-user"></i>`;
+        const icon = (s.Icon || '').trim() || 'star';
+
+        const websiteHref = s.Website ? (s.Website.startsWith('http') ? s.Website : `https://${s.Website}`) : '';
+        const contactRows = [
+          sponsorContactRow('fa-globe', s.Website, websiteHref),
+          sponsorContactRow('fa-phone', s.Phone, s.Phone ? `tel:${s.Phone.replace(/[^\d+]/g, '')}` : ''),
+          sponsorContactRow('fa-envelope', s.Email, s.Email ? `mailto:${s.Email}` : ''),
+          sponsorContactRow('fa-at', s.SocialLabel, s.SocialURL || ''),
+        ].join('');
+
+        const tags = (s.Tags || '').split(',').map(t => t.trim()).filter(Boolean)
+          .map(t => `<span class="sponsor-tag">${escapeHtml(t)}</span>`).join('');
+
+        return `
+          <div class="sponsor-card"${style}>
+            <div class="sponsor-card-bar"></div>
+            <div class="sponsor-card-body">
+              <div class="sponsor-card-head">
+                <div class="sponsor-avatar">${avatar}</div>
+                <div>
+                  <div class="sponsor-name">${escapeHtml(s.Name)}</div>
+                  ${s.Role ? `<div class="sponsor-role">${escapeHtml(s.Role)}</div>` : ''}
+                </div>
+              </div>
+              <div style="text-align:center;">
+                <div class="sponsor-icon-badge"><i class="fas fa-${escapeHtml(icon)}"></i></div>
+                ${s.BusinessName ? `<div class="sponsor-business-name">${escapeHtml(s.BusinessName)}</div>` : ''}
+                ${s.Tagline ? `<div class="sponsor-tagline">${escapeHtml(s.Tagline)}</div>` : ''}
+              </div>
+              <hr class="sponsor-divider">
+              ${s.Tier ? `<div class="sponsor-tier">${escapeHtml(s.Tier)}</div><br>` : ''}
+              ${s.Category ? `<div class="sponsor-category">${escapeHtml(s.Category)}</div>` : ''}
+              ${s.Description ? `<p class="sponsor-description">${escapeHtml(s.Description)}</p>` : ''}
+              ${tags ? `<div class="sponsor-tags">${tags}</div>` : ''}
+              ${contactRows ? `<div class="sponsor-contact">${contactRows}</div>` : ''}
+              ${s.CTAText ? `<a class="sponsor-cta" href="${escapeHtml(s.CTALink || websiteHref || '#')}" target="_blank" rel="noopener">${escapeHtml(s.CTAText)} →</a>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+
+      if (!active.length) grid.closest('.partners-section')?.style.setProperty('display', 'none');
+  }, () => { grid.closest('.partners-section')?.style.setProperty('display', 'none'); });
 }
 
 /* =====================================================
@@ -1196,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderPerfPromo();
   loadTestimonials();
   loadImpactSlider();
-  renderPartnerLogos();
+  renderSponsors();
   renderCultureIconRibbon();
   renderLogoPride();
   loadTimeline();
