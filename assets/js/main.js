@@ -118,7 +118,7 @@ function initMarquee() {
   const track = document.getElementById('marquee-track');
   if (!banner || !track) return; // only present on index.html
 
-  fetch(CONFIG.MARQUEE_JSON)
+  fetch(CONFIG.MARQUEE_JSON, { cache: 'no-store' })
     .then(res => res.ok ? res.json() : null)
     .then(cfg => {
       if (!cfg || !cfg.active || !cfg.text) return; // stays hidden (default state)
@@ -196,7 +196,9 @@ function fileProtocolNotice() {
 /* Load an Excel workbook and return rows of the first sheet as objects */
 function loadSheet(path, onDone, onError) {
   if (location.protocol === 'file:') return;
-  fetch(path)
+  // no-store: these .xlsx files are edited live via the admin panel, so a
+  // stale browser-cached copy would silently hide brand-new/updated rows.
+  fetch(path, { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
     .then(buf => {
       const wb = XLSX.read(buf, { type: 'array' });
@@ -506,7 +508,7 @@ let slides = [], currentSlideIndex = 0, slideInterval;
 function loadImpactSlider() {
   if (!document.getElementById('slider')) return;
   if (location.protocol === 'file:') return;
-  fetch(CONFIG.HIGHLIGHTS_JSON)
+  fetch(CONFIG.HIGHLIGHTS_JSON, { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(items => {
       slides = items.filter(s => s.photo);
@@ -560,7 +562,7 @@ function renderLogoPride() {
   const row2 = document.getElementById('pride-row-2');
   if (!row1 || !row2) return;
   if (location.protocol === 'file:') return;
-  fetch(CONFIG.LOGO_VARIANTS_JSON)
+  fetch(CONFIG.LOGO_VARIANTS_JSON, { cache: 'no-store' })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(items => {
       const srcs = items.map(i => i.src).filter(Boolean);
