@@ -619,28 +619,37 @@ main { flex: 1; }
 
 .perf-promo-cta { width: auto; display: inline-block; padding: 14px 28px; margin-top: auto; align-self: flex-start; }
 
-/* Marathi Shala homepage teaser reuses the .perf-promo-grid scaffolding
-   as-is (same column layout, same mobile collapse, same photo/text left-
-   right arrangement as Performances) so both teasers line up to the same
-   overall height. Distinct only where it needs to be: its own warm
-   saffron/brown gradient instead of Performances' maroon/purple, and a
-   small centered logo badge instead of a full-bleed cover photo. */
+/* Marathi Shala homepage teaser: reuses .perf-promo-grid's dark/light
+   split idea but with its own narrow fixed-width logo rail instead of a
+   1.3fr photo column — a 110px logo doesn't need a huge column to sit in,
+   so forcing it into one just left a big empty gray box. Narrower column
+   + shorter copy below keeps the whole card compact instead of matching
+   Performances' height artificially. */
+.shala-promo .perf-promo-grid { grid-template-columns: 200px 1fr; }
+@media (max-width: 900px) { .shala-promo .perf-promo-grid { grid-template-columns: 1fr; } }
 .shala-promo .perf-promo-side {
   background: linear-gradient(165deg, var(--saffron) 0%, #5c2c0a 100%);
 }
 .shala-promo .perf-promo-side .hero2-eyebrow { color: #ffe8c2; }
-.shala-promo .perf-promo-item-icon i { color: #fff; }
-/* Same min-height as .perf-promo-photo so this column matches the
-   Performances panel's height exactly, even though the logo inside it
-   is small. */
 .shala-logo-panel {
   display: flex; align-items: center; justify-content: center;
-  background: var(--apple-light-gray); min-height: 420px;
+  background: var(--apple-light-gray); padding: 24px;
 }
 .shala-logo-panel img {
   width: 110px; height: 110px; border-radius: 18px; object-fit: cover;
   box-shadow: 0 10px 24px rgba(0,0,0,0.15);
 }
+
+/* Compact icon+label chips, replacing the longer perf-promo-item rows —
+   short and scannable instead of four paragraphs of description. */
+.shala-highlights { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
+.shala-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.14); color: #fff;
+  font-family: var(--font-family); font-size: 12.5px; font-weight: 600;
+  padding: 9px 14px; border-radius: 980px;
+}
+.shala-chip i { font-size: 12px; opacity: 0.9; }
 
 .timeline-button-container { text-align: center; padding: 8px 0 16px; }
 
