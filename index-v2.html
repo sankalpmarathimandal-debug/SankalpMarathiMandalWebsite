@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[PREVIEW] संकल्प - आपलं मराठी मंडळ | Sankalp Marathi Mandal, Massachusetts</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Sankalp Marathi Mandal — a Marathi community organization in Massachusetts celebrating Maharashtrian culture, festivals, Marathi Shala, and community events in New England.">
+<meta name="keywords" content="Marathi Mandal, Massachusetts, New England, Marathi Shala, Maharashtrian culture, Sankalp, Marathi community">
+
+<!-- Open Graph -->
+<meta property="og:title" content="संकल्प - आपलं मराठी मंडळ | Sankalp Marathi Mandal">
+<meta property="og:description" content="Celebrating Maharashtrian heritage in New England — events, Marathi Shala, and community.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.sankalpmarathi.org/">
+<meta name="twitter:card" content="summary">
+
+<!-- Dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=06c95f6">
+
+<!-- PREVIEW-ONLY styles for the hero v3 experiment — scoped to this page only,
+     nothing here touches the shared assets/css/style.css used by the real site. -->
+<style>
+  .hero3-wrap { max-width: 1280px; margin: 24px auto 0; padding: 0 24px; }
+  .hero3-card {
+    position: relative; overflow: hidden; border-radius: 28px;
+    border: 1px solid #dcb570;
+    background:
+      radial-gradient(circle at 8% 12%, rgba(217,164,65,0.10) 0%, transparent 40%),
+      radial-gradient(circle at 92% 85%, rgba(181,23,29,0.06) 0%, transparent 45%),
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 2px, transparent 2px, transparent 4px),
+      linear-gradient(155deg, #fbf3e4 0%, #f6ead2 55%, #f2e0bd 100%);
+    padding: 44px 44px 0;
+  }
+  .hero3-top { display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: center; position: relative; z-index: 2; }
+  @media (max-width: 760px) { .hero3-top { grid-template-columns: 1fr; } }
+
+  .hero3-logo {
+    background: #fff; border: 1px solid #e3c88b; border-radius: 20px;
+    padding: 20px; box-shadow: 0 10px 26px rgba(120,80,20,0.12);
+  }
+  .hero3-logo img { width: 100%; display: block; }
+
+  .hero3-location {
+    display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-family);
+    font-size: 13px; font-weight: 600; color: var(--brand-gradient-start);
+    background: #fff; border: 1px solid #e9d3a3; padding: 7px 16px; border-radius: 980px;
+    margin-bottom: 18px;
+  }
+  .hero3-h1 { font-family: var(--font-devanagari); font-size: clamp(30px, 4vw, 44px); color: var(--apple-dark); margin: 0 0 12px; line-height: 1.3; }
+  .hero3-h1 .accent { color: var(--brand-gradient-start); }
+
+  .hero3-divider { display: flex; align-items: center; gap: 10px; max-width: 340px; margin-bottom: 18px; color: #c99a3f; }
+  .hero3-divider span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #c99a3f, transparent); }
+  .hero3-divider i { font-size: 8px; }
+
+  .hero3-sub { font-family: var(--font-devanagari); font-size: 15px; color: #5a5044; max-width: 520px; line-height: 1.7; margin-bottom: 26px; }
+
+  .hero3-ctas { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
+  .hero3-ctas .cta-button { width: auto; padding: 13px 26px; display: inline-flex; align-items: center; gap: 8px; }
+
+  .hero3-trust { display: flex; flex-direction: column; gap: 10px; font-family: var(--font-family); font-size: 12.5px; color: #5a5044; }
+  .hero3-trust span { display: flex; align-items: flex-start; gap: 8px; }
+  .hero3-trust b { color: var(--apple-dark); }
+
+  .hero3-motif {
+    position: absolute; right: -40px; bottom: 0; width: 320px; height: 320px;
+    opacity: 0.10; filter: sepia(1) saturate(2) hue-rotate(-10deg); pointer-events: none; z-index: 1;
+  }
+  .hero3-motif img { width: 100%; height: 100%; object-fit: contain; }
+
+  .hero3-ribbon-divider { display: flex; align-items: center; gap: 14px; padding: 32px 0 0; color: #c99a3f; position: relative; z-index: 2; }
+  .hero3-ribbon-divider span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #c99a3f, transparent); }
+  .hero3-ribbon-divider i { font-size: 12px; }
+
+  .hero3-ribbon { background: rgba(217,164,65,0.14); margin-top: 24px; padding: 24px 44px 28px; position: relative; z-index: 2; }
+  .hero3-ribbon-label {
+    text-align: center; font-family: var(--font-devanagari); font-size: 14px; font-weight: 700;
+    color: #8a5a1c; margin-bottom: 16px; letter-spacing: 0.02em;
+  }
+  .hero3-ribbon .icon-strip-row { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%); }
+
+  @media (max-width: 640px) {
+    .hero3-card { padding: 32px 20px 0; }
+    .hero3-ribbon { padding: 20px 20px 24px; }
+    .hero3-motif { width: 200px; height: 200px; right: -20px; }
+  }
+</style>
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Sankalp Marathi Mandal",
+  "alternateName": "संकल्प - आपलं मराठी मंडळ",
+  "url": "https://www.sankalpmarathi.org",
+  "sameAs": [
+    "https://www.instagram.com/sankalpmarathimandal",
+    "https://www.facebook.com/share/g/18UEkDGmBE/",
+    "https://www.youtube.com/@sankalpmarathimandal4296"
+  ]
+}
+</script>
+</head>
+
+<body>
+<div style="background:#1d1d1f;color:#ffd479;text-align:center;font-size:13px;padding:8px 16px;font-family:'Inter',sans-serif;">
+  🧪 PREVIEW PAGE — design experiments only, not the live homepage. See <a href="index.html" style="color:#fff;text-decoration:underline;">index.html</a> for the real site.
+</div>
+<!-- NAVIGATION -->
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/images/branding/logo.png" alt="Sankalp Marathi Mandal logo" class="nav-brand-logo">
+      <span class="nav-brand-text">संकल्प <span class="nav-brand-sub">- आपलं मराठी मंडळ</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="events.html">Event Timeline</a></li>
+      <li><a href="team.html">Our Team</a></li>
+      <li><a href="shala.html">Marathi Shala</a></li>
+      <li><a href="calendar.html">Shala Calendar</a></li>
+      <li><a href="faq.html">FAQs</a></li>
+      <li><a href="showcase.html">Showcase</a></li>
+      <li><a href="forms.html">Forms</a></li>
+      <li><a href="book-a-performance.html">Book a Performance</a></li>
+      <li><a href="constitution.html">Constitution</a></li>
+    </ul>
+    <a href="join.html" class="nav-cta">Join Us</a>
+  </div>
+</nav>
+
+<!-- MARQUEE BANNER — populated from data/marquee.json by main.js; hidden entirely when inactive or absent -->
+<div class="marquee-banner" id="marquee-banner" role="marquee" aria-label="Announcements" style="display:none;">
+  <div class="marquee-track" id="marquee-track"></div>
+</div>
+
+<main>
+<!-- HOME HERO v3 — parchment card with the culture icon ribbon merged into
+     its own bottom band (was a separate section below). The corner motif
+     is the existing fort_gate culture icon, enlarged/faded, as a stand-in
+     for hand-painted artwork — flagged as an approximation, see chat. -->
+<div class="hero3-wrap">
+  <div class="hero3-card">
+    <div class="hero3-top">
+      <div class="hero3-logo">
+        <img src="assets/images/branding/logo.png" alt="Sankalp Marathi Mandal logo" onerror="this.style.display='none';">
+      </div>
+      <div class="hero3-copy">
+        <span class="hero3-location"><i class="fas fa-location-dot"></i> Sankalp Marathi Mandal &middot; Massachusetts</span>
+        <h1 class="hero3-h1">एक <span class="accent">संकल्प</span> मराठी जपण्याचा</h1>
+        <div class="hero3-divider" aria-hidden="true"><span></span><i class="fas fa-diamond"></i><span></span></div>
+        <p class="hero3-sub">जगाच्या पाठीवर कुठेही असलो तरी मराठीपणाची ज्योत मनामध्ये तेवते</p>
+        <div class="hero3-ctas">
+          <a class="cta-button cta-primary" href="join.html">Join Us <i class="fas fa-arrow-right" style="font-size:12px;"></i></a>
+          <a class="cta-button cta-secondary" href="sponsor.html">Become a Sponsor <i class="fas fa-arrow-right" style="font-size:12px;"></i></a>
+        </div>
+        <div class="hero3-trust">
+          <span><i class="fas fa-flag" style="color:#c0392b;"></i> <b>Our Mission</b> — Preserve &amp; celebrate Maharashtrian heritage</span>
+          <span><i class="fas fa-eye" style="color:#6c3fa0;"></i> <b>Our Vision</b> — A thriving community across generations</span>
+          <span><i class="fas fa-people-group" style="color:#e07b2c;"></i> <b>Our Values</b> — Unity, language, and connection</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero3-motif" aria-hidden="true"><img src="assets/images/culture-icons/13_fort_gate.png" alt=""></div>
+
+    <div class="hero3-ribbon-divider" aria-hidden="true"><span></span><i class="fas fa-sun"></i><span></span></div>
+
+    <!-- Same auto-managed ribbon as before (data/culture-icons.json, add/remove
+         files in assets/images/culture-icons/ to change it) — just moved inside
+         the hero card. Per-icon Marathi labels like the reference image are NOT
+         included yet: that needs a labeled/curated list instead of the current
+         auto-generated-from-filenames approach. Flagged for a follow-up. -->
+    <div class="hero3-ribbon">
+      <div class="hero3-ribbon-label">परंपरेचा वारसा &middot; मराठी मनाचा अभिमान</div>
+      <div class="icon-strip-row">
+        <div class="icon-strip-track" id="icon-strip-track"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<section class="section-divider" id="events-title">
+  <h2 class="section-title">Our Events</h2>
+  <p class="section-subtitle">Discover our past, present and future events.</p>
+</section>
+
+<section class="events-section" id="events">
+  <div class="ev3-grid" id="events-grid"></div>
+  <div class="timeline-button-container">
+    <a href="events.html" class="timeline-button">View Timeline</a>
+  </div>
+</section>
+
+<!-- BOOK A PERFORMANCE — homepage teaser, links to book-a-performance.html -->
+<section class="perf-promo" id="perf-promo">
+  <div class="perf-promo-grid">
+    <div class="perf-promo-photo">
+      <img src="assets/images/programs/performance-showcase.jpg" alt="Sankalp devotional performance" loading="lazy">
+    </div>
+    <div class="perf-promo-side">
+      <span class="hero2-eyebrow">Available to Book</span>
+      <h2 class="perf-promo-title">Sankalp Performances</h2>
+      <p class="perf-promo-sub">Bring the spirit of Maharashtra to your celebration with devotional singing, abhang, and traditional cultural programs.</p>
+      <div class="perf-promo-list" id="perf-promo-grid"></div>
+      <a href="book-a-performance.html" class="cta-button cta-primary perf-promo-cta">Explore All Performances</a>
+    </div>
+  </div>
+</section>
+
+<!-- Event Modal -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close modal" id="modal-close-btn">×</button>
+    <div class="modal-layout" id="modal-layout">
+      <div class="modal-media" id="modal-media"></div>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-desc" id="modal-desc"></p>
+        <div class="modal-meta" id="modal-meta"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<section class="section-divider" id="voices-title">
+  <h2 class="section-title">Community Voices</h2>
+  <p class="section-subtitle">Shared experiences, shared pride.</p>
+</section>
+
+<section id="testimonials">
+  <div class="testimonials-grid" id="testimonials-container"></div>
+</section>
+
+<!-- IMPACT -->
+<section class="section-divider" id="impact-title">
+  <h2 class="section-title">Our Impact Stories</h2>
+  <p class="section-subtitle">Making a difference to preserve culture.</p>
+</section>
+
+<section class="events-section" id="impact">
+  <div class="impact-slider-container">
+    <div class="slider-wrapper" id="slider"></div>
+    <div class="slider-controls">
+      <button class="slider-btn" onclick="prevSlide()" aria-label="Previous slide">‹</button>
+      <button class="slider-btn" onclick="nextSlide()" aria-label="Next slide">›</button>
+    </div>
+    <div class="thumbnails" id="thumbs"></div>
+  </div>
+  <div class="popup" id="popup" onclick="closePopup()">
+    <img id="popupImg" alt="Full size image">
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="section-divider" id="partners-title">
+  <h2 class="section-title">Our Valued Partners</h2>
+  <p class="section-subtitle">Building success, hand in hand.</p>
+</section>
+
+<section class="partners-section" id="partners">
+  <div class="partners-container">
+    <div class="logos-grid" id="logos-track"></div>
+  </div>
+</section>
+
+<!-- COMMUNITY PRIDE WALL -->
+<section class="section-divider" id="pride-title">
+  <h2 class="section-title">Community Pride Wall</h2>
+  <p class="section-subtitle">अभिमान आपल्या मराठी संस्कृतीचा — creative logo art made by our own community.</p>
+</section>
+
+<section class="pride-river" id="pride-wall">
+  <div class="pride-row">
+    <div class="pride-track" id="pride-row-1"></div>
+  </div>
+  <div class="pride-row reverse">
+    <div class="pride-track" id="pride-row-2"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section-divider" id="about-title">
+  <h2 class="section-title">About Us</h2>
+  <p class="section-subtitle">Passion, Purpose and People at heart</p>
+</section>
+
+
+<section class="about-section" id="about">
+  <div class="about-container">
+    <p class="about-intro">
+      मराठी माणूस जगाच्या पाठीवर कुठेही गेला तरी एखादं मंडळ स्थापन करतोच. त्यामागे एकच भावना, एकच उद्देश - आपल्या बांधवाना एकत्र आणणे तसेच आपल्या पुढच्या पिढीलाही आपल्या संस्कृतीची ओळख व्हावी ही कळकळ त्या मागे असतेच. हाच विचार मनात बाळगून हे मंडळ स्थापन केले आहे. मराठी कुटुंबांनी दिवाळीतील स्नेहसम्मेलनात एकत्र येऊन या मंडळाचे रोपटे लावले आणि त्याचे वटवृक्षात रूपांतर व्हावे हेही एक उद्दिष्ट.
+    </p>
+    <!--
+    <div class="about-cards-wrapper">
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-flag"></i></div>
+        <h4>Our Mission</h4>
+        <p>To preserve and celebrate Maharashtrian heritage, fostering pride, unity, and connection within the community.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-eye"></i></div>
+        <h4>Our Vision</h4>
+        <p>To build a thriving community that cherishes Marathi traditions, artistry, and language, ensuring our cultural legacy endures for future generations.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-icon"><i class="fas fa-handshake"></i></div>
+        <h4>Our Values</h4>
+        <p>We unite Marathi families and students in New England to celebrate culture, preserve the language, collaborate with community partners, and stay connected digitally.</p>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <p class="footer-welcome">
+      We extend a warm welcome to everyone to join our connected Marathi community. Together, let's extend a helping hand to others and contribute to creating a healthy and peaceful society worldwide.
+    </p>
+    <p class="footer-tagline">एक संकल्प मराठी जपण्याचा</p>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="events.html">Event Timeline</a>
+      <a href="team.html">Our Team</a>
+      <a href="shala.html">Marathi Shala</a>
+      <a href="calendar.html">Shala Calendar</a>
+      <a href="faq.html">FAQs</a>
+      <a href="showcase.html">Showcase</a>
+      <a href="forms.html">Forms</a>
+      <a href="book-a-performance.html">Book a Performance</a>
+      <a href="constitution.html">Constitution</a>
+      <a href="https://sankalp-admin.sankalpsj.workers.dev" target="_blank" rel="noopener">Admin</a>
+    </nav>
+    <p class="footer-copyright">Copyright © <span id="currentYear"></span> Sankalp - All Rights Reserved.</p>
+    <div class="footer-social">
+      <a href="https://www.instagram.com/sankalpmarathimandal" target="_blank" rel="noopener" aria-label="Instagram">
+        <i class="fa-brands fa-square-instagram" style="font-size:32px;color:#E36C18;"></i>
+      </a>
+      <a href="https://www.facebook.com/share/g/18UEkDGmBE/" target="_blank" rel="noopener" aria-label="Facebook">
+        <i class="fa-brands fa-square-facebook" style="font-size:32px;color:#E36C18;"></i>
+      </a>
+      <a href="https://www.youtube.com/@sankalpmarathimandal4296" target="_blank" rel="noopener" aria-label="YouTube">
+        <i class="fa-brands fa-square-youtube" style="font-size:32px;color:#E36C18;"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+<script src="assets/js/main.js?v=06c95f6" defer></script>
+</body>
+</html>
