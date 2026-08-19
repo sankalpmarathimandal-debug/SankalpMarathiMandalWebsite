@@ -619,30 +619,27 @@ main { flex: 1; }
 
 .perf-promo-cta { width: auto; display: inline-block; padding: 14px 28px; margin-top: auto; align-self: flex-start; }
 
-/* Marathi Shala homepage teaser reuses the .perf-promo-grid item-list
-   scaffolding (so the highlight rows behave the same) but is deliberately
-   NOT a copy of the Performances panel: its own warm saffron/gold gradient
-   (instead of Performances' maroon/purple) and the logo panel swapped to
-   the second column so the two teasers read as a distinct pair, not
-   duplicates of each other. */
-.shala-grid { grid-template-columns: 1fr 0.85fr; }
-/* .shala-grid's own grid-template-columns comes after the .perf-promo-grid
-   mobile collapse rule above, so without this it was winning the cascade
-   at mobile widths too — the two columns stayed side by side and the logo
-   panel got squeezed off-screen instead of stacking underneath the text. */
-@media (max-width: 900px) { .shala-grid { grid-template-columns: 1fr; } }
+/* Marathi Shala homepage teaser reuses the .perf-promo-grid scaffolding
+   as-is (same column layout, same mobile collapse, same photo/text left-
+   right arrangement as Performances) so both teasers line up to the same
+   overall height. Distinct only where it needs to be: its own warm
+   saffron/brown gradient instead of Performances' maroon/purple, and a
+   small centered logo badge instead of a full-bleed cover photo. */
 .shala-promo .perf-promo-side {
   background: linear-gradient(165deg, var(--saffron) 0%, #5c2c0a 100%);
 }
 .shala-promo .perf-promo-side .hero2-eyebrow { color: #ffe8c2; }
 .shala-promo .perf-promo-item-icon i { color: #fff; }
+/* Same min-height as .perf-promo-photo so this column matches the
+   Performances panel's height exactly, even though the logo inside it
+   is small. */
 .shala-logo-panel {
   display: flex; align-items: center; justify-content: center;
-  background: var(--apple-light-gray); padding: 40px; min-height: 420px;
+  background: var(--apple-light-gray); min-height: 420px;
 }
 .shala-logo-panel img {
-  width: 220px; height: 220px; border-radius: 28px; object-fit: cover;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+  width: 110px; height: 110px; border-radius: 18px; object-fit: cover;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.15);
 }
 
 .timeline-button-container { text-align: center; padding: 8px 0 16px; }
