@@ -24,6 +24,14 @@
      (.hero2, untouched) with the culture icon ribbon nested inside the same
      card as a third grid row, instead of living in a separate section below. -->
 <style>
+  /* The hero logo kept intermittently flashing then vanishing on mobile
+     Safari even after scoping the overflow:hidden fix below — the
+     fade-in-on-load keyframe animation itself is the unreliable part on
+     that engine. It's decorative only, so just turn it off outright for
+     this image: always render at full opacity, no animation dependency,
+     no possibility of a stuck/dropped frame making it disappear. */
+  .hero2-art img { animation: none !important; opacity: 1 !important; transform: none !important; }
+
   /* Clip only the ribbon row itself, not the whole card. Scoping
      overflow:hidden to .hero2 was clipping the hero image's own
      fade-in transform animation too — on iOS/WebKit that combo
