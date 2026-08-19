@@ -640,7 +640,12 @@ function renderSponsors() {
         const avatar = s.AvatarURL
           ? `<img src="${escapeHtml(s.AvatarURL)}" alt="${escapeHtml(s.Name)}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>'">`
           : `<i class="fas fa-user"></i>`;
-        const icon = (s.Icon || '').trim() || 'star';
+        const icon = (s.Icon || '').trim();
+        // Middle badge: real business logo if one's set, otherwise fall back
+        // to the small Font Awesome icon so the badge is never empty.
+        const middleBadge = s.LogoURL
+          ? `<img src="${escapeHtml(s.LogoURL)}" alt="${escapeHtml(s.BusinessName || s.Name)}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-${escapeHtml(icon || 'star')}\\'></i>'">`
+          : `<i class="fas fa-${escapeHtml(icon || 'star')}"></i>`;
 
         const websiteHref = s.Website ? (s.Website.startsWith('http') ? s.Website : `https://${s.Website}`) : '';
         const contactRows = [
@@ -660,12 +665,12 @@ function renderSponsors() {
               <div class="sponsor-card-head">
                 <div class="sponsor-avatar">${avatar}</div>
                 <div>
-                  <div class="sponsor-name">${escapeHtml(s.Name)}</div>
+                  <div class="sponsor-name">${escapeHtml(s.Name)}${icon ? ` <i class="fas fa-${escapeHtml(icon)} sponsor-name-icon"></i>` : ''}</div>
                   ${s.Role ? `<div class="sponsor-role">${escapeHtml(s.Role)}</div>` : ''}
                 </div>
               </div>
               <div style="text-align:center;">
-                <div class="sponsor-icon-badge"><i class="fas fa-${escapeHtml(icon)}"></i></div>
+                <div class="sponsor-icon-badge">${middleBadge}</div>
                 ${s.BusinessName ? `<div class="sponsor-business-name">${escapeHtml(s.BusinessName)}</div>` : ''}
                 ${s.Tagline ? `<div class="sponsor-tagline">${escapeHtml(s.Tagline)}</div>` : ''}
               </div>
