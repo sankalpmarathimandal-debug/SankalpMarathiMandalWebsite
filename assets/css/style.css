@@ -619,11 +619,18 @@ main { flex: 1; }
 
 .perf-promo-cta { width: auto; display: inline-block; padding: 14px 28px; margin-top: auto; align-self: flex-start; }
 
-/* Marathi Shala homepage teaser reuses the .perf-promo-grid scaffolding
-   above (same dark side panel, same item-list styling) with the visual
-   panel narrower and swapped to the second column, so the two teaser
-   sections read as a matched pair rather than duplicates. */
+/* Marathi Shala homepage teaser reuses the .perf-promo-grid item-list
+   scaffolding (so the highlight rows behave the same) but is deliberately
+   NOT a copy of the Performances panel: its own warm saffron/gold gradient
+   (instead of Performances' maroon/purple) and the logo panel swapped to
+   the second column so the two teasers read as a distinct pair, not
+   duplicates of each other. */
 .shala-grid { grid-template-columns: 1fr 0.85fr; }
+.shala-promo .perf-promo-side {
+  background: linear-gradient(165deg, var(--saffron) 0%, #5c2c0a 100%);
+}
+.shala-promo .perf-promo-side .hero2-eyebrow { color: #ffe8c2; }
+.shala-promo .perf-promo-item-icon i { color: #fff; }
 .shala-logo-panel {
   display: flex; align-items: center; justify-content: center;
   background: var(--apple-light-gray); padding: 40px; min-height: 420px;
