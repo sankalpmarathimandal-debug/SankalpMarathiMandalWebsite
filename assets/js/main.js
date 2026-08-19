@@ -686,7 +686,6 @@ function renderSponsors() {
               ${tags ? `<div class="sponsor-tags">${tags}</div>` : ''}
               ${contactRows ? `<hr class="sponsor-contact-divider"><div class="sponsor-contact">${contactRows}</div>` : ''}
             </div>
-            <div class="sponsor-card-bar"></div>
           </div>`;
       }).join('');
 
