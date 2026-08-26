@@ -1,24 +1,45 @@
 [
   {
-    "src": "assets/images/culture-icons/02_diya.png"
+    "src": "assets/images/culture-icons/Tulsi.svg"
   },
   {
-    "src": "assets/images/culture-icons/03_pheta.png"
+    "src": "assets/images/culture-icons/Shankha 1.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Rangoli.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/pheta.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Om.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Maharashtra.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Killa 1.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/kalash.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Homa.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Flag 1.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Diya.svg"
+  },
+  {
+    "src": "assets/images/culture-icons/Dhol 1.svg"
   },
   {
     "src": "assets/images/culture-icons/04_gandhi_cap.png"
   },
   {
-    "src": "assets/images/culture-icons/05_bhagwa_dhwaj.png"
-  },
-  {
-    "src": "assets/images/culture-icons/06_shankha.png"
-  },
-  {
     "src": "assets/images/culture-icons/07_manjira.png"
-  },
-  {
-    "src": "assets/images/culture-icons/08_dholak.png"
   },
   {
     "src": "assets/images/culture-icons/09_pakhawaj.png"
@@ -46,9 +67,6 @@
   },
   {
     "src": "assets/images/culture-icons/19_paduka.png"
-  },
-  {
-    "src": "assets/images/culture-icons/20_kalash.png"
   },
   {
     "src": "assets/images/culture-icons/21_diya_on_rangoli.png"
