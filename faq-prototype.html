@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQs (Prototype) | संकल्प - आपलं मराठी मंडळ</title>
+<meta name="description" content="Frequently asked questions about Sankalp Marathi Mandal — membership, events, Marathi Shala, volunteering, and sponsorship.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css?v=f1cf50f">
+
+<!--
+  ============================================================================
+  PROTOTYPE — not linked from the live site, safe to preview and throw away.
+  Open it the same way you preview any other page (Start Local Preview.command,
+  or push to a branch and view on GitHub Pages).
+
+  What's different from faq.html, and why:
+
+  1. Search box — filters questions live as you type. Doesn't touch data/faq.xlsx
+     at all; pure front-end. Useful once the list grows past ~12-15 questions.
+
+  2. Expand all / Collapse all — quality-of-life for people who want to skim
+     everything (or print the page) instead of clicking one at a time.
+
+  3. Optional category grouping — if you ever add a "Category" column to
+     data/faq.xlsx (e.g. "Membership", "Events", "Marathi Shala"), this page
+     groups questions under headings automatically. Leave the column out and
+     it renders as one flat list, exactly like today — zero code change either way.
+
+  4. Shareable links per question — each question gets a stable URL
+     (faq-prototype.html#is-there-an-annual-fee). Clicking the link icon next
+     to a question copies that URL. Handy for "someone asked me this on
+     WhatsApp" — instead of "check the FAQ page", you can send the exact answer.
+     Opening a link with a #hash auto-expands and scrolls to that question.
+
+  5. Auto-generated FAQ structured data (JSON-LD) — built from the same rows
+     already in data/faq.xlsx, so it can't drift out of sync with the visible
+     page. This is what lets Google show your Q&As directly in search results.
+     Caveat: because content loads via JavaScript (same as the rest of the
+     site today), this only helps for crawlers that execute JS — which
+     includes Googlebot, but not every search engine. A fully static
+     pre-rendered page would be more bulletproof; flagging it, not fixing it
+     here.
+
+  6. "Still have a question?" card at the end — same email as the last FAQ
+     row today, just presented as a clear call-to-action instead of being
+     one more accordion item to click open.
+
+  Everything above reads data/faq.xlsx exactly like the live page (same
+  loadSheet()/CONFIG from assets/js/main.js) — there is nothing new to
+  maintain in the data file unless you want the optional Category column.
+  ============================================================================
+-->
+
+<style>
+  /* Prototype-only additions. If adopted, fold these into assets/css/style.css. */
+  .faq-toolbar {
+    max-width: 800px; margin: 0 auto 28px; padding: 0 20px;
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .faq-search-wrap { position: relative; flex: 1 1 260px; }
+  .faq-search-wrap i {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--apple-gray); font-size: 14px; pointer-events: none;
+  }
+  .faq-search {
+    width: 100%; padding: 12px 16px 12px 40px; border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.1); font-family: var(--font-family);
+    font-size: 15px; color: var(--apple-dark); background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .faq-search:focus {
+    outline: none; border-color: var(--accent-orange);
+    box-shadow: 0 0 0 3px rgba(227,108,24,0.14);
+  }
+  .faq-search-clear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    border: none; background: none; color: var(--apple-gray); cursor: pointer;
+    font-size: 13px; padding: 6px 8px; display: none;
+  }
+  .faq-search-clear.visible { display: block; }
+  .faq-toolbar-actions { display: flex; gap: 8px; }
+  .faq-toolbar-btn {
+    font-family: var(--font-family); font-size: 13px; font-weight: 600;
+    color: var(--apple-dark); background: var(--apple-light-gray);
+    border: 1px solid rgba(0,0,0,0.06); border-radius: 999px;
+    padding: 10px 16px; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .faq-toolbar-btn:hover { background: #ececee; }
+  .faq-results-count {
+    max-width: 800px; margin: 0 auto 14px; padding: 0 20px;
+    font-family: var(--font-family); font-size: 13px; color: var(--apple-gray);
+  }
+  .faq-category-heading {
+    font-family: var(--font-family); font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-orange);
+    margin: 32px 0 12px; padding: 0 4px;
+  }
+  .faq-category-heading:first-child { margin-top: 0; }
+  .faq-item { position: relative; }
+  .faq-item.faq-highlight {
+    animation: faqPulse 1.6s ease;
+  }
+  @keyframes faqPulse {
+    0% { box-shadow: 0 0 0 0 rgba(227,108,24,0.35); }
+    100% { box-shadow: 0 0 0 12px rgba(227,108,24,0); }
+  }
+  .faq-link-btn {
+    position: absolute; top: 18px; right: 52px;
+    background: none; border: none; cursor: pointer;
+    color: var(--apple-gray); font-size: 13px; padding: 6px;
+    opacity: 0; transition: opacity 0.15s, color 0.15s;
+  }
+  .faq-item:hover .faq-link-btn, .faq-link-btn:focus-visible { opacity: 1; }
+  .faq-link-btn:hover { color: var(--accent-orange); }
+  mark.faq-match { background: rgba(227,108,24,0.18); color: inherit; border-radius: 3px; padding: 0 1px; }
+  .faq-empty-state {
+    max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center;
+    color: var(--apple-gray); font-family: var(--font-family); font-size: 15px;
+  }
+  .faq-empty-state a { color: var(--accent-orange); font-weight: 600; text-decoration: none; }
+  .faq-cta-card {
+    max-width: 800px; margin: 40px auto 0; padding: 32px 28px;
+    background: var(--apple-dark); border-radius: var(--radius-lg, 18px);
+    text-align: center;
+  }
+  .faq-cta-card h3 {
+    font-family: var(--font-family); color: #fff; font-size: 20px; margin: 0 0 8px;
+  }
+  .faq-cta-card p {
+    font-family: var(--font-family); color: rgba(255,255,255,0.7); font-size: 14px;
+    margin: 0 0 20px; line-height: 1.6;
+  }
+  .faq-cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-orange); color: #fff; text-decoration: none;
+    font-family: var(--font-family); font-weight: 600; font-size: 14px;
+    padding: 12px 24px; border-radius: 999px; transition: transform 0.15s, background 0.15s;
+  }
+  .faq-cta-btn:hover { background: var(--accent-orange-bright); transform: scale(1.03); }
+  .faq-toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--apple-dark); color: #fff; font-family: var(--font-family);
+    font-size: 13px; font-weight: 600; padding: 12px 20px; border-radius: 999px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 999;
+  }
+  .faq-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .proto-banner {
+    max-width: 800px; margin: 0 auto 24px; padding: 14px 20px;
+    background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 12px;
+    font-family: var(--font-family); font-size: 13px; color: #92400e; text-align: center;
+  }
+</style>
+</head>
+
+<body>
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/images/branding/logo.png" alt="Sankalp Marathi Mandal logo" class="nav-brand-logo">
+      <span class="nav-brand-text">संकल्प <span class="nav-brand-sub">- आपलं मराठी मंडळ</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="events.html">Event Timeline</a></li>
+      <li><a href="team.html">Our Team</a></li>
+      <li><a href="shala.html">Marathi Shala</a></li>
+      <li><a href="calendar.html">Shala Calendar</a></li>
+      <li><a href="faq-prototype.html" class="active">FAQs</a></li>
+      <li><a href="showcase.html">Showcase</a></li>
+      <li><a href="forms.html">Forms</a></li>
+      <li><a href="book-a-performance.html">Book a Performance</a></li>
+      <li><a href="constitution.html">Constitution</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+<section class="page-hero">
+  <h1>Frequently Asked Questions</h1>
+  <p>Everything you need to know about joining and participating in संकल्प.</p>
+</section>
+
+<div class="proto-banner">
+  🧪 Prototype — search, expand/collapse, shareable question links, and auto-generated SEO data. Reads the same <code>data/faq.xlsx</code> as the live FAQ page.
+</div>
+
+<section class="faq-section">
+  <div class="faq-toolbar">
+    <div class="faq-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" class="faq-search" id="faqSearch" placeholder="Search questions… (e.g. volunteer, fee, Marathi class)" aria-label="Search FAQs">
+      <button class="faq-search-clear" id="faqSearchClear" aria-label="Clear search"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="faq-toolbar-actions">
+      <button class="faq-toolbar-btn" id="faqExpandAll">Expand all</button>
+      <button class="faq-toolbar-btn" id="faqCollapseAll">Collapse all</button>
+    </div>
+  </div>
+  <p class="faq-results-count" id="faqResultsCount"></p>
+  <div id="faq-container-v2"></div>
+
+  <div class="faq-cta-card">
+    <h3>Still have a question?</h3>
+    <p>Can't find what you're looking for? Send us a note and we'll get back to you.</p>
+    <a class="faq-cta-btn" href="mailto:sankalpmarathimandal@gmail.com"><i class="fas fa-envelope"></i> Email sankalpmarathimandal@gmail.com</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <p class="footer-tagline">एक संकल्प मराठी जपण्याचा</p>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="events.html">Event Timeline</a>
+      <a href="team.html">Our Team</a>
+      <a href="shala.html">Marathi Shala</a>
+      <a href="calendar.html">Shala Calendar</a>
+      <a href="faq-prototype.html">FAQs</a>
+      <a href="showcase.html">Showcase</a>
+      <a href="forms.html">Forms</a>
+      <a href="book-a-performance.html">Book a Performance</a>
+      <a href="constitution.html">Constitution</a>
+      <a href="https://sankalp-admin.sankalpsj.workers.dev" target="_blank" rel="noopener">Admin</a>
+    </nav>
+    <p class="footer-copyright">Copyright © <span id="currentYear"></span> Sankalp - All Rights Reserved.</p>
+    <div class="footer-social">
+      <a href="https://www.instagram.com/sankalpmarathimandal" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-square-instagram" style="font-size:32px;color:#E36C18;"></i></a>
+      <a href="https://www.facebook.com/share/g/18UEkDGmBE/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-square-facebook" style="font-size:32px;color:#E36C18;"></i></a>
+      <a href="https://www.youtube.com/@sankalpmarathimandal4296" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-square-youtube" style="font-size:32px;color:#E36C18;"></i></a>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+<div class="faq-toast" id="faqToast">Link copied</div>
+
+<!-- Reuses CONFIG / loadSheet / escapeHtml / initNav / initBackToTop from the real site JS.
+     renderFaqs() inside main.js targets id="faq-container", which doesn't exist on this
+     page, so it's a harmless no-op — none of this file's logic touches main.js. -->
+<script src="assets/js/main.js?v=f1cf50f" defer></script>
+
+<script defer>
+document.addEventListener('DOMContentLoaded', function () {
+  const container = document.getElementById('faq-container-v2');
+  if (!container || typeof loadSheet !== 'function') return;
+
+  const searchInput = document.getElementById('faqSearch');
+  const searchClear = document.getElementById('faqSearchClear');
+  const resultsCount = document.getElementById('faqResultsCount');
+  const toast = document.getElementById('faqToast');
+  let allFaqs = [];
+
+  function slugify(text, used) {
+    let base = String(text).toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 60) || 'question';
+    let slug = base, n = 2;
+    while (used.has(slug)) { slug = base + '-' + n++; }
+    used.add(slug);
+    return slug;
+  }
+
+  function highlight(text, term) {
+    const safe = escapeHtml(text);
+    if (!term) return safe;
+    try {
+      const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+      return safe.replace(re, '<mark class="faq-match">$1</mark>');
+    } catch (e) { return safe; }
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('visible'), 1800);
+  }
+
+  function copyLink(slug) {
+    const url = location.origin + location.pathname + '#' + slug;
+    const done = () => showToast('Link copied — paste it anywhere');
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopy(url, done));
+    } else {
+      fallbackCopy(url, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function render(term) {
+    const q = (term || '').trim().toLowerCase();
+    const matches = allFaqs.filter(f =>
+      !q || f.Question.toLowerCase().includes(q) || f.Answer.toLowerCase().includes(q));
+
+    resultsCount.textContent = q
+      ? `Showing ${matches.length} of ${allFaqs.length} question${allFaqs.length === 1 ? '' : 's'}`
+      : `${allFaqs.length} question${allFaqs.length === 1 ? '' : 's'}`;
+
+    if (!matches.length) {
+      container.innerHTML = `<div class="faq-empty-state">
+        No questions match "${escapeHtml(term)}".
+        <a href="mailto:sankalpmarathimandal@gmail.com">Email us</a> and we'll answer directly, and consider adding it here.
+      </div>`;
+      return;
+    }
+
+    const hasCategories = matches.some(f => f.Category && f.Category.trim());
+    const item = f => `
+      <div class="faq-item" id="faq-${f.slug}">
+        <button class="faq-link-btn" data-slug="${f.slug}" aria-label="Copy link to this question" title="Copy link"><i class="fas fa-link"></i></button>
+        <button class="faq-question" aria-expanded="false"><span>${highlight(f.Question, q)}</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">${highlight(f.Answer, q)}</div></div>
+      </div>`;
+
+    if (hasCategories) {
+      const cats = [...new Set(matches.map(f => (f.Category || 'General').trim() || 'General'))];
+      container.innerHTML = cats.map(c => `
+        <h2 class="faq-category-heading">${escapeHtml(c)}</h2>
+        ${matches.filter(f => ((f.Category || 'General').trim() || 'General') === c).map(item).join('')}
+      `).join('');
+    } else {
+      container.innerHTML = matches.map(item).join('');
+    }
+
+    initFaqAccordion(container);
+
+    container.querySelectorAll('.faq-link-btn').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); copyLink(btn.dataset.slug); });
+    });
+
+    if (q) {
+      container.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.add('open');
+        el.querySelector('.faq-question').setAttribute('aria-expanded', 'true');
+        const ans = el.querySelector('.faq-answer');
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+      });
+    }
+  }
+
+  function injectJsonLd(faqs) {
+    const data = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(f => ({
+        '@type': 'Question',
+        name: f.Question,
+        acceptedAnswer: { '@type': 'Answer', text: f.Answer }
+      }))
+    };
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(data, null, 2);
+    document.head.appendChild(script);
+  }
+
+  function openFromHash() {
+    const slug = location.hash.replace('#', '');
+    if (!slug) return;
+    const el = document.getElementById('faq-' + slug);
+    if (!el) return;
+    el.classList.add('open', 'faq-highlight');
+    el.querySelector('.faq-question').setAttribute('aria-expanded', 'true');
+    const ans = el.querySelector('.faq-answer');
+    ans.style.maxHeight = ans.scrollHeight + 'px';
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    setTimeout(() => el.classList.remove('faq-highlight'), 1800);
+  }
+
+  loadSheet(CONFIG.FAQS_CSV, rows => {
+    const used = new Set();
+    allFaqs = rows
+      .filter(f => f.Question && f.Question.trim())
+      .filter(f => !f.Active || f.Active.toLowerCase() !== 'no')
+      .sort((a, b) => parseInt(a.Order || 0) - parseInt(b.Order || 0))
+      .map(f => ({ ...f, slug: slugify(f.Question, used) }));
+
+    render('');
+    injectJsonLd(allFaqs);
+    openFromHash();
+  }, () => {
+    container.innerHTML = `<div class="faq-empty-state">Couldn't load FAQs right now. <a href="mailto:sankalpmarathimandal@gmail.com">Email us</a> in the meantime.</div>`;
+  });
+
+  searchInput.addEventListener('input', () => {
+    searchClear.classList.toggle('visible', !!searchInput.value);
+    render(searchInput.value);
+  });
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchClear.classList.remove('visible');
+    render('');
+    searchInput.focus();
+  });
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && searchInput.value) { searchInput.value = ''; render(''); searchClear.classList.remove('visible'); }
+  });
+
+  document.getElementById('faqExpandAll').addEventListener('click', () => {
+    container.querySelectorAll('.faq-item').forEach(el => {
+      el.classList.add('open');
+      el.querySelector('.faq-question').setAttribute('aria-expanded', 'true');
+      const ans = el.querySelector('.faq-answer');
+      ans.style.maxHeight = ans.scrollHeight + 'px';
+    });
+  });
+  document.getElementById('faqCollapseAll').addEventListener('click', () => {
+    container.querySelectorAll('.faq-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      el.querySelector('.faq-answer').style.maxHeight = null;
+    });
+  });
+
+  window.addEventListener('hashchange', openFromHash);
+});
+</script>
+</body>
+</html>
