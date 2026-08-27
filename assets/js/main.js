@@ -812,14 +812,31 @@ function renderSponsors() {
 /* =====================================================
    TEAM (our-team.html + marathi-shala.html)
    ===================================================== */
-function renderTeamGrid(csv, containerId) {
+
+// URL-safe anchor id for a Group name, e.g. "Board Of Directors" -> "group-board-of-directors"
+function groupSlug(g) {
+  return 'group-' + g.toString().trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
+}
+
+// subnavId is optional: pass the id of an empty <nav class="subnav"> to get
+// a pill for every distinct Group in the sheet, generated automatically —
+// add/rename/remove a Group in the xlsx and the sub-nav follows with no
+// code changes. Same pattern as shala.html's sub-nav, just built from data
+// instead of hardcoded.
+function renderTeamGrid(csv, containerId, subnavId) {
   const container = document.getElementById(containerId);
   if (!container) return;
+  const subnav = subnavId ? document.getElementById(subnavId) : null;
   loadSheet(csv, rows => {
       const members = rows.filter(m => m.Name && m.Name.trim());
+      // Group values sometimes carry stray whitespace (incl. non-breaking
+      // spaces) from being pasted into the xlsx — normalize so "Teachers"
+      // and " Teachers" don't split into two separate headings/pills.
+      members.forEach(m => { m.Group = (m.Group || '').replace(/ /g, ' ').trim(); });
       const groups = [...new Set(members.map(m => m.Group))];
+
       container.innerHTML = groups.map(g => `
-        <h2 class="timeline-year" style="text-align:center;margin-top:40px;">${escapeHtml(g)}</h2>
+        <h2 class="timeline-year" id="${groupSlug(g)}" style="text-align:center;margin-top:40px;">${escapeHtml(g)}</h2>
         <div class="team-grid" style="padding-top:20px;padding-bottom:20px;">
           ${members.filter(m => m.Group === g).map(m => {
             const initials = m.Name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -834,6 +851,16 @@ function renderTeamGrid(csv, containerId) {
               </div>`;
           }).join('')}
         </div>`).join('');
+
+      if (subnav) {
+        if (groups.length > 1) {
+          subnav.innerHTML = `<div class="subnav-inner">${groups.map(g => `<a href="#${groupSlug(g)}">${escapeHtml(g)}</a>`).join('')}</div>`;
+          subnav.style.display = '';
+          initSubnav();
+        } else {
+          subnav.style.display = 'none';
+        }
+      }
   });
 }
 
@@ -1399,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderCultureIconRibbon();
   renderLogoPride();
   loadTimeline();
-  renderTeamGrid(CONFIG.TEAM_CSV, 'team-container');
+  renderTeamGrid(CONFIG.TEAM_CSV, 'team-container', 'team-subnav');
   renderTeamGrid(CONFIG.SHALA_TEAM_CSV, 'shala-team-container');
   renderFaqs(CONFIG.FAQS_CSV, 'faq-container', false);
   renderFaqs(CONFIG.SHALA_FAQS_CSV, 'shala-faq-container', true);
