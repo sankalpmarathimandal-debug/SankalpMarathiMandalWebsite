@@ -74,6 +74,7 @@ const CONFIG = {
   SHALA_FAQS_CSV: 'data/shala-faq.xlsx',
   SHALA_GUIDELINES_PARENTS_CSV: 'data/shala-guidelines-parents.xlsx',
   SHALA_GUIDELINES_TEACHERS_CSV: 'data/shala-guidelines-teachers.xlsx',
+  SHALA_ADMISSIONS_CSV: 'data/shala-admissions.xlsx',
   SHALA_CALENDAR_CSV: 'data/shala-calendar.xlsx',
   FORMS_CSV: 'data/forms.xlsx',
   SHOWCASE_CSV: 'data/showcase.xlsx',
@@ -366,6 +367,37 @@ function loadEvents() {
         });
     },
     () => { grid.innerHTML = '<p style="text-align:center;color:var(--apple-gray);grid-column:1/-1;">Events could not be loaded right now.</p>'; }
+  );
+}
+
+/* =====================================================
+   SHALA ADMISSIONS BANNER (shala.html) — occasional announcement strip
+   at the top of the page, right under the sub-nav. Admin-editable via
+   data/shala-admissions.xlsx (Message/CTAText/CTALink columns) and only
+   shown when a row's Active is Yes — same "hidden unless enabled" pattern
+   as the homepage marquee, just Excel-driven instead of a JSON toggle so
+   the Shala team can write it in the admin panel's table editor.
+   ===================================================== */
+function renderShalaAdmissions() {
+  const el = document.getElementById('shala-admissions-banner');
+  if (!el) return;
+
+  loadSheet(CONFIG.SHALA_ADMISSIONS_CSV, rows => {
+      const active = rows
+        .filter(r => r.Message && r.Message.trim() && (r.Active || '').trim().toLowerCase() === 'yes')
+        .sort((a, b) => (parseInt(a.Order) || 0) - (parseInt(b.Order) || 0))[0];
+      if (!active) { el.style.display = 'none'; return; }
+
+      el.innerHTML = `
+        <h3><i class="fas fa-bell" style="color:#f59e0b;"></i> ${escapeHtml(active.Title || 'Announcement')}</h3>
+        <p>${escapeHtml(active.Message)}</p>
+        ${active.CTAText && active.CTALink
+          ? `<a class="cta-button cta-primary" style="max-width:280px;" href="${escapeHtml(active.CTALink)}" rel="noopener">${escapeHtml(active.CTAText)}</a>`
+          : ''}
+      `;
+      el.style.display = '';
+    },
+    () => { el.style.display = 'none'; }
   );
 }
 
@@ -1353,6 +1385,7 @@ document.addEventListener('DOMContentLoaded', function() {
   renderFaqs(CONFIG.SHALA_FAQS_CSV, 'shala-faq-container', true);
   renderFaqs(CONFIG.SHALA_GUIDELINES_PARENTS_CSV, 'shala-guidelines-parents-container', false);
   renderFaqs(CONFIG.SHALA_GUIDELINES_TEACHERS_CSV, 'shala-guidelines-teachers-container', false);
+  renderShalaAdmissions();
   renderShalaEvents();
   initSubnav();
   renderShowcase();

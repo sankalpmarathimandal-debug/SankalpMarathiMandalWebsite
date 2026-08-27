@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=e8c40f5">
+<link rel="stylesheet" href="assets/css/style.css?v=0e952e7">
 </head>
 
 <body>
@@ -48,13 +48,18 @@
 <nav class="subnav" aria-label="Shala page sections">
   <div class="subnav-inner">
     <a href="#shala-events">Events</a>
-    <a href="#overview">Overview</a>
     <a href="#curriculum">Curriculum</a>
     <a href="#shala-team">Team</a>
     <a href="#guidelines">Guidelines</a>
     <a href="#faqs">FAQs</a>
   </div>
 </nav>
+
+<!-- ADMISSIONS BANNER — occasional, admin-controlled via
+     data/shala-admissions.xlsx (Active column). Hidden entirely unless a
+     row is marked Active = Yes, so it can be switched off outside of
+     enrollment season without any code changes. -->
+<section class="shala-highlight" id="shala-admissions-banner" style="display:none;margin-top:32px;"></section>
 
 <!-- SHALA EVENTS — data/events.xlsx rows tagged Audience=Shala in the admin
      panel; this whole section (header + grid) hides itself if none are
@@ -65,14 +70,6 @@
     <p class="mr-tagline mr-plain">Picnics, exams, and in-person Shala activities.</p>
   </div>
   <div class="shala-events-grid ev3-grid" id="shala-events-grid"></div>
-</section>
-
-<section class="events-section" id="overview" style="padding-top:32px;">
-  <div class="shala-highlight">
-    <h3><i class="fas fa-bell" style="color:#f59e0b;"></i> Admissions Open Now</h3>
-    <p>Enroll your child in Sankalp Marathi Shala for the upcoming academic year (September – June). Open to children aged 4 and above.</p>
-    <a class="cta-button cta-primary" style="max-width:280px;" href="mailto:sankalpmarathimandal@gmail.com?subject=Marathi%20Shala%20Admission" rel="noopener">Email Us to Enroll</a>
-  </div>
 </section>
 
 <section class="info-cards info-cards--four" id="curriculum">
@@ -178,6 +175,6 @@
 </footer>
 
 <button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
-<script src="assets/js/main.js?v=e8c40f5" defer></script>
+<script src="assets/js/main.js?v=0e952e7" defer></script>
 </body>
 </html>

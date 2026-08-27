@@ -78,6 +78,7 @@ SankalpMarathiMandalWebsite/
 │   ├── shala-faq.xlsx      Shala page FAQs
 │   ├── shala-guidelines-parents.xlsx   Shala page — Parent guidelines accordion
 │   ├── shala-guidelines-teachers.xlsx  Shala page — Teacher guidelines accordion
+│   ├── shala-admissions.xlsx           Shala page — occasional admissions banner (Active toggle)
 │   ├── shala-calendar.xlsx Shala Calendar page (Year, Month, Day, Title, Type, Time, Notes)
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
 │   ├── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
