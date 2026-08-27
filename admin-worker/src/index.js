@@ -24,13 +24,13 @@ const XLSX_FILES = [
   { path: "data/testimonials.xlsx", label: "Testimonials", desc: "Homepage “Community Voices”" },
   { path: "data/sponsors.xlsx", label: "Presenting Sponsors", desc: "Homepage sponsor cards. To add a headshot photo: upload it under 'Sponsor Photos' below, then paste its path into AvatarURL (e.g. assets/images/partners/radhika.jpg) — leave blank for a generic icon. Columns: Active (Yes/No), DisplayOrder, Tier (e.g. Gold Partner — shown as a badge), Name, Role, AvatarURL (headshot, shown in the circle), AccentColor (hex, drives that card's colors), Icon (small Font Awesome solid icon name shown next to the name, e.g. chart-line or house-chimney), LogoURL (business logo image shown in the middle badge — also uploaded via 'Sponsor Photos'), BusinessName, Tagline, Category, Description, Tags (comma-separated), Website, Phone, Email, SocialLabel, SocialURL, CTAText, CTALink." },
   { path: "data/team.xlsx", label: "Team", desc: "Our Team page" },
-  { path: "data/shala-team.xlsx", label: "Shala Team", desc: "Marathi Shala team section" },
+  { path: "data/shala-team.xlsx", label: "Shala Team", desc: "<strong style=\"color:#b91c1c;\">⚠️ This is the Shala org structure — any change (adding/removing a role, reordering the org chart) needs approval from the Sankalp Board and EC members before publishing.</strong> Marathi Shala team section. Columns: Name, Position, Group (drives the org-chart grouping), Photo — upload headshots under Shala Team Photos below and paste the path here." },
   { path: "data/faq.xlsx", label: "FAQ", desc: "FAQs page" },
   { path: "data/shala-faq.xlsx", label: "Shala FAQ", desc: "Marathi Shala FAQs" },
   { path: "data/shala-guidelines-parents.xlsx", label: "Shala Guidelines — Parents", desc: "Parent handbook accordion on the Marathi Shala page. Columns: ID, Question (used as the accordion heading), Answer, Order, Active (Yes/No)." },
   { path: "data/shala-guidelines-teachers.xlsx", label: "Shala Guidelines — Teachers", desc: "Teacher handbook accordion on the Marathi Shala page. Same columns as the Parents guidelines above." },
-  { path: "data/shala-admissions.xlsx", label: "Shala Admissions Banner", desc: "Occasional announcement banner at the top of the Marathi Shala page (right under the menu). Only shows when a row's Active is Yes — set it to No when enrollment closes, no need to delete anything. Columns: ID, Active (Yes/No), Title (bold heading), Message, CTAText + CTALink (button — can be a mailto: link or a Google Form URL), Order." },
-  { path: "data/shala-events.xlsx", label: "Shala Events", desc: "Standalone events database for the Marathi Shala page's Events section — fully separate from the main Events & Performances sheet. Set Type to current or future (previous rows are stored but not shown); only one current and one future row are featured. Same columns as the main Events sheet: Type, Name, Month, Date, Year, Venue, Location, Contact, Time, Summary, Description, ImageURL, Flyer, Instagram URL." },
+  { path: "data/shala-admissions.xlsx", label: "Banner", desc: "Occasional announcement banner at the top of the Marathi Shala page (right under the menu) — not just for admissions, use it for any Shala announcement. Only shows when a row's Active is Yes — set it to No when the announcement is over, no need to delete anything. Columns: ID, Active (Yes/No), Title (bold heading), Message, CTAText + CTALink (button — can be a mailto: link or a Google Form URL), Order." },
+  { path: "data/shala-events.xlsx", label: "Shala Events", desc: "Standalone events database for the Marathi Shala page's Events section — fully separate from the main Events & Performances sheet. Set Type to current or future (previous rows are stored but not shown); only one current and one future row are featured. Upload event photos/flyers under Shala Event Images below and paste the path into ImageURL/Flyer. Same columns as the main Events sheet: Type, Name, Month, Date, Year, Venue, Location, Contact, Time, Summary, Description, ImageURL, Flyer, Instagram URL." },
   { path: "data/shala-calendar.xlsx", label: "Shala Calendar", desc: "Shala Calendar page + download button" },
   { path: "data/forms.xlsx", label: "Forms & Sign-ups", desc: "Forms & Sign-ups page" },
   { path: "data/showcase.xlsx", label: "Showcase", desc: "Showcase page entries" },
@@ -52,7 +52,8 @@ const SIMPLE_JSON_FILES = [
 const FOLDERS = [
   { path: "assets/images/events", label: "Event Images", accept: "image/*", yearFolders: true, note: "Organized by year — pick/type a year below", xlsxRef: "data/events.xlsx" },
   { path: "assets/images/team", label: "Team Photos", accept: "image/*", xlsxRef: "data/team.xlsx" },
-  { path: "assets/images/shala", label: "Shala Images", accept: "image/*", xlsxRef: "data/shala-events.xlsx" },
+  { path: "assets/images/shala/team", label: "Shala Team Photos", accept: "image/*", xlsxRef: "data/shala-team.xlsx" },
+  { path: "assets/images/shala/events", label: "Shala Event Images", accept: "image/*", xlsxRef: "data/shala-events.xlsx" },
   { path: "assets/images/showcase", label: "Showcase Photos", accept: "image/*", xlsxRef: "data/showcase.xlsx" },
   { path: "assets/images/partners", label: "Sponsor Photos", accept: "image/*", xlsxRef: "data/sponsors.xlsx" },
   {
@@ -88,7 +89,9 @@ const PAGES = [
   { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/sponsors.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
   { key: "events", label: "Events Page", xlsx: ["data/events.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
-  { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx", "data/shala-guidelines-parents.xlsx", "data/shala-guidelines-teachers.xlsx", "data/shala-admissions.xlsx", "data/shala-events.xlsx"], folders: ["assets/images/shala"] },
+  // Ordered to match the live page's actual top-to-bottom flow: Banner,
+  // Events, Guidelines, Team, then FAQ.
+  { key: "shala", label: "Shala Page", xlsx: ["data/shala-admissions.xlsx", "data/shala-events.xlsx", "data/shala-guidelines-parents.xlsx", "data/shala-guidelines-teachers.xlsx", "data/shala-team.xlsx", "data/shala-faq.xlsx"], folders: ["assets/images/shala/team", "assets/images/shala/events"] },
   { key: "calendar", label: "Shala Calendar", xlsx: ["data/shala-calendar.xlsx"], folders: [] },
   { key: "faq", label: "FAQ Page", xlsx: ["data/faq.xlsx"], folders: [] },
   { key: "forms", label: "Forms & Sign-ups", xlsx: ["data/forms.xlsx"], folders: [] },
@@ -1194,10 +1197,13 @@ function pageSectionHtml(page, idx) {
   </section>`;
 }
 
-function logSectionHtml() {
+function logSectionHtml(isShalaRole) {
+  const desc = isShalaRole
+    ? "Every change made to Shala page content (Banner, Events, Guidelines, Team, FAQ) is a real GitHub commit — this list is pulled live from GitHub, filtered to just Shala's own files, so it can never fall out of sync. Click a row to see the exact before/after diff on GitHub."
+    : "Every change made here (or by anyone else pushing to the repo) is a real GitHub commit — this list is pulled live from GitHub, not a separate log file, so it can never fall out of sync. Click a row to see the exact before/after diff on GitHub.";
   return `<section class="page-section" id="page-log">
     <h2 class="section">Activity Log</h2>
-    <p style="font-size:13px;color:#6b6558;margin:0 0 14px;">Every change made here (or by anyone else pushing to the repo) is a real GitHub commit — this list is pulled live from GitHub, not a separate log file, so it can never fall out of sync. Click a row to see the exact before/after diff on GitHub.</p>
+    <p style="font-size:13px;color:#6b6558;margin:0 0 14px;">${desc}</p>
     <div class="card" style="padding:0;overflow:hidden;">
       <div class="table-wrap" style="max-height:520px;">
         <table class="xlsx-table" style="width:100%;">
@@ -1216,10 +1222,10 @@ function adminPage(role) {
 
   const tabs = pages.map(
     (p, i) => `<button class="page-tab${i === 0 ? " active" : ""}" data-page="${p.key}" onclick="showPage('${p.key}')">${p.label}</button>`
-  ).join("\n") + (isShalaRole ? "" :
-      `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
-    + `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`);
-  const sections = pages.map(pageSectionHtml).join("\n") + (isShalaRole ? "" : "\n" + logSectionHtml());
+  ).join("\n")
+    + `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
+    + (isShalaRole ? "" : `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`);
+  const sections = pages.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml(isShalaRole);
   // Folder listing is gated server-side by isAllowedPath too, but only
   // wiring up the folders this role can actually see keeps the page's own
   // JS from even trying to load anything out of scope.
@@ -1862,10 +1868,20 @@ export default {
         }
 
         if (url.pathname === "/api/logs" && request.method === "GET") {
-          // Activity Log is hidden from the Shala-scoped UI and blocked
-          // here too, since it surfaces commits outside Shala's own files.
-          if (role !== "full") return json({ error: "Not allowed" }, 403);
           const perPage = Math.min(Number(url.searchParams.get("per_page")) || 40, 100);
+          if (role === "shala") {
+            // Shala gets its own Activity Log, filtered to commits touching
+            // only its own files — never the full site's history. GitHub's
+            // commit list has no multi-path filter, so fetch a larger page
+            // of all commits and keep the ones whose message names one of
+            // Shala's allowed paths (every admin commit message embeds the
+            // exact path it changed), then trim to what was asked for.
+            const pages = PAGES.filter((p) => SHALA_ROLE_PAGE_KEYS.includes(p.key));
+            const allowedPaths = [...pages.flatMap((p) => p.xlsx || []), ...pages.flatMap((p) => p.folders || [])];
+            const commits = await ghListCommits(env, 100);
+            const filtered = commits.filter((c) => allowedPaths.some((p) => c.message.includes(p)));
+            return json(filtered.slice(0, perPage));
+          }
           const commits = await ghListCommits(env, perPage);
           return json(commits);
         }

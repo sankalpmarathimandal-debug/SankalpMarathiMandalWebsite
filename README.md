@@ -78,7 +78,7 @@ SankalpMarathiMandalWebsite/
 │   ├── shala-faq.xlsx      Shala page FAQs
 │   ├── shala-guidelines-parents.xlsx   Shala page — Parent guidelines accordion
 │   ├── shala-guidelines-teachers.xlsx  Shala page — Teacher guidelines accordion
-│   ├── shala-admissions.xlsx           Shala page — occasional admissions banner (Active toggle)
+│   ├── shala-admissions.xlsx           Shala page — occasional banner (Active toggle, not just for admissions)
 │   ├── shala-events.xlsx               Shala page — Events section, fully separate from data/events.xlsx
 │   ├── shala-calendar.xlsx Shala Calendar page (Year, Month, Day, Title, Type, Time, Notes)
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
@@ -116,9 +116,10 @@ SankalpMarathiMandalWebsite/
 | Culture icon ribbon (homepage, below the hero) | just add/remove image files in `assets/images/culture-icons/` and push — updates automatically, no captions shown |
 | Presenting Sponsors | `data/sponsors.xlsx` (optional headshot in `assets/images/partners/`) |
 | Team members | `data/team.xlsx` + photo in `assets/images/team/` |
-| Shala team / FAQs | `data/shala-team.xlsx` / `data/shala-faq.xlsx` |
+| Shala team / org chart | `data/shala-team.xlsx` + photos in `assets/images/shala/team/` — ⚠️ any org structure change needs Sankalp Board + EC approval before publishing |
+| Shala FAQs | `data/shala-faq.xlsx` |
 | Shala guidelines (parents/teachers) | `data/shala-guidelines-parents.xlsx` / `data/shala-guidelines-teachers.xlsx` |
-| Shala-specific events | `data/shala-events.xlsx` — standalone sheet, separate from the main Events & Performances sheet |
+| Shala-specific events | `data/shala-events.xlsx` + photos/flyers in `assets/images/shala/events/` — standalone sheet, separate from the main Events & Performances sheet |
 | Shala calendar | `data/shala-calendar.xlsx` — one row per date (see below) |
 | General FAQs | `data/faq.xlsx` |
 | Constitution | replace `docs/constitution.pdf` |
