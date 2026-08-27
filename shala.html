@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=088ac1a">
+<link rel="stylesheet" href="assets/css/style.css?v=a105699">
 </head>
 
 <body>
@@ -38,20 +38,55 @@
 </nav>
 
 <main>
-<section class="page-hero">
-  <img src="assets/images/branding/shala-logo.jpg" alt="Sankalp Marathi Shala logo" style="width:140px;height:140px;border-radius:24px;object-fit:cover;margin-bottom:20px;box-shadow:0 12px 28px rgba(0,0,0,0.15);">
-  <h1>Sankalp Marathi Shala</h1>
-  <p>मायबोलीची गोडी पुढच्या पिढीपर्यंत — BMM-approved Marathi language learning for our children, in collaboration with Bharati Vidyapeeth, Pune.</p>
-</section>
+<!-- SHALA HERO — gradient hero card (content from sankalpmarathi.org/marathi-shala),
+     with the BMM Curriculum / Five-Level / Schedule / Volunteer Teacher
+     highlight boxes folded in on the content side, logo on the other. -->
+<div class="shala-hero-wrap">
+  <section class="shala-hero">
+    <div class="shala-hero-copy">
+      <div class="shala-hero-emojis">🎓✨🚀</div>
+      <h1 class="shala-hero-title">विद्या परं बलम्!</h1>
+      <p class="shala-hero-subtitle">Where Every Student Shines Bright ⭐</p>
+      <p class="shala-hero-desc">"संकल्प मराठी शाळा" हा आमचा महत्त्वाचा उपक्रम जाहीर करताना आनंद होत आहे. याचा उद्देश विद्यार्थ्यांना नाविन्यपूर्ण मराठी शिक्षण, सर्जनशीलता आणि वैयक्तिक विकासाच्या संधी देणे आहे. या उपक्रमाच्या यशासाठी आपला सक्रिय सहभाग व पाठिंबा अपेक्षित आहे. एकत्र येऊन आपण सकारात्मक बदल घडवू शकतो.</p>
+      <a class="shala-hero-email" href="mailto:sankalpmarathishala@gmail.com">sankalpmarathishala@gmail.com 🎉</a>
+      <div class="shala-hero-boxes">
+        <div class="shala-hero-box">
+          <i class="fas fa-book-open"></i>
+          <h4>BMM Curriculum</h4>
+          <p>BMM–Bharati Vidyapeeth curriculum with joint certification.</p>
+        </div>
+        <div class="shala-hero-box">
+          <i class="fas fa-layer-group"></i>
+          <h4>Five-Level Program</h4>
+          <p>Levels 1–5, plus a starter batch for ages 4–6.</p>
+        </div>
+        <div class="shala-hero-box">
+          <i class="fas fa-calendar-days"></i>
+          <h4>Schedule</h4>
+          <p>September – June, one weekly virtual class.</p>
+        </div>
+        <div class="shala-hero-box">
+          <i class="fas fa-chalkboard-user"></i>
+          <h4>Volunteer Teachers</h4>
+          <p>Taught by dedicated parent volunteers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="shala-hero-visual">
+      <div class="shala-hero-logo-card">
+        <img src="assets/images/branding/shala-logo.jpg" alt="Sankalp Marathi Shala logo">
+      </div>
+    </div>
+  </section>
+</div>
 
 <!-- SUB-NAV -->
 <nav class="subnav" aria-label="Shala page sections">
   <div class="subnav-inner">
     <a href="#shala-events">Events</a>
-    <a href="#curriculum">Curriculum</a>
     <a href="calendar.html">Calendar</a>
-    <a href="#shala-team">Team</a>
     <a href="#guidelines">Guidelines</a>
+    <a href="#shala-team">Team</a>
     <a href="#faqs">FAQs</a>
   </div>
 </nav>
@@ -73,40 +108,6 @@
   <div class="shala-events-grid ev3-grid" id="shala-events-grid"></div>
 </section>
 
-<section class="info-cards info-cards--four" id="curriculum">
-  <div class="info-card">
-    <div class="about-icon"><i class="fas fa-book-open"></i></div>
-    <h4>BMM Curriculum</h4>
-    <p>Curriculum approved by Bruhan Maharashtra Mandal of North America in collaboration with Bharati Vidyapeeth, Pune. Students earn BMM-BV joint certificates for the 'Marathi Bhasha' exams at each level.</p>
-  </div>
-  <div class="info-card">
-    <div class="about-icon"><i class="fas fa-layer-group"></i></div>
-    <h4>Five-Level Program</h4>
-    <p>A structured program from Level 1 to Level 5 covering reading, writing, and speaking. A dedicated batch for 4–6 year olds prepares the youngest learners for the levels ahead.</p>
-  </div>
-  <div class="info-card">
-    <div class="about-icon"><i class="fas fa-calendar-days"></i></div>
-    <h4>Schedule</h4>
-    <p>The school year runs September to June, matching the regular school cycle. One 45-minute virtual class per week, plus in-person event-based activities often combined with Mandal festivals like Ganapati and Diwali.</p>
-    <p style="margin-top:14px;"><a href="calendar.html" style="color:var(--brand-gradient-start);font-weight:600;text-decoration:none;">View monthly calendar <i class="fas fa-arrow-right" style="font-size:12px;"></i></a></p>
-  </div>
-  <div class="info-card">
-    <div class="about-icon"><i class="fas fa-chalkboard-user"></i></div>
-    <h4>Volunteer Teachers</h4>
-    <p>All teachers are dedicated volunteers. Parents are welcome to join the teaching team — no prior experience needed, we'll help you get started. Our first batch began Oct 15, 2023, on the occasion of GhatSthapana.</p>
-  </div>
-</section>
-
-<!-- SHALA TEAM -->
-<section class="section-divider" id="shala-team">
-  <h2 class="section-title">Shala Team</h2>
-  <p class="section-subtitle">The people behind the classroom.</p>
-</section>
-
-<section style="max-width:1100px;margin:0 auto;padding:0 24px 40px;">
-  <div id="shala-team-container"></div>
-</section>
-
 <!-- SHALA GUIDELINES -->
 <section class="section-divider" id="guidelines">
   <h2 class="section-title">Shala Guidelines</h2>
@@ -122,6 +123,16 @@
     <div class="guidelines-column-title"><i class="fas fa-chalkboard-user"></i> For Teachers</div>
     <div id="shala-guidelines-teachers-container"></div>
   </div>
+</section>
+
+<!-- SHALA TEAM -->
+<section class="section-divider" id="shala-team">
+  <h2 class="section-title">Shala Team</h2>
+  <p class="section-subtitle">The people behind the classroom.</p>
+</section>
+
+<section style="max-width:1100px;margin:0 auto;padding:0 24px 40px;">
+  <div id="shala-team-container"></div>
 </section>
 
 <!-- SHALA FAQS -->
@@ -176,6 +187,6 @@
 </footer>
 
 <button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
-<script src="assets/js/main.js?v=088ac1a" defer></script>
+<script src="assets/js/main.js?v=a105699" defer></script>
 </body>
 </html>
