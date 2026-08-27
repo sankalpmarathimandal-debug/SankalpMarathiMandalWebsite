@@ -255,9 +255,15 @@ main { flex: 1; }
   background: linear-gradient(90deg, var(--saffron), var(--brand-gradient-start), var(--brand-gradient-end));
 }
 
+/* Text itself carries the ॥ ... ॥ danda brackets (same convention as
+   .mr-danda section headers) — uppercase + tracking here matches that
+   treatment so every page title, not just in-page section intros, reads
+   consistently site-wide. */
 .page-hero h1 {
   font-size: clamp(32px, 6vw, 52px);
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
   -webkit-background-clip: text;
   background-clip: text;
