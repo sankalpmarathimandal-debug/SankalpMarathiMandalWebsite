@@ -115,11 +115,12 @@ SankalpMarathiMandalWebsite/
 | Community Pride Wall (homepage) | just add/remove image files in `assets/images/branding/logo-variants/` and push — updates automatically, see "Updating the Community Pride Wall" below |
 | Culture icon ribbon (homepage, below the hero) | just add/remove image files in `assets/images/culture-icons/` and push — updates automatically, no captions shown |
 | Presenting Sponsors | `data/sponsors.xlsx` (optional headshot in `assets/images/partners/`) |
-| Team members | `data/team.xlsx` + photo in `assets/images/team/` |
+| Team members | `data/team.xlsx` + photo in `assets/images/team/` — sub-nav pills at the top of the page (Board of Directors, Executive Team, etc.) are generated automatically from the `Group` column, see "Team page sub-nav" below |
 | Shala team / org chart | `data/shala-team.xlsx` + photos in `assets/images/shala/team/` — ⚠️ any org structure change needs Sankalp Board + EC approval before publishing |
-| Shala FAQs | `data/shala-faq.xlsx` |
+| Shala FAQs | `data/shala-faq.xlsx` — grouped into collapsible sections by the `Category` column (General, Academics, etc.); a new `Category` value automatically becomes its own expandable group, no code changes |
 | Shala guidelines (parents/teachers) | `data/shala-guidelines-parents.xlsx` / `data/shala-guidelines-teachers.xlsx` |
 | Shala-specific events | `data/shala-events.xlsx` + photos/flyers in `assets/images/shala/events/` — standalone sheet, separate from the main Events & Performances sheet |
+| Shala page hero (title, tagline, description, email, the 4 highlight boxes) | hand-written HTML in `shala.html` inside `<div class="shala-hero-wrap">` — not data-driven, edit the text directly in that file |
 | Shala calendar | `data/shala-calendar.xlsx` — one row per date (see below) |
 | General FAQs | `data/faq.xlsx` |
 | Constitution | replace `docs/constitution.pdf` |
@@ -130,6 +131,10 @@ SankalpMarathiMandalWebsite/
 | Announcement banner | `data/marquee.json` — or the "Announcement Marquee" card on the Home Page tab in the admin panel (no coding) |
 
 Keep the header row of each workbook intact, and keep images web-friendly (≤1200px, JPG preferred).
+
+### Team page sub-nav (auto-generated)
+
+The pill sub-nav at the top of `team.html` is not hardcoded — it's built from the distinct values in the `Group` column of `data/team.xlsx` (e.g. "Board of Directors", "Executive Team", "Our First Team - 2019"). Add a new group, rename one, or remove one in the spreadsheet and the sub-nav (and the section it links to) follows automatically on the next page load — no HTML or code changes needed. If there's only one group, the sub-nav hides itself. The same pattern originally shipped on the Shala page's sub-nav (Events/Calendar/Guidelines/Team/FAQs), which is still hand-coded in `shala.html` since those are fixed sections, not spreadsheet-driven groups.
 
 ### Updating the Shala Calendar
 
@@ -257,17 +262,29 @@ Double-click **Start Local Preview.command** — it opens the site in your brows
 2. Repo **Settings → Pages → Custom domain** → enter `www.sankalpmarathi.org` → Save, enable "Enforce HTTPS".
 3. At your domain registrar, add a DNS CNAME record: `www` → `sankalpmarathimandal-debug.github.io`
 
-## Admin panel — Flyer Builder
+## Admin panel
 
-The admin panel (`admin-worker/`, deployed as the `sankalp-admin` Cloudflare
-Worker) now includes a **🎨 Flyer Builder** tab, served at `/flyer` behind
-the same login as the rest of the dashboard. It's a point-and-click tool for
+The admin panel (`admin-worker/`, deployed as the `sankalp-admin` Cloudflare Worker at https://sankalp-admin.sankalpsj.workers.dev) is where non-technical team members can upload/replace workbooks and images without touching git. Two logins exist:
+
+- **Full role** — sees every page's tabs, folders, the Flyer Builder, and the full site-wide Activity Log.
+- **Shala role** — scoped to just the Shala page's own files (`data/shala-*.xlsx`, `assets/images/shala/team/`, `assets/images/shala/events/`) and its own filtered Activity Log, so a Shala-only volunteer can't see or touch the rest of the site.
+
+**Downloading an image to edit it:** every image thumbnail in the admin panel has a **Download** button next to Rename/Delete — click it to save the current live image to your computer so you can edit it and re-upload the updated version, instead of having to track down the original file separately.
+
+**Activity Log:** every tab has an Activity Log section showing recent commits to the files that role can see (full role sees everything; Shala role sees only Shala-page commits) — useful for confirming an upload actually went through, or seeing who changed what.
+
+### Flyer Builder
+
+Also included: a **🎨 Flyer Builder** tab, served at `/flyer` behind
+the same login as the rest of the dashboard (full role only). It's a point-and-click tool for
 making an event flyer — click to edit text, swap the background color or
 image, add a hero photo, up to 5 sponsor logos, and an optional payment/RSVP
 QR code — then "Download PDF" for a ready-to-share flyer, or "Save Editable
 Copy" to keep an HTML version to reopen later. It runs entirely in the
 browser (no GitHub commits, doesn't touch the live site). See
 `admin-worker/SETUP.md` for details.
+
+⚠️ Any change to `admin-worker/src/index.js` needs a separate `npx wrangler deploy` from inside `admin-worker/` — a plain `git push` updates the live site but does **not** update the live admin panel.
 
 ## Still to do
 
@@ -283,3 +300,4 @@ cleanup items).
 - `data/forms.xlsx` ships with one inactive example row — replace or delete once real forms are added
 - `data/showcase.xlsx` ships with two inactive example rows demonstrating Event grouping and a document card (`DocumentURL`/`ImageURL` point at placeholder files that don't exist yet) — replace or delete once real content is added
 - `data/programs.xlsx` / `data/program-participants.xlsx` (Book a Performance page) ship with two inactive example rows ("Geet Ramayan", "Abhangvani") — replace the placeholder description/participants, add a logo photo, and set `Active` to `Yes` to publish each one
+- `data/shala-events.xlsx` ships with two sample/placeholder rows ("Shala Winter Picnic (Sample)", "Shala Annual Day (Sample)") used to preview the Shala Events cards and flyer modal — replace or delete them via the admin panel once real Shala events are added
