@@ -294,7 +294,7 @@ main { flex: 1; }
      so the pill bar lines up with the hero and body content instead of
      looking off-center against them. */
   max-width: 1120px; margin: 0 auto;
-  display: flex; flex-wrap: nowrap; align-items: center; overflow-x: auto;
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; overflow-x: auto;
   gap: 8px; scrollbar-width: none;
 }
 .subnav-inner::-webkit-scrollbar { display: none; }
