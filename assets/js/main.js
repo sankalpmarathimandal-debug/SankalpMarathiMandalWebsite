@@ -75,6 +75,7 @@ const CONFIG = {
   SHALA_GUIDELINES_PARENTS_CSV: 'data/shala-guidelines-parents.xlsx',
   SHALA_GUIDELINES_TEACHERS_CSV: 'data/shala-guidelines-teachers.xlsx',
   SHALA_ADMISSIONS_CSV: 'data/shala-admissions.xlsx',
+  SHALA_EVENTS_DB: 'data/shala-events.xlsx',
   SHALA_CALENDAR_CSV: 'data/shala-calendar.xlsx',
   FORMS_CSV: 'data/forms.xlsx',
   SHOWCASE_CSV: 'data/showcase.xlsx',
@@ -402,20 +403,19 @@ function renderShalaAdmissions() {
 }
 
 /* =====================================================
-   SHALA EVENTS (shala.html) — same unified data/events.xlsx sheet,
-   filtered to rows tagged Audience = "Shala" in the admin panel. Reuses
-   the exact homepage event card (ev3CardHtml) and click-to-open modal.
-   Section hides itself entirely if nothing is tagged yet.
+   SHALA EVENTS (shala.html) — own dedicated data/shala-events.xlsx sheet,
+   fully independent from the main events database so the Shala team can
+   manage it without touching data/events.xlsx. Reuses the exact homepage
+   event card (ev3CardHtml) and click-to-open modal. Section hides itself
+   entirely if no rows are present yet.
    ===================================================== */
 function renderShalaEvents() {
   const grid = document.getElementById('shala-events-grid');
   const section = document.getElementById('shala-events');
   if (!grid || !section) return;
 
-  loadSheet(CONFIG.EVENTS_DB, rows => {
-      const shalaEvents = rows.filter(e =>
-        e.Name && e.Name.trim() && (e.Audience || '').trim().toLowerCase() === 'shala'
-      );
+  loadSheet(CONFIG.SHALA_EVENTS_DB, rows => {
+      const shalaEvents = rows.filter(e => e.Name && e.Name.trim());
       // Only current + future are shown here (same featured-card treatment
       // as the homepage), never "previous" — this section is meant to
       // highlight what's coming up, not a full history.
