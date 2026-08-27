@@ -1333,12 +1333,32 @@ function renderFaqs(csv, containerId, groupByCategory) {
       if (groupByCategory) {
         const cats = [...new Set(faqs.map(f => f.Category || 'General'))];
         container.innerHTML = cats.map(c => `
-          <h2 class="timeline-year" style="font-size:22px;">${escapeHtml(c)}</h2>
-          ${faqs.filter(f => (f.Category || 'General') === c).map(item).join('')}`).join('');
+          <div class="faq-category">
+            <button class="faq-category-header" aria-expanded="false">
+              <span>${escapeHtml(c)}</span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="faq-category-body">
+              <div class="faq-category-body-inner">
+                ${faqs.filter(f => (f.Category || 'General') === c).map(item).join('')}
+              </div>
+            </div>
+          </div>`).join('');
+        initFaqCategoryAccordion(container);
       } else {
         container.innerHTML = faqs.map(item).join('');
       }
       initFaqAccordion(container);
+  });
+}
+
+function initFaqCategoryAccordion(scope) {
+  (scope || document).querySelectorAll('.faq-category').forEach(cat => {
+    const btn = cat.querySelector('.faq-category-header');
+    btn.addEventListener('click', () => {
+      const open = cat.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
   });
 }
 

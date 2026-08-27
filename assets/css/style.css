@@ -1504,6 +1504,43 @@ main { flex: 1; }
    paragraph like normal HTML would. */
 .faq-answer-inner { padding: 0 24px 20px; color: var(--apple-gray); line-height: 1.7; font-size: 15px; white-space: pre-line; }
 
+/* Category groups (Shala FAQs — General, Academic, Enrollment, etc.) —
+   each category heading is itself an expand/collapse toggle for its
+   questions, on top of the individual question accordion above. Uses a
+   grid-template-rows 0fr->1fr transition instead of max-height so it keeps
+   animating correctly even as individual questions inside open/close and
+   change the group's content height. */
+.faq-category { margin-bottom: 14px; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-card); }
+
+.faq-category-header {
+  width: 100%;
+  background: var(--apple-light-gray);
+  border: none;
+  text-align: left;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-family);
+  color: var(--apple-dark);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.faq-category-header i { font-size: 13px; color: var(--apple-gray); transition: transform 0.3s ease; }
+.faq-category.open .faq-category-header i { transform: rotate(180deg); }
+
+.faq-category-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+.faq-category.open .faq-category-body { grid-template-rows: 1fr; }
+.faq-category-body-inner { overflow: hidden; }
+.faq-category.open .faq-category-body-inner { padding-top: 14px; }
+.faq-category-body-inner .faq-item:last-child { margin-bottom: 0; }
+
 /* =====================================================
    SHOWCASE PAGE
    ===================================================== */
