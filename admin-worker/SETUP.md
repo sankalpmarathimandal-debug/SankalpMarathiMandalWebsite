@@ -42,7 +42,7 @@ This opens a browser to authorize Wrangler against your Cloudflare account.
 
 ## 4. Set the secrets
 
-Three secrets are needed (never stored in the code):
+Three secrets are required (never stored in the code):
 
 ```bash
 npx wrangler secret put GITHUB_TOKEN
@@ -54,6 +54,18 @@ npx wrangler secret put ADMIN_PASSWORD
 npx wrangler secret put SESSION_SECRET
 # any long random string, e.g. output of: openssl rand -hex 32
 ```
+
+Optionally, add a second, restricted password for the Shala team:
+
+```bash
+npx wrangler secret put SHALA_ADMIN_PASSWORD
+# a separate password just for the Shala team — logging in with it only
+# shows the Shala page's team/FAQ/guidelines/calendar, nothing else on
+# the site (no homepage, sponsors, general events, etc.)
+```
+
+If you skip this one, the login page still works exactly as before — only
+`ADMIN_PASSWORD` (full access) is checked.
 
 ## 5. Deploy
 
@@ -124,6 +136,10 @@ see history on GitHub or revert a commit if needed.
   automatic (a GitHub Action regenerates the manifest whenever a file is
   added/removed there).
 - **Rotating the password:** run `npx wrangler secret put ADMIN_PASSWORD`
-  again with a new value, then `npx wrangler deploy`.
+  again with a new value, then `npx wrangler deploy`. Same for
+  `SHALA_ADMIN_PASSWORD`. There's no built-in way to remove the Shala
+  login entirely other than rotating it to something no one has — the
+  Worker just stops checking it if the secret is unset, so deleting the
+  secret (`npx wrangler secret delete SHALA_ADMIN_PASSWORD`) also works.
 - **Revoking access:** delete the GitHub token (Step 1) any time to
   immediately cut off the admin panel's write access.

@@ -86,7 +86,7 @@ const PAGES = [
   { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/sponsors.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
   { key: "events", label: "Events Page", xlsx: ["data/events.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
-  { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx", "data/shala-guidelines-parents.xlsx", "data/shala-guidelines-teachers.xlsx", "data/events.xlsx"], folders: ["assets/images/shala"] },
+  { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx", "data/shala-guidelines-parents.xlsx", "data/shala-guidelines-teachers.xlsx"], folders: ["assets/images/shala"] },
   { key: "calendar", label: "Shala Calendar", xlsx: ["data/shala-calendar.xlsx"], folders: [] },
   { key: "faq", label: "FAQ Page", xlsx: ["data/faq.xlsx"], folders: [] },
   { key: "forms", label: "Forms & Sign-ups", xlsx: ["data/forms.xlsx"], folders: [] },
@@ -94,6 +94,14 @@ const PAGES = [
   { key: "performances", label: "Book a Performance", xlsx: ["data/programs.xlsx", "data/program-participants.xlsx"], folders: ["assets/images/programs"] },
   { key: "constitution", label: "Constitution Page", xlsx: [], folders: [], docs: ["docs/constitution.pdf"] },
 ];
+
+// A second, restricted login (SHALA_ADMIN_PASSWORD) only sees these PAGES
+// keys — Shala team/FAQ/guidelines and the Shala calendar. Deliberately
+// does NOT include "home" or "events", so the Shala-only login can never
+// touch data/events.xlsx (it's shared with general Mandal events) — an
+// admin with the full ADMIN_PASSWORD still tags an event Audience=Shala
+// to make it show up on the Shala page.
+const SHALA_ROLE_PAGE_KEYS = ["shala", "calendar"];
 
 // ---------------------------------------------------------------------------
 // Event Flyer Builder — a fully self-contained, client-side flyer design
@@ -1001,21 +1009,28 @@ async function hmac(secret, message) {
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function makeSession(env) {
+// Session token carries a role ("full" or "shala") alongside the expiry,
+// both covered by the HMAC signature so a shala-role cookie can't be
+// hand-edited into a full-role one without knowing SESSION_SECRET.
+async function makeSession(env, role) {
   const expiry = Date.now() + SESSION_HOURS * 3600 * 1000;
-  const sig = await hmac(env.SESSION_SECRET, String(expiry));
-  return `${expiry}.${sig}`;
+  const sig = await hmac(env.SESSION_SECRET, `${expiry}.${role}`);
+  return `${expiry}.${role}.${sig}`;
 }
 
+// Returns the role string ("full"/"shala") if the session cookie is valid,
+// or null otherwise. Callers should treat any falsy return as "not logged in".
 async function verifySession(env, cookieHeader) {
-  if (!cookieHeader) return false;
+  if (!cookieHeader) return null;
   const match = cookieHeader.match(/(?:^|;\s*)session=([^;]+)/);
-  if (!match) return false;
-  const [expiryStr, sig] = decodeURIComponent(match[1]).split(".");
-  if (!expiryStr || !sig) return false;
-  if (Date.now() > Number(expiryStr)) return false;
-  const expected = await hmac(env.SESSION_SECRET, expiryStr);
-  return expected === sig;
+  if (!match) return null;
+  const parts = decodeURIComponent(match[1]).split(".");
+  if (parts.length !== 3) return null;
+  const [expiryStr, role, sig] = parts;
+  if (!expiryStr || !role || !sig) return null;
+  if (Date.now() > Number(expiryStr)) return null;
+  const expected = await hmac(env.SESSION_SECRET, `${expiryStr}.${role}`);
+  return expected === sig ? role : null;
 }
 
 function setCookieHeader(token) {
@@ -1193,25 +1208,34 @@ function logSectionHtml() {
   </section>`;
 }
 
-function adminPage() {
-  const tabs = PAGES.map(
+function adminPage(role) {
+  const isShalaRole = role === "shala";
+  const pages = isShalaRole ? PAGES.filter((p) => SHALA_ROLE_PAGE_KEYS.includes(p.key)) : PAGES;
+
+  const tabs = pages.map(
     (p, i) => `<button class="page-tab${i === 0 ? " active" : ""}" data-page="${p.key}" onclick="showPage('${p.key}')">${p.label}</button>`
-  ).join("\n") + `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
-    + `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`;
-  const sections = PAGES.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml();
-  const allFolderPaths = JSON.stringify(FOLDERS.map((f) => f.path));
+  ).join("\n") + (isShalaRole ? "" :
+      `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
+    + `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`);
+  const sections = pages.map(pageSectionHtml).join("\n") + (isShalaRole ? "" : "\n" + logSectionHtml());
+  // Folder listing is gated server-side by isAllowedPath too, but only
+  // wiring up the folders this role can actually see keeps the page's own
+  // JS from even trying to load anything out of scope.
+  const allFolderPaths = JSON.stringify(pages.flatMap((p) => p.folders || []));
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sankalp Website Admin</title><style>${BASE_STYLE}</style>
+  <title>${isShalaRole ? "Sankalp Shala Admin" : "Sankalp Website Admin"}</title><style>${BASE_STYLE}</style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   </head>
   <body>
   <header>
-    <h1>Sankalp Website Admin</h1>
+    <h1>${isShalaRole ? "Sankalp Shala Admin" : "Sankalp Website Admin"}</h1>
     <a href="/logout">Log out</a>
   </header>
   <main>
-    <p style="font-size:13px;color:#6b6558">Pick the page you want to change below. Uploads and edits commit directly to the live site's GitHub repo — changes go live within a minute or two.</p>
+    <p style="font-size:13px;color:#6b6558">${isShalaRole
+      ? "Shala team login — you can edit the Shala page's team, FAQs, guidelines, and calendar. Uploads and edits commit directly to the live site's GitHub repo — changes go live within a minute or two."
+      : "Pick the page you want to change below. Uploads and edits commit directly to the live site's GitHub repo — changes go live within a minute or two."}</p>
 
     <div class="page-tabs">
       ${tabs}
@@ -1760,13 +1784,19 @@ export default {
       if (url.pathname === "/login" && request.method === "POST") {
         const form = await request.formData();
         const password = form.get("password");
-        if (password !== env.ADMIN_PASSWORD) {
+        // Two passwords, two roles: ADMIN_PASSWORD gets the full dashboard,
+        // SHALA_ADMIN_PASSWORD (optional — only checked if it's been set)
+        // gets a restricted view scoped to Shala content only.
+        let role = null;
+        if (password === env.ADMIN_PASSWORD) role = "full";
+        else if (env.SHALA_ADMIN_PASSWORD && password === env.SHALA_ADMIN_PASSWORD) role = "shala";
+        if (!role) {
           return new Response(loginPage("Wrong password."), {
             status: 401,
             headers: { "Content-Type": "text/html" },
           });
         }
-        const token = await makeSession(env);
+        const token = await makeSession(env, role);
         return new Response(null, {
           status: 302,
           headers: { Location: "/admin", "Set-Cookie": setCookieHeader(token) },
@@ -1783,28 +1813,31 @@ export default {
         });
       }
 
-      const authed = await verifySession(env, cookie);
+      const role = await verifySession(env, cookie);
 
       if (url.pathname === "/" || url.pathname === "/login") {
-        if (authed) return Response.redirect(url.origin + "/admin", 302);
+        if (role) return Response.redirect(url.origin + "/admin", 302);
         return new Response(loginPage(), { headers: { "Content-Type": "text/html" } });
       }
 
       if (url.pathname === "/admin") {
-        if (!authed) return Response.redirect(url.origin + "/", 302);
-        return new Response(adminPage(), { headers: { "Content-Type": "text/html" } });
+        if (!role) return Response.redirect(url.origin + "/", 302);
+        return new Response(adminPage(role), { headers: { "Content-Type": "text/html" } });
       }
 
       if (url.pathname === "/flyer") {
-        if (!authed) return Response.redirect(url.origin + "/", 302);
+        // Flyer Builder isn't part of the Shala-scoped role for now — keep
+        // that login narrowly focused on Shala content only.
+        if (role !== "full") return Response.redirect(url.origin + "/", 302);
         return new Response(FLYER_BUILDER_HTML, { headers: { "Content-Type": "text/html" } });
       }
 
       if (url.pathname.startsWith("/api/")) {
-        if (!authed) return json({ error: "Not logged in" }, 401);
+        if (!role) return json({ error: "Not logged in" }, 401);
 
         if (url.pathname === "/api/list" && request.method === "GET") {
           const folder = url.searchParams.get("folder");
+          if (!isAllowedPath(folder, role)) return json({ error: "Path not allowed" }, 400);
           const cfg = FOLDERS.find((f) => f.path === folder);
           if (!cfg) return json({ error: "Unknown folder" }, 400);
           const items = await ghListFolder(env, folder, !!cfg.yearFolders);
@@ -1813,7 +1846,7 @@ export default {
 
         if (url.pathname === "/api/file" && request.method === "GET") {
           const path = url.searchParams.get("path");
-          if (!isAllowedPath(path)) return json({ error: "Path not allowed" }, 400);
+          if (!isAllowedPath(path, role)) return json({ error: "Path not allowed" }, 400);
           const file = await ghGetFile(env, path);
           if (!file) return json({ error: "File not found" }, 404);
           return json(file);
@@ -1821,12 +1854,15 @@ export default {
 
         if (url.pathname === "/api/commit" && request.method === "POST") {
           const body = await request.json();
-          if (!isAllowedPath(body.path)) return json({ error: "Path not allowed" }, 400);
+          if (!isAllowedPath(body.path, role)) return json({ error: "Path not allowed" }, 400);
           const result = await ghCommitFile(env, body.path, body.contentBase64, body.message || `Admin update: ${body.path}`);
           return json({ ok: true, commit: result.commit?.sha });
         }
 
         if (url.pathname === "/api/logs" && request.method === "GET") {
+          // Activity Log is hidden from the Shala-scoped UI and blocked
+          // here too, since it surfaces commits outside Shala's own files.
+          if (role !== "full") return json({ error: "Not allowed" }, 403);
           const perPage = Math.min(Number(url.searchParams.get("per_page")) || 40, 100);
           const commits = await ghListCommits(env, perPage);
           return json(commits);
@@ -1834,7 +1870,7 @@ export default {
 
         if (url.pathname === "/api/rename" && request.method === "POST") {
           const body = await request.json();
-          if (!isAllowedPath(body.oldPath) || !isAllowedPath(body.newPath)) {
+          if (!isAllowedPath(body.oldPath, role) || !isAllowedPath(body.newPath, role)) {
             return json({ error: "Path not allowed" }, 400);
           }
           await ghRenameFile(env, body.oldPath, body.newPath, body.message || `Admin: rename ${body.oldPath} -> ${body.newPath}`);
@@ -1843,7 +1879,7 @@ export default {
 
         if (url.pathname === "/api/delete" && request.method === "POST") {
           const body = await request.json();
-          if (!isAllowedPath(body.path)) return json({ error: "Path not allowed" }, 400);
+          if (!isAllowedPath(body.path, role)) return json({ error: "Path not allowed" }, 400);
           const result = await ghDeleteFile(env, body.path, body.message || `Admin delete: ${body.path}`);
           return json({ ok: true, commit: result.commit?.sha });
         }
@@ -1862,10 +1898,23 @@ function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
 }
 
-// Only allow writes to paths this admin panel is meant to manage —
-// prevents the API being used to overwrite arbitrary repo files.
-function isAllowedPath(path) {
+// Only allow writes to paths this admin panel is meant to manage — prevents
+// the API being used to overwrite arbitrary repo files. The "shala" role is
+// additionally restricted to only the files/folders reachable from
+// SHALA_ROLE_PAGE_KEYS (enforced here server-side, not just hidden in the
+// UI) — this is what actually keeps a Shala-only login off data/events.xlsx
+// and everything else on the site.
+function isAllowedPath(path, role) {
   if (!path || typeof path !== "string") return false;
+
+  if (role === "shala") {
+    const pages = PAGES.filter((p) => SHALA_ROLE_PAGE_KEYS.includes(p.key));
+    const allowedXlsx = pages.flatMap((p) => p.xlsx || []);
+    const allowedFolders = pages.flatMap((p) => p.folders || []);
+    if (allowedXlsx.includes(path)) return true;
+    return allowedFolders.some((f) => path === f || path.startsWith(f + "/"));
+  }
+
   if (XLSX_FILES.some((f) => f.path === path)) return true;
   if (SINGLE_DOCS.some((f) => f.path === path)) return true;
   if (SIMPLE_JSON_FILES.some((f) => f.path === path)) return true;

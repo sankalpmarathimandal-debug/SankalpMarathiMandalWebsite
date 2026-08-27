@@ -309,12 +309,18 @@ main { flex: 1; }
 }
 
 /* =====================================================
-   SHALA EVENTS (shala.html) — reuses .ev3-card, just a plain wrapping
-   grid instead of the homepage's featured/previous/future 3-area layout.
+   SHALA EVENTS (shala.html) — same .ev3-grid/.ev3-card component as the
+   homepage, but only ever shows up to 2 cards (current + future — no
+   "previous"), so the grid-template-areas drop the previous slot: the
+   featured "upcoming" card spans the top row, future takes the row below
+   full-width instead of sharing it with a previous card.
    ===================================================== */
-.shala-events-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 18px; max-width: 1040px; margin: 0 auto; padding: 0 24px 8px;
+.shala-events-grid.ev3-grid {
+  max-width: 1040px; margin: 0 auto 16px; padding: 0 24px;
+  grid-template-areas: "upcoming upcoming" "future future";
+}
+@media (max-width: 800px) {
+  .shala-events-grid.ev3-grid { grid-template-areas: "upcoming" "future"; }
 }
 
 /* =====================================================

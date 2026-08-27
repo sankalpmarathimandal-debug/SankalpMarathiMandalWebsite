@@ -384,25 +384,27 @@ function renderShalaEvents() {
       const shalaEvents = rows.filter(e =>
         e.Name && e.Name.trim() && (e.Audience || '').trim().toLowerCase() === 'shala'
       );
-      if (!shalaEvents.length) { section.style.display = 'none'; return; }
+      // Only current + future are shown here (same featured-card treatment
+      // as the homepage), never "previous" — this section is meant to
+      // highlight what's coming up, not a full history.
+      const current = shalaEvents.find(e => (e.Type || '').trim().toLowerCase() === 'current');
+      const future  = shalaEvents.find(e => (e.Type || '').trim().toLowerCase() === 'future');
+      const toShow = [
+        current && { e: current, t: 'current', cls: 'ev3-upcoming' },
+        future  && { e: future,  t: 'future',  cls: 'ev3-future' },
+      ].filter(Boolean);
 
-      const order = { previous: 0, current: 1, future: 2 };
+      if (!toShow.length) { section.style.display = 'none'; return; }
+
       grid.innerHTML = '';
-      shalaEvents
-        .sort((a, b) => {
-          const ta = order[(a.Type || '').trim().toLowerCase()] ?? 2;
-          const tb = order[(b.Type || '').trim().toLowerCase()] ?? 2;
-          return ta - tb;
-        })
-        .forEach(e => {
-          const t = (e.Type || '').trim().toLowerCase() || 'future';
-          const card = document.createElement('div');
-          card.innerHTML = ev3CardHtml(e, t, '');
-          const el = card.firstElementChild;
-          el.addEventListener('click', function() { openModal(e, this); });
-          el.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openModal(e, this); } });
-          grid.appendChild(el);
-        });
+      toShow.forEach(({ e, t, cls }) => {
+        const card = document.createElement('div');
+        card.innerHTML = ev3CardHtml(e, t, cls);
+        const el = card.firstElementChild;
+        el.addEventListener('click', function() { openModal(e, this); });
+        el.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openModal(e, this); } });
+        grid.appendChild(el);
+      });
     },
     () => { section.style.display = 'none'; }
   );
