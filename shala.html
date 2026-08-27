@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="assets/css/style.css?v=f1cf50f">
+<link rel="stylesheet" href="assets/css/style.css?v=dcf1590">
 </head>
 
 <body>
@@ -44,7 +44,30 @@
   <p>मायबोलीची गोडी पुढच्या पिढीपर्यंत — BMM-approved Marathi language learning for our children, in collaboration with Bharati Vidyapeeth, Pune.</p>
 </section>
 
-<section class="events-section" style="padding-top:32px;">
+<!-- SUB-NAV -->
+<nav class="subnav" aria-label="Shala page sections">
+  <div class="subnav-inner">
+    <a href="#shala-events">Events</a>
+    <a href="#overview">Overview</a>
+    <a href="#curriculum">Curriculum</a>
+    <a href="#shala-team">Team</a>
+    <a href="#guidelines">Guidelines</a>
+    <a href="#faqs">FAQs</a>
+  </div>
+</nav>
+
+<!-- SHALA EVENTS — data/events.xlsx rows tagged Audience=Shala in the admin
+     panel; this whole section (header + grid) hides itself if none are
+     tagged yet. -->
+<section id="shala-events">
+  <div class="mr-divider" style="padding-top:40px;">
+    <h2 class="mr-danda mr-english">॥ Shala Events ॥</h2>
+    <p class="mr-tagline mr-plain">Picnics, exams, and in-person Shala activities.</p>
+  </div>
+  <div class="shala-events-grid" id="shala-events-grid"></div>
+</section>
+
+<section class="events-section" id="overview" style="padding-top:32px;">
   <div class="shala-highlight">
     <h3><i class="fas fa-bell" style="color:#f59e0b;"></i> Admissions Open Now</h3>
     <p>Enroll your child in Sankalp Marathi Shala for the upcoming academic year (September – June). Open to children aged 4 and above.</p>
@@ -52,7 +75,7 @@
   </div>
 </section>
 
-<section class="info-cards info-cards--four">
+<section class="info-cards info-cards--four" id="curriculum">
   <div class="info-card">
     <div class="about-icon"><i class="fas fa-book-open"></i></div>
     <h4>BMM Curriculum</h4>
@@ -77,7 +100,7 @@
 </section>
 
 <!-- SHALA TEAM -->
-<section class="section-divider">
+<section class="section-divider" id="shala-team">
   <h2 class="section-title">Shala Team</h2>
   <p class="section-subtitle">The people behind the classroom.</p>
 </section>
@@ -86,8 +109,25 @@
   <div id="shala-team-container"></div>
 </section>
 
+<!-- SHALA GUIDELINES -->
+<section class="section-divider" id="guidelines">
+  <h2 class="section-title">Shala Guidelines</h2>
+  <p class="section-subtitle">Handbooks for parents and teachers.</p>
+</section>
+
+<section class="guidelines-columns">
+  <div>
+    <div class="guidelines-column-title"><i class="fas fa-user-group"></i> For Parents</div>
+    <div id="shala-guidelines-parents-container"></div>
+  </div>
+  <div>
+    <div class="guidelines-column-title"><i class="fas fa-chalkboard-user"></i> For Teachers</div>
+    <div id="shala-guidelines-teachers-container"></div>
+  </div>
+</section>
+
 <!-- SHALA FAQS -->
-<section class="section-divider">
+<section class="section-divider" id="faqs">
   <h2 class="section-title">Shala FAQs</h2>
   <p class="section-subtitle">Everything parents ask us, answered.</p>
 </section>
@@ -95,6 +135,21 @@
 <section class="faq-section" style="padding-top:10px;">
   <div id="shala-faq-container"></div>
 </section>
+
+<!-- Event Modal (for Shala Events cards above) -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close modal" id="modal-close-btn">×</button>
+    <div class="modal-layout" id="modal-layout">
+      <div class="modal-media" id="modal-media"></div>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modal-title"></h2>
+        <p class="modal-desc" id="modal-desc"></p>
+        <div class="modal-meta" id="modal-meta"></div>
+      </div>
+    </div>
+  </div>
+</div>
 </main>
 
 <footer>
@@ -123,6 +178,6 @@
 </footer>
 
 <button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
-<script src="assets/js/main.js?v=f1cf50f" defer></script>
+<script src="assets/js/main.js?v=dcf1590" defer></script>
 </body>
 </html>

@@ -72,6 +72,8 @@ const CONFIG = {
   SHALA_TEAM_CSV: 'data/shala-team.xlsx',
   FAQS_CSV: 'data/faq.xlsx',
   SHALA_FAQS_CSV: 'data/shala-faq.xlsx',
+  SHALA_GUIDELINES_PARENTS_CSV: 'data/shala-guidelines-parents.xlsx',
+  SHALA_GUIDELINES_TEACHERS_CSV: 'data/shala-guidelines-teachers.xlsx',
   SHALA_CALENDAR_CSV: 'data/shala-calendar.xlsx',
   FORMS_CSV: 'data/forms.xlsx',
   SHOWCASE_CSV: 'data/showcase.xlsx',
@@ -365,6 +367,80 @@ function loadEvents() {
     },
     () => { grid.innerHTML = '<p style="text-align:center;color:var(--apple-gray);grid-column:1/-1;">Events could not be loaded right now.</p>'; }
   );
+}
+
+/* =====================================================
+   SHALA EVENTS (shala.html) — same unified data/events.xlsx sheet,
+   filtered to rows tagged Audience = "Shala" in the admin panel. Reuses
+   the exact homepage event card (ev3CardHtml) and click-to-open modal.
+   Section hides itself entirely if nothing is tagged yet.
+   ===================================================== */
+function renderShalaEvents() {
+  const grid = document.getElementById('shala-events-grid');
+  const section = document.getElementById('shala-events');
+  if (!grid || !section) return;
+
+  loadSheet(CONFIG.EVENTS_DB, rows => {
+      const shalaEvents = rows.filter(e =>
+        e.Name && e.Name.trim() && (e.Audience || '').trim().toLowerCase() === 'shala'
+      );
+      if (!shalaEvents.length) { section.style.display = 'none'; return; }
+
+      const order = { previous: 0, current: 1, future: 2 };
+      grid.innerHTML = '';
+      shalaEvents
+        .sort((a, b) => {
+          const ta = order[(a.Type || '').trim().toLowerCase()] ?? 2;
+          const tb = order[(b.Type || '').trim().toLowerCase()] ?? 2;
+          return ta - tb;
+        })
+        .forEach(e => {
+          const t = (e.Type || '').trim().toLowerCase() || 'future';
+          const card = document.createElement('div');
+          card.innerHTML = ev3CardHtml(e, t, '');
+          const el = card.firstElementChild;
+          el.addEventListener('click', function() { openModal(e, this); });
+          el.addEventListener('keydown', function(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openModal(e, this); } });
+          grid.appendChild(el);
+        });
+    },
+    () => { section.style.display = 'none'; }
+  );
+}
+
+/* =====================================================
+   PAGE SUB-NAV (shala.html) — pill anchor links under the page hero,
+   scrolls to matching sections and highlights whichever one is currently
+   in view via IntersectionObserver.
+   ===================================================== */
+function initSubnav() {
+  const nav = document.querySelector('.subnav');
+  if (!nav) return;
+  const links = [...nav.querySelectorAll('a')];
+  const sections = links
+    .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+    .filter(Boolean);
+
+  links.forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.getElementById(a.getAttribute('href').slice(1));
+      if (!target) return;
+      e.preventDefault();
+      const navHeight = nav.getBoundingClientRect().height + document.querySelector('.site-nav').getBoundingClientRect().height + 16;
+      const top = target.getBoundingClientRect().top + window.scrollY - navHeight;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  if (!sections.length) return;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
 }
 
 /* =====================================================
@@ -1273,6 +1349,10 @@ document.addEventListener('DOMContentLoaded', function() {
   renderTeamGrid(CONFIG.SHALA_TEAM_CSV, 'shala-team-container');
   renderFaqs(CONFIG.FAQS_CSV, 'faq-container', false);
   renderFaqs(CONFIG.SHALA_FAQS_CSV, 'shala-faq-container', true);
+  renderFaqs(CONFIG.SHALA_GUIDELINES_PARENTS_CSV, 'shala-guidelines-parents-container', false);
+  renderFaqs(CONFIG.SHALA_GUIDELINES_TEACHERS_CSV, 'shala-guidelines-teachers-container', false);
+  renderShalaEvents();
+  initSubnav();
   renderShowcase();
   loadShalaCalendar();
   renderForms();

@@ -20,13 +20,15 @@
 // ---------------------------------------------------------------------------
 
 const XLSX_FILES = [
-  { path: "data/events.xlsx", label: "Events & Performances", desc: "One sheet: homepage event cards, Event Timeline page, and the homepage Book a Performance teaser. Set 'Event Type' to Event or Performance; Event rows also need a Type (previous/current/future) to appear as one of the 3 featured homepage cards — leave Type blank for timeline-only events." },
+  { path: "data/events.xlsx", label: "Events & Performances", desc: "One sheet: homepage event cards, Event Timeline page, the homepage Book a Performance teaser, and the Shala Events section on the Marathi Shala page. Set 'Event Type' to Event or Performance; Event rows also need a Type (previous/current/future) to appear as one of the 3 featured homepage cards — leave Type blank for timeline-only events. To also show an event on the Shala page, set Audience to 'Shala' (leave blank for general Mandal events)." },
   { path: "data/testimonials.xlsx", label: "Testimonials", desc: "Homepage “Community Voices”" },
   { path: "data/sponsors.xlsx", label: "Presenting Sponsors", desc: "Homepage sponsor cards. To add a headshot photo: upload it under 'Sponsor Photos' below, then paste its path into AvatarURL (e.g. assets/images/partners/radhika.jpg) — leave blank for a generic icon. Columns: Active (Yes/No), DisplayOrder, Tier (e.g. Gold Partner — shown as a badge), Name, Role, AvatarURL (headshot, shown in the circle), AccentColor (hex, drives that card's colors), Icon (small Font Awesome solid icon name shown next to the name, e.g. chart-line or house-chimney), LogoURL (business logo image shown in the middle badge — also uploaded via 'Sponsor Photos'), BusinessName, Tagline, Category, Description, Tags (comma-separated), Website, Phone, Email, SocialLabel, SocialURL, CTAText, CTALink." },
   { path: "data/team.xlsx", label: "Team", desc: "Our Team page" },
   { path: "data/shala-team.xlsx", label: "Shala Team", desc: "Marathi Shala team section" },
   { path: "data/faq.xlsx", label: "FAQ", desc: "FAQs page" },
   { path: "data/shala-faq.xlsx", label: "Shala FAQ", desc: "Marathi Shala FAQs" },
+  { path: "data/shala-guidelines-parents.xlsx", label: "Shala Guidelines — Parents", desc: "Parent handbook accordion on the Marathi Shala page. Columns: ID, Question (used as the accordion heading), Answer, Order, Active (Yes/No)." },
+  { path: "data/shala-guidelines-teachers.xlsx", label: "Shala Guidelines — Teachers", desc: "Teacher handbook accordion on the Marathi Shala page. Same columns as the Parents guidelines above." },
   { path: "data/shala-calendar.xlsx", label: "Shala Calendar", desc: "Shala Calendar page + download button" },
   { path: "data/forms.xlsx", label: "Forms & Sign-ups", desc: "Forms & Sign-ups page" },
   { path: "data/showcase.xlsx", label: "Showcase", desc: "Showcase page entries" },
@@ -84,7 +86,7 @@ const PAGES = [
   { key: "home", label: "Home Page", xlsx: ["data/events.xlsx", "data/testimonials.xlsx", "data/sponsors.xlsx"], folders: ["assets/images/highlights", "assets/images/branding/logo-variants", "assets/images/culture-icons", "assets/images/partners"] },
   { key: "events", label: "Events Page", xlsx: ["data/events.xlsx"], folders: ["assets/images/events"] },
   { key: "team", label: "Team Page", xlsx: ["data/team.xlsx"], folders: ["assets/images/team"] },
-  { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx"], folders: ["assets/images/shala"] },
+  { key: "shala", label: "Shala Page", xlsx: ["data/shala-team.xlsx", "data/shala-faq.xlsx", "data/shala-guidelines-parents.xlsx", "data/shala-guidelines-teachers.xlsx", "data/events.xlsx"], folders: ["assets/images/shala"] },
   { key: "calendar", label: "Shala Calendar", xlsx: ["data/shala-calendar.xlsx"], folders: [] },
   { key: "faq", label: "FAQ Page", xlsx: ["data/faq.xlsx"], folders: [] },
   { key: "forms", label: "Forms & Sign-ups", xlsx: ["data/forms.xlsx"], folders: [] },

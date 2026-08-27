@@ -76,6 +76,8 @@ SankalpMarathiMandalWebsite/
 │   ├── shala-team.xlsx     Shala page team
 │   ├── faq.xlsx            FAQ page questions
 │   ├── shala-faq.xlsx      Shala page FAQs
+│   ├── shala-guidelines-parents.xlsx   Shala page — Parent guidelines accordion
+│   ├── shala-guidelines-teachers.xlsx  Shala page — Teacher guidelines accordion
 │   ├── shala-calendar.xlsx Shala Calendar page (Year, Month, Day, Title, Type, Time, Notes)
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
 │   ├── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
@@ -113,6 +115,8 @@ SankalpMarathiMandalWebsite/
 | Presenting Sponsors | `data/sponsors.xlsx` (optional headshot in `assets/images/partners/`) |
 | Team members | `data/team.xlsx` + photo in `assets/images/team/` |
 | Shala team / FAQs | `data/shala-team.xlsx` / `data/shala-faq.xlsx` |
+| Shala guidelines (parents/teachers) | `data/shala-guidelines-parents.xlsx` / `data/shala-guidelines-teachers.xlsx` |
+| Shala-specific events | Tag a row in `data/events.xlsx` with `Audience = Shala` |
 | Shala calendar | `data/shala-calendar.xlsx` — one row per date (see below) |
 | General FAQs | `data/faq.xlsx` |
 | Constitution | replace `docs/constitution.pdf` |

@@ -274,6 +274,65 @@ main { flex: 1; }
 }
 
 /* =====================================================
+   PAGE SUB-NAV — in-page anchor pills under a page hero (currently
+   shala.html), sticky under the main nav so it's reachable while
+   scrolling through a long page. Active section is highlighted via
+   IntersectionObserver in initSubnav() (main.js).
+   ===================================================== */
+.subnav {
+  /* .site-nav above is itself sticky at top:0 with a fixed 56px height
+     (.nav-inner { height: 56px }) — stick this bar right underneath it,
+     not on top of it. */
+  position: sticky; top: 56px; z-index: 40;
+  background: rgba(253,250,244,0.92);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 12px 20px;
+}
+.subnav-inner {
+  max-width: 900px; margin: 0 auto;
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  gap: 8px; scrollbar-width: none;
+}
+.subnav-inner::-webkit-scrollbar { display: none; }
+.subnav a {
+  flex-shrink: 0;
+  font-family: var(--font-family); font-size: 13.5px; font-weight: 600;
+  color: var(--apple-dark); background: var(--apple-light-gray);
+  border-radius: 980px; padding: 9px 18px; text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.subnav a:hover { background: #eeeef0; }
+.subnav a.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
+}
+
+/* =====================================================
+   SHALA EVENTS (shala.html) — reuses .ev3-card, just a plain wrapping
+   grid instead of the homepage's featured/previous/future 3-area layout.
+   ===================================================== */
+.shala-events-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 18px; max-width: 1040px; margin: 0 auto; padding: 0 24px 8px;
+}
+
+/* =====================================================
+   SHALA GUIDELINES (shala.html) — Parents / Teachers accordions
+   side by side on desktop, stacked on mobile.
+   ===================================================== */
+.guidelines-columns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+  max-width: 1100px; margin: 0 auto; padding: 0 24px 60px;
+}
+@media (max-width: 800px) { .guidelines-columns { grid-template-columns: 1fr; } }
+.guidelines-column-title {
+  font-family: var(--font-family); font-size: 15px; font-weight: 700;
+  color: var(--brand-gradient-start); text-transform: uppercase; letter-spacing: 0.04em;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* =====================================================
    HOME HERO — single rounded/shadowed card holding the logo (left) and
    headline/CTAs (right). Currently used on index.html only. Colors, fonts
    and radius/shadow tokens are the same ones used everywhere else on the
@@ -1424,7 +1483,11 @@ main { flex: 1; }
   transition: max-height 0.35s ease;
 }
 
-.faq-answer-inner { padding: 0 24px 20px; color: var(--apple-gray); line-height: 1.7; font-size: 15px; }
+/* white-space:pre-line preserves the line breaks/bullet formatting typed
+   into the Answer cell in the xlsx (e.g. the Shala Guidelines, which are
+   long multi-bullet blocks) instead of collapsing them into one run-on
+   paragraph like normal HTML would. */
+.faq-answer-inner { padding: 0 24px 20px; color: var(--apple-gray); line-height: 1.7; font-size: 15px; white-space: pre-line; }
 
 /* =====================================================
    SHOWCASE PAGE
