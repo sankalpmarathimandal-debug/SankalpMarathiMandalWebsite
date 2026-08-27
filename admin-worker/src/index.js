@@ -1282,6 +1282,30 @@ function adminPage(role) {
     return btoa(binary);
   }
 
+  // Fetches the file as a blob first (rather than a plain <a href download>)
+  // because the download attribute is ignored on cross-origin links in most
+  // browsers — download_url points at raw.githubusercontent.com, a
+  // different origin from this admin panel. GitHub's raw content CDN sends
+  // permissive CORS headers, so the fetch itself works fine; only the
+  // "force download instead of navigating" part needs the blob trick.
+  async function downloadThumb(url, filename) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Download failed (' + res.status + ')');
+      const blob = await res.blob();
+      const objUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objUrl);
+    } catch (e) {
+      alert('Could not download ' + filename + ': ' + e.message);
+    }
+  }
+
   function setStatus(card, msg, ok) {
     const el = card.querySelector('.status');
     el.textContent = msg;
@@ -1646,6 +1670,12 @@ function adminPage(role) {
         nameEl.title = displayName;
         nameEl.textContent = displayName;
         wrap.appendChild(nameEl);
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'secondary';
+        downloadBtn.textContent = 'Download';
+        downloadBtn.onclick = function() { downloadThumb(it.download_url, displayName.split('/').pop()); };
+        wrap.appendChild(downloadBtn);
 
         const renameBtn = document.createElement('button');
         renameBtn.className = 'secondary rename-btn';
