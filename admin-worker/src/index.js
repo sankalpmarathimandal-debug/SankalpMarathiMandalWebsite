@@ -109,6 +109,44 @@ const PAGES = [
 const SHALA_ROLE_PAGE_KEYS = ["shala", "calendar"];
 
 // ---------------------------------------------------------------------------
+// Join Us / Become a Sponsor submissions — public endpoint (/api/submit)
+// Site visitors' Join Us / Become a Sponsor forms POST here in addition to
+// emailing via Web3Forms, so every submission also lands as a row in one of
+// these CSVs and is visible (and removable, once a team member has added the
+// person) from the "Inquiries" tab in the full admin login. Full-role only —
+// not part of the Shala-scoped login, since neither form is Shala-specific.
+const SUBMISSION_LOGS = {
+  join: {
+    path: "data/join-submissions.csv",
+    label: "Join Us",
+    columns: ["Timestamp", "Full Name", "Email", "Phone", "Family or Kids", "Interested In", "Message"],
+  },
+  sponsor: {
+    path: "data/sponsor-submissions.csv",
+    label: "Become a Sponsor",
+    columns: ["Timestamp", "Organization Name", "Contact Person", "Email", "Phone", "Sponsorship Interest", "Message"],
+  },
+};
+
+// Only these origins may POST to /api/submit — keeps the open endpoint from
+// being usable as a free spam relay by other sites.
+const ALLOWED_SUBMIT_ORIGINS = new Set([
+  "https://sankalpmarathimandal-debug.github.io",
+  "https://www.sankalpmarathi.org",
+  "https://sankalpmarathi.org",
+]);
+
+function submitCorsHeaders(origin) {
+  if (!ALLOWED_SUBMIT_ORIGINS.has(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Event Flyer Builder — a fully self-contained, client-side flyer design
 // tool (background/hero image, sponsors, QR code, PDF export). Served at
 // /flyer, behind the same login as the rest of the admin panel. No GitHub
@@ -997,6 +1035,93 @@ async function ghDeleteFile(env, path, message) {
 }
 
 // ---------------------------------------------------------------------------
+// Join Us / Become a Sponsor submissions — server-side CSV helpers
+// ---------------------------------------------------------------------------
+
+// GitHub's Contents API is base64-in/base64-out; atob/btoa alone are
+// Latin1-only, so route through TextEncoder/TextDecoder for names/messages
+// with non-ASCII characters (e.g. Marathi text).
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+function base64ToUtf8(b64) {
+  const binary = atob(b64.replace(/\n/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+function csvEscape(value) {
+  const s = (value ?? "").toString().replace(/\r?\n/g, " ").trim();
+  if (/[",]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function csvRow(values) {
+  return values.map(csvEscape).join(",") + "\r\n";
+}
+
+// Appends one row to a CSV in the repo, creating it with a header row if it
+// doesn't exist yet. Retries a few times on a 409 (another submission
+// committed in between our GET and PUT) by re-reading the file and
+// re-appending — two form submissions landing seconds apart is the only
+// realistic race here, so a handful of retries is plenty.
+async function appendCsvRow(env, path, header, rowValues, message) {
+  let lastErr;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const existing = await ghGetFile(env, path);
+    let text = existing ? base64ToUtf8(existing.contentBase64) : csvRow(header);
+    if (text && !/\r?\n$/.test(text)) text += "\r\n";
+    text += csvRow(rowValues);
+    const res = await fetch(ghUrl(env, path), {
+      method: "PUT",
+      headers: { ...ghHeaders(env), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        content: utf8ToBase64(text),
+        branch: env.GITHUB_BRANCH,
+        ...(existing ? { sha: existing.sha } : {}),
+      }),
+    });
+    if (res.ok) return res.json();
+    if (res.status !== 409 && res.status !== 422) {
+      throw new Error(`GitHub commit ${path} failed: ${res.status} ${await res.text()}`);
+    }
+    lastErr = new Error(`GitHub commit ${path} conflicted: ${res.status}`);
+  }
+  throw lastErr;
+}
+
+async function handleSubmission(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid request" }, 400);
+  }
+
+  const cfg = SUBMISSION_LOGS[body && body.form];
+  if (!cfg) return json({ error: "Unknown form" }, 400);
+
+  // Honeypot (same "botcheck" field the HTML forms already carry) — pretend
+  // success so bots learn nothing.
+  if (body.botcheck) return json({ ok: true });
+
+  const clean = (v) => (typeof v === "string" ? v.slice(0, 2000) : "");
+  const row = cfg.columns.map((col) => (col === "Timestamp" ? new Date().toISOString() : clean(body[col])));
+
+  const emailIdx = cfg.columns.indexOf("Email");
+  if (emailIdx === -1 || !row[emailIdx]) return json({ error: "Missing required fields" }, 400);
+
+  await appendCsvRow(env, cfg.path, cfg.columns, row, `New ${cfg.label} submission`);
+  return json({ ok: true });
+}
+
+// ---------------------------------------------------------------------------
 // Session (signed cookie, no server-side storage needed)
 // ---------------------------------------------------------------------------
 
@@ -1216,6 +1341,25 @@ function logSectionHtml(isShalaRole) {
   </section>`;
 }
 
+function submissionsSectionHtml() {
+  const tables = Object.entries(SUBMISSION_LOGS).map(([key, cfg]) => `
+      <h3 style="margin:18px 0 8px;font-size:15px;">${cfg.label}</h3>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap" style="max-height:420px;">
+          <table class="xlsx-table" style="width:100%;">
+            <thead><tr id="submissions-thead-${key}"></tr></thead>
+            <tbody id="submissions-tbody-${key}"><tr><td style="padding:14px;color:#999;">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>`).join("\n");
+  return `<section class="page-section" id="page-submissions">
+    <h2 class="section">Inquiries</h2>
+    <p style="font-size:13px;color:#6b6558;margin:0 0 14px;">Every Join Us / Become a Sponsor submission lands here automatically (in addition to the email notification), so it's never dependent on email delivery. Review a row, add the person wherever they belong on the site, then click Delete to clear it off this list — that only removes it from here, nothing else on the site is affected.</p>
+    ${tables}
+    <div class="row" style="margin-top:12px;"><button class="secondary" onclick="loadSubmissions()">Refresh</button></div>
+  </section>`;
+}
+
 function adminPage(role) {
   const isShalaRole = role === "shala";
   const pages = isShalaRole ? PAGES.filter((p) => SHALA_ROLE_PAGE_KEYS.includes(p.key)) : PAGES;
@@ -1224,8 +1368,10 @@ function adminPage(role) {
     (p, i) => `<button class="page-tab${i === 0 ? " active" : ""}" data-page="${p.key}" onclick="showPage('${p.key}')">${p.label}</button>`
   ).join("\n")
     + `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
+    + (isShalaRole ? "" : `\n<button class="page-tab" data-page="submissions" onclick="showPage('submissions')">Inquiries</button>`)
     + (isShalaRole ? "" : `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`);
-  const sections = pages.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml(isShalaRole);
+  const sections = pages.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml(isShalaRole)
+    + (isShalaRole ? "" : "\n" + submissionsSectionHtml());
   // Folder listing is gated server-side by isAllowedPath too, but only
   // wiring up the folders this role can actually see keeps the page's own
   // JS from even trying to load anything out of scope.
@@ -1802,9 +1948,106 @@ function adminPage(role) {
     }
   }
 
+  // ---- Join Us / Become a Sponsor inquiries --------------------------------
+
+  const SUBMISSION_FORMS = [
+    { key: 'join', path: 'data/join-submissions.csv', label: 'Join Us' },
+    { key: 'sponsor', path: 'data/sponsor-submissions.csv', label: 'Become a Sponsor' },
+  ];
+
+  // Minimal CSV parser/escaper — only ever needs to round-trip files this
+  // same admin panel (or the /api/submit endpoint) wrote, so it doesn't need
+  // to handle arbitrary third-party CSV quirks.
+  function parseCsvClient(text) {
+    return text.split(/\\r?\\n/).filter(function(l) { return l.length > 0; }).map(function(line) {
+      const cells = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQ) {
+          if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+          else if (c === '"') { inQ = false; }
+          else cur += c;
+        } else {
+          if (c === '"') inQ = true;
+          else if (c === ',') { cells.push(cur); cur = ''; }
+          else cur += c;
+        }
+      }
+      cells.push(cur);
+      return cells;
+    });
+  }
+
+  function csvEscapeClient(v) {
+    const s = (v == null ? '' : String(v)).replace(/\\r?\\n/g, ' ').trim();
+    if (/[",]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  async function loadSubmissions() {
+    for (const f of SUBMISSION_FORMS) {
+      const tbody = document.getElementById('submissions-tbody-' + f.key);
+      const thead = document.getElementById('submissions-thead-' + f.key);
+      if (!tbody) continue;
+      tbody.innerHTML = '<tr><td style="padding:14px;color:#999;">Loading…</td></tr>';
+      try {
+        const res = await fetch('/api/file?path=' + encodeURIComponent(f.path));
+        if (res.status === 404) {
+          if (thead) thead.innerHTML = '';
+          tbody.innerHTML = '<tr><td style="padding:14px;color:#999;">No submissions yet.</td></tr>';
+          continue;
+        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load');
+        const rows = parseCsvClient(base64ToUtf8(data.contentBase64));
+        const header = rows[0] || [];
+        const body = rows.slice(1);
+        if (thead) thead.innerHTML = header.map(function(h) { return '<th>' + h.replace(/</g, '&lt;') + '</th>'; }).join('') + '<th></th>';
+        if (!body.length) {
+          tbody.innerHTML = '<tr><td colspan="' + (header.length + 1) + '" style="padding:14px;color:#999;">No submissions yet.</td></tr>';
+          continue;
+        }
+        tbody.innerHTML = body.map(function(r, i) {
+          return '<tr>' + r.map(function(c) { return '<td>' + (c || '').replace(/</g, '&lt;') + '</td>'; }).join('')
+            + '<td style="white-space:nowrap;"><button class="secondary" onclick="deleteSubmissionRow(\\'' + f.key + '\\',' + i + ')">Delete</button></td></tr>';
+        }).join('');
+      } catch (e) {
+        tbody.innerHTML = '<tr><td style="padding:14px;color:#a33;">' + e.message + '</td></tr>';
+      }
+    }
+  }
+
+  async function deleteSubmissionRow(key, rowIndex) {
+    const f = SUBMISSION_FORMS.find(function(x) { return x.key === key; });
+    if (!f) return;
+    if (!confirm('Remove this row from the Inquiries list? This does not affect anything else on the site.')) return;
+    try {
+      const res = await fetch('/api/file?path=' + encodeURIComponent(f.path));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load');
+      const rows = parseCsvClient(base64ToUtf8(data.contentBase64));
+      const header = rows[0];
+      const body = rows.slice(1);
+      body.splice(rowIndex, 1);
+      const newText = [header].concat(body).map(function(r) { return r.map(csvEscapeClient).join(','); }).join('\\r\\n') + '\\r\\n';
+      const commitRes = await fetch('/api/commit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: f.path, contentBase64: utf8ToBase64(newText), message: 'Admin: remove reviewed ' + f.label + ' submission' })
+      });
+      const commitJson = await commitRes.json();
+      if (!commitRes.ok) throw new Error(commitJson.error || 'Save failed');
+      loadSubmissions();
+    } catch (e) {
+      alert('Could not remove row: ' + e.message);
+    }
+  }
+
   JSON.parse('${allFolderPaths}').forEach(loadFolder);
   loadLogs();
   loadMarquee();
+  loadSubmissions();
   </script>
   </body></html>`;
 }
@@ -1849,6 +2092,24 @@ export default {
             "Set-Cookie": "session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0",
           },
         });
+      }
+
+      // Public — Join Us / Become a Sponsor call this directly from the
+      // live site, unauthenticated, same as the Web3Forms POST they also
+      // send. Needs CORS since the site and this Worker are different
+      // origins.
+      if (url.pathname === "/api/submit") {
+        const origin = request.headers.get("Origin") || "";
+        if (request.method === "OPTIONS") {
+          return new Response(null, { status: 204, headers: submitCorsHeaders(origin) });
+        }
+        if (request.method === "POST") {
+          const res = await handleSubmission(request, env);
+          const headers = new Headers(res.headers);
+          for (const [k, v] of Object.entries(submitCorsHeaders(origin))) headers.set(k, v);
+          return new Response(res.body, { status: res.status, headers });
+        }
+        return json({ error: "Method not allowed" }, 405);
       }
 
       const role = await verifySession(env, cookie);
@@ -1966,5 +2227,6 @@ function isAllowedPath(path, role) {
   if (XLSX_FILES.some((f) => f.path === path)) return true;
   if (SINGLE_DOCS.some((f) => f.path === path)) return true;
   if (SIMPLE_JSON_FILES.some((f) => f.path === path)) return true;
+  if (Object.values(SUBMISSION_LOGS).some((f) => f.path === path)) return true;
   return FOLDERS.some((f) => path === f.path || path.startsWith(f.path + "/"));
 }

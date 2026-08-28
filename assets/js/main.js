@@ -90,6 +90,14 @@ const CONFIG = {
   // enter your email, no account/password needed, a key arrives by email
   // instantly. Paste it below and both forms start working.
   WEB3FORMS_ACCESS_KEY: 'b5ba71b4-5c39-405f-9c67-1383a073f01f',
+
+  // In addition to the Web3Forms email above, Join Us / Become a Sponsor
+  // submissions are also logged as a row in a CSV in the repo (via the
+  // admin Worker's public /api/submit endpoint), visible/removable from
+  // the "Inquiries" tab in the admin panel — so the team has a record even
+  // if an email gets lost. Best-effort only: if this fails, the form still
+  // succeeds/fails based on Web3Forms alone.
+  SUBMISSION_LOG_ENDPOINT: 'https://sankalp-admin.sankalpsj.workers.dev/api/submit',
 };
 
 /* =====================================================
@@ -1279,6 +1287,37 @@ function calendarAgendaItem(e, showDate) {
    a free no-login email relay. Set CONFIG.WEB3FORMS_ACCESS_KEY
    (get one free at https://web3forms.com) for delivery to work.
    ===================================================== */
+// Form field names -> the columns the admin panel's "Inquiries" tab expects
+// for each form (see SUBMISSION_LOGS in admin-worker/src/index.js). Only
+// Join Us / Become a Sponsor are logged this way — Book a Performance's
+// request form isn't.
+const SUBMISSION_LOG_FORMS = {
+  joinForm: { key: 'join', fields: ['Full Name', 'Email', 'Phone', 'Family or Kids', 'Message'], multi: { 'Interested In': 'Interested In' } },
+  sponsorForm: { key: 'sponsor', fields: ['Organization Name', 'Contact Person', 'Email', 'Phone', 'Sponsorship Interest', 'Message'] },
+};
+
+// Best-effort copy of a submission into the admin panel's CSV-backed
+// "Inquiries" list, alongside the Web3Forms email above. Never blocks or
+// affects the form's own success/error UI — if this silently fails, the
+// email path (already validated) is still the source of truth.
+function logSubmissionForReview(form, formId) {
+  const cfg = SUBMISSION_LOG_FORMS[formId];
+  if (!cfg || !CONFIG.SUBMISSION_LOG_ENDPOINT) return;
+  const fd = new FormData(form);
+  const payload = { form: cfg.key, botcheck: !!fd.get('botcheck') };
+  cfg.fields.forEach(name => { payload[name] = fd.get(name) || ''; });
+  if (cfg.multi) {
+    Object.entries(cfg.multi).forEach(([fieldName, payloadKey]) => {
+      payload[payloadKey] = fd.getAll(fieldName).join('; ');
+    });
+  }
+  fetch(CONFIG.SUBMISSION_LOG_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => { /* best-effort — Web3Forms above is the primary path */ });
+}
+
 function initWeb3Form(formId) {
   const form = document.getElementById(formId);
   if (!form) return;
@@ -1302,6 +1341,8 @@ function initWeb3Form(formId) {
       }
       return;
     }
+
+    logSubmissionForReview(form, formId);
 
     const originalBtnText = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }

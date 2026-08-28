@@ -84,7 +84,9 @@ SankalpMarathiMandalWebsite/
 │   ├── forms.xlsx          Forms & Sign-ups page (Title, Description, Link, Active, Order)
 │   ├── showcase.xlsx       Showcase page (Event, Title, Description, Category, YouTubeURL, ImageURL, DocumentURL, Active, Order)
 │   ├── programs.xlsx       Book a Performance program menu (Title, Description, ImageURL, InstagramURL, PriceType, PriceDetails, Active, Order)
-│   └── program-participants.xlsx  Book a Performance participants (Program, Name, Role, Order)
+│   ├── program-participants.xlsx  Book a Performance participants (Program, Name, Role, Order)
+│   ├── join-submissions.csv       Auto-generated — every Join Us submission, see "Inquiries" below
+│   └── sponsor-submissions.csv    Auto-generated — every Become a Sponsor submission, see "Inquiries" below
 │
 ├── assets/
 │   ├── css/style.css          All styling — editing this auto-bumps the `?v=` cache-busting tag on every page via `.github/workflows/bump-cache-version.yml`, so visitors don't get stuck with a stale cached copy
@@ -187,6 +189,8 @@ No Google Forms — `join.html` and `sponsor.html` are real HTML forms that subm
 
 Until a real key is set, submitting either form shows a friendly "not set up yet" message instead of failing silently.
 
+Independent of Web3Forms, every submission is also logged to a CSV in the repo and viewable in the admin panel — see "Inquiries" under the Admin panel section below. That path doesn't depend on the Web3Forms key at all, so it keeps working even if email delivery has an issue.
+
 ### Updating Forms & Sign-ups (no coding required)
 
 `forms.html` is a self-service page — anyone on the team can publish a new sign-up or survey without touching code, using `data/forms.xlsx`. Columns: `Title, Description, Link, Active, Order`.
@@ -272,6 +276,8 @@ The admin panel (`admin-worker/`, deployed as the `sankalp-admin` Cloudflare Wor
 **Downloading an image to edit it:** every image thumbnail in the admin panel has a **Download** button next to Rename/Delete — click it to save the current live image to your computer so you can edit it and re-upload the updated version, instead of having to track down the original file separately.
 
 **Activity Log:** every tab has an Activity Log section showing recent commits to the files that role can see (full role sees everything; Shala role sees only Shala-page commits) — useful for confirming an upload actually went through, or seeing who changed what.
+
+**Inquiries (full role only):** every Join Us / Become a Sponsor submission is logged as a row in `data/join-submissions.csv` / `data/sponsor-submissions.csv` — in addition to, not instead of, the Web3Forms email — via the admin Worker's own public `/api/submit` endpoint (no Google Forms, no third-party storage). The "Inquiries" tab shows both lists as tables; once someone's been added wherever they belong on the site, click **Delete** next to their row to clear it off the list (this only removes the row, nothing else on the site is affected). This exists so the team has a record independent of email delivery — useful since email relays like Web3Forms occasionally get caught by spam/inbox filters.
 
 ### Flyer Builder
 
