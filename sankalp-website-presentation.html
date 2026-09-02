@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>संकल्प मराठी मंडळ — नवीन वेबसाईट सादरीकरण</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#8c2f39;
+    --gold:#e3ab3c;
+    --gold-light:#f6dfa4;
+    --cream:#faf6ee;
+    --ink:#242018;
+    --muted:#6b6558;
+    --good:#2e7d4f;
+    --bad:#a33;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Devanagari','Segoe UI',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:36px 24px 60px;}
+  header{
+    background:linear-gradient(135deg,var(--maroon) 0%,#a8404c 60%,var(--gold) 130%);
+    color:#fff;
+    border-radius:18px;
+    padding:38px 34px;
+    margin-bottom:32px;
+    box-shadow:0 10px 30px rgba(140,47,57,0.25);
+  }
+  header .eyebrow{
+    font-size:14px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    opacity:0.85;
+    margin-bottom:8px;
+  }
+  header h1{
+    margin:0 0 10px;
+    font-size:34px;
+    font-weight:800;
+  }
+  header p{
+    margin:0;
+    font-size:17px;
+    opacity:0.95;
+    max-width:640px;
+  }
+  h2.section-title{
+    font-size:22px;
+    font-weight:800;
+    color:var(--maroon);
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h2.section-title .num{
+    background:var(--maroon);
+    color:#fff;
+    width:30px;height:30px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    flex:none;
+  }
+  .section-sub{
+    color:var(--muted);
+    font-size:14px;
+    margin:0 0 18px 40px;
+  }
+  section{margin-bottom:38px;}
+
+  /* comparison table */
+  .compare{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-left:40px;
+  }
+  .compare-col{border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+  .compare-col .head{
+    padding:14px 18px;
+    font-weight:700;
+    font-size:16px;
+    color:#fff;
+  }
+  .compare-col.old .head{background:#8a8375;}
+  .compare-col.new .head{background:var(--maroon);}
+  .compare-col ul{list-style:none;margin:0;padding:14px 18px;}
+  .compare-col li{
+    padding:10px 0 10px 26px;
+    position:relative;
+    font-size:14.5px;
+    border-bottom:1px solid #f1ede2;
+  }
+  .compare-col li:last-child{border-bottom:none;}
+  .compare-col.old li::before{content:"✕";color:var(--bad);position:absolute;left:0;font-weight:700;}
+  .compare-col.new li::before{content:"✓";color:var(--good);position:absolute;left:0;font-weight:700;}
+
+  /* talking points */
+  .points{margin-left:40px;display:grid;gap:12px;}
+  .point{
+    background:#fff;
+    border-left:4px solid var(--gold);
+    border-radius:10px;
+    padding:14px 18px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    font-size:15px;
+  }
+  .point b{color:var(--maroon);}
+
+  /* pending */
+  .pending{
+    margin-left:40px;
+    background:#fff8ea;
+    border:1px solid var(--gold-light);
+    border-radius:12px;
+    padding:16px 20px;
+  }
+  .pending li{margin-bottom:8px;font-size:14.5px;}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:40px;
+  }
+
+  @media (max-width:680px){
+    .compare{grid-template-columns:1fr;}
+    .section-sub, .points, .pending{margin-left:0;}
+    header h1{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">संकल्प मराठी मंडळ · कोर टीम सादरीकरण</div>
+    <h1>नवीन वेबसाईट — प्रकाशनापूर्वी आढावा</h1>
+    <p>जुनी Google Sites वेबसाईट आणि नवीन वेबसाईट यांची तुलना, ठळक वैशिष्ट्ये आणि पुढील पायऱ्या — आजच्या कॉलसाठी.</p>
+  </header>
+
+  <section>
+    <h2 class="section-title"><span class="num">1</span> जुनी वि. नवीन — थोडक्यात तुलना</h2>
+    <p class="section-sub">डिझाईनपासून ते रोजच्या वापरापर्यंत काय बदललं</p>
+    <div class="compare">
+      <div class="compare-col old">
+        <div class="head">जुनी वेबसाईट (Google Sites)</div>
+        <ul>
+          <li>कालबाह्य, साधी रचना</li>
+          <li>मोबाईलवर नीट दिसत नाही</li>
+          <li>बदल करायला तांत्रिक मदत लागायची</li>
+          <li>Google Forms वर अवलंबून</li>
+          <li>शाळा विभाग मुख्य साईटशी विसंगत दिसायचा</li>
+          <li>कोणी काय बदललं याची नोंद नाही</li>
+          <li>इव्हेंट फ्लायरसाठी वेगळं सॉफ्टवेअर लागायचं</li>
+        </ul>
+      </div>
+      <div class="compare-col new">
+        <div class="head">नवीन वेबसाईट</div>
+        <ul>
+          <li>व्यावसायिक, आधुनिक डिझाईन — संपूर्ण साईटवर सुसंगत</li>
+          <li>मोबाईल, टॅबलेट, लॅपटॉप — सर्वत्र सुंदर दिसते</li>
+          <li>कोडिंगशिवाय, कोणीही अ‍ॅडमिन पॅनलमधून बदल करू शकतं</li>
+          <li>स्वतःचे फॉर्म्स — ईमेल + बॅकअप यादी दोन्ही</li>
+          <li>शाळा पान आता मुख्य पानाशी पूर्ण सुसंगत, आकर्षक डिझाईन</li>
+          <li>प्रत्येक बदलाची नोंद — Activity Log मध्ये कधी, काय बदललं ते दिसतं</li>
+          <li>अ‍ॅडमिन पॅनलमध्येच इव्हेंट फ्लायर बनवण्याचं टूल</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title"><span class="num">2</span> ठळक मुद्दे — कॉलमध्ये मांडण्यासाठी</h2>
+    <p class="section-sub">टीमला दाखवण्यासाठी सर्वात महत्त्वाचे पॉईंट्स</p>
+    <div class="points">
+      <div class="point"><b>सर्व कंटेंट Excel मधून चालतो</b> — इव्हेंट्स, टीम, FAQ, शाळा माहिती — सगळं एका Excel फाईलमध्ये, कोडिंगची गरज नाही.</div>
+      <div class="point"><b>अ‍ॅडमिन पॅनल — दोन प्रकारचे लॉगिन</b> — पूर्ण अ‍ॅक्सेस (सर्व साईट) आणि फक्त-शाळा अ‍ॅक्सेस (फक्त शाळा टीमसाठी, बाकी काहीही बदलता येणार नाही).</div>
+      <div class="point"><b>Join Us / Sponsor फॉर्म्स आता दुहेरी सुरक्षित</b> — सबमिशन ईमेलवर येतंच, आणि आता अ‍ॅडमिन पॅनलच्या "Inquiries" यादीतही आपोआप नोंदलं जातं — त्यामुळे कोणतीही एन्ट्री हरवणार नाही, ईमेलमध्ये अडचण आली तरी.</div>
+      <div class="point"><b>टीम पान — आपोआप अपडेट होणारा सब-मेनू</b> — नवीन गट (उदा. नवीन बोर्ड टीम) Excel मध्ये जोडला की सब-मेनूमध्ये आपोआप दिसतो, कोडिंग नाही.</div>
+      <div class="point"><b>शाळा संघरचना बदलण्यासाठी स्पष्ट सूचना</b> — कोणताही बदल करण्याआधी संकल्प बोर्ड व EC यांची मान्यता आवश्यक असल्याचं अ‍ॅडमिन पॅनलमध्येच ठळकपणे लिहिलेलं आहे.</div>
+      <div class="point"><b>शाळा FAQ आता विभागानुसार</b> — General, Academics, इत्यादी विभाग वेगळे उघड-बंद करता येतात, शोधणं सोपं झालं आहे.</div>
+      <div class="point"><b>प्रत्येक फोटो/फाईल डाउनलोड करता येते</b> — सध्याचा फोटो एडिट करून पुन्हा अपलोड करायचा असेल तर अ‍ॅडमिन पॅनलमधूनच डाउनलोड करता येतं.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title"><span class="num">3</span> अजून काय बाकी आहे</h2>
+    <p class="section-sub">प्रकाशनापूर्वी लक्षात ठेवण्यासारखं</p>
+    <ul class="pending">
+      <li><b>मुख्य डोमेन (www.sankalpmarathi.org)</b> अजूनही जुन्या Google Sites कडे आहे — नवीन साईट सध्या तात्पुरत्या GitHub लिंकवर चालू आहे. डोमेन वळवण्याची शेवटची पायरी अजून बाकी आहे.</li>
+      <li>Web3Forms ईमेल सेटिंगमधली एक छोटी अडचण नुकतीच शोधून दुरुस्त केली — आता व्यवस्थित काम करत आहे.</li>
+    </ul>
+  </section>
+
+  <footer>संकल्प मराठी मंडळ — कोर टीम सादरीकरणासाठी तयार केलेलं</footer>
+
+</div>
+</body>
+</html>
