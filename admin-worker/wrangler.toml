@@ -9,6 +9,13 @@ GITHUB_OWNER = "sankalpmarathimandal-debug"
 GITHUB_REPO = "SankalpMarathiMandalWebsite"
 GITHUB_BRANCH = "main"
 
+# Holds queued edits waiting for someone to hit Publish in the "Pending
+# Changes" tab — see SETUP.md step 4b for the one-time command that creates
+# this namespace and gives you the id to paste below.
+[[kv_namespaces]]
+binding = "PENDING_CHANGES"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
 # Optional: once deployed you can map this Worker to a subdomain, e.g.
 # admin.sankalpmarathi.org, by adding a route here or doing it in the
 # Cloudflare dashboard under Workers > Triggers > Custom Domains.

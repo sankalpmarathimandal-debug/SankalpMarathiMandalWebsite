@@ -2,9 +2,11 @@
 
 This gives you a private webpage (e.g. `admin.sankalpmarathi.org`) where you
 log in with a password and upload replacement Excel files, images, or PDFs.
-It commits them straight to the `SankalpMarathiMandalWebsite` GitHub repo, and GitHub Pages
-redeploys the live site automatically — no GitHub account needed for whoever
-is uploading.
+Every save is queued in a **Pending Changes** tab for review — nothing
+touches the live site until someone clicks **Publish** on it there, which is
+what actually commits it to the `SankalpMarathiMandalWebsite` GitHub repo and
+triggers GitHub Pages to redeploy — no GitHub account needed for whoever
+is uploading or for whoever reviews and publishes.
 
 It runs on **Cloudflare Workers** (free tier is plenty for this).
 
@@ -67,6 +69,27 @@ npx wrangler secret put SHALA_ADMIN_PASSWORD
 If you skip this one, the login page still works exactly as before — only
 `ADMIN_PASSWORD` (full access) is checked.
 
+## 4b. Create the Pending Changes storage
+
+Queued edits (waiting for someone to hit Publish) are stored in a Cloudflare
+KV namespace — a one-time setup step:
+
+```bash
+npx wrangler kv namespace create PENDING_CHANGES
+```
+
+This prints something like:
+
+```
+[[kv_namespaces]]
+binding = "PENDING_CHANGES"
+id = "a1b2c3d4e5f6..."
+```
+
+Copy the `id` value into `wrangler.toml`, replacing
+`REPLACE_WITH_KV_NAMESPACE_ID` on the `id = "..."` line under the existing
+`[[kv_namespaces]]` block (don't add a second block — one is already there).
+
 ## 5. Deploy
 
 ```bash
@@ -91,6 +114,17 @@ later (e.g. `admin.sankalpmarathi.org`), update the footer link on all pages
 to match. Since the admin link is now public, make sure `ADMIN_PASSWORD` is
 strong.
 
+## How Pending Changes works
+
+Every save (Excel table edit, upload, delete, rename, marquee edit) lands in
+the **Pending Changes** tab instead of going live immediately — it shows who
+submitted it, when, and a preview of what would change. Anyone logged in
+(full or Shala-scoped) can Publish or Reject the items they're allowed to
+see; Publish is the only action that ever actually commits to GitHub. The
+one exception is the **Inquiries** tab (Join Us / Become a Sponsor
+submissions and clearing them out) — those never touch the live site, so
+they still save instantly, same as before.
+
 ## What the dashboard can do
 
 - **Excel data files** — replace any of the 12 workbooks (`events.xlsx`,
@@ -114,9 +148,9 @@ strong.
   file that can be reopened and edited later. This tool runs entirely in the
   browser — nothing it does is committed to GitHub or touches the live site.
 
-Every change made via the Excel/image/PDF sections above is a real Git
-commit (authored as you, via the token), so nothing is lost — you can always
-see history on GitHub or revert a commit if needed.
+Once published, every change made via the Excel/image/PDF sections above is
+a real Git commit (authored as you, via the token), so nothing is lost — you
+can always see history on GitHub or revert a commit if needed.
 
 ## Things to know
 
