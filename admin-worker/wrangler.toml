@@ -14,7 +14,7 @@ GITHUB_BRANCH = "main"
 # this namespace and gives you the id to paste below.
 [[kv_namespaces]]
 binding = "PENDING_CHANGES"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "7f9d12debe0243ac9d8870fcff780380"
 
 # Optional: once deployed you can map this Worker to a subdomain, e.g.
 # admin.sankalpmarathi.org, by adding a route here or doing it in the
