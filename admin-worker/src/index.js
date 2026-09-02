@@ -1035,6 +1035,73 @@ async function ghDeleteFile(env, path, message) {
 }
 
 // ---------------------------------------------------------------------------
+// Pending Changes queue — every content edit lands here instead of being
+// committed straight to GitHub; clicking Publish in the dashboard is what
+// actually calls the gh* functions above. Backed by a Workers KV namespace
+// (PENDING_CHANGES), keyed "pending:<id>" so a prefix list() is the whole
+// "database" — no need for a separate index.
+//
+// The Join Us / Become a Sponsor submission-log CSVs are deliberately NOT
+// routed through this queue (see needsReview) — nothing on the live site
+// reads them, they're purely an admin-facing Inquiries list, so gating them
+// behind a review step would just be friction with no benefit.
+// ---------------------------------------------------------------------------
+
+function needsReview(path) {
+  return !Object.values(SUBMISSION_LOGS).some((f) => f.path === path);
+}
+
+function newPendingId() {
+  return Date.now().toString(36) + "-" + crypto.randomUUID().slice(0, 8);
+}
+
+async function queuePendingChange(env, entry) {
+  const id = newPendingId();
+  const record = { id, submittedAt: new Date().toISOString(), ...entry };
+  await env.PENDING_CHANGES.put("pending:" + id, JSON.stringify(record));
+  return record;
+}
+
+// Role-scoped the same way /api/logs already is: a "shala" login only ever
+// sees (and can publish/reject) items touching its own allowed paths.
+async function listPendingChanges(env, role) {
+  const list = await env.PENDING_CHANGES.list({ prefix: "pending:" });
+  const records = await Promise.all(list.keys.map((k) => env.PENDING_CHANGES.get(k.name, "json")));
+  const items = records.filter(Boolean);
+  if (role === "shala") {
+    return items.filter((it) => isAllowedPath(it.kind === "rename" ? it.newPath : it.path, "shala"));
+  }
+  return items;
+}
+
+async function getPendingChange(env, id) {
+  return env.PENDING_CHANGES.get("pending:" + id, "json");
+}
+
+async function deletePendingChange(env, id) {
+  await env.PENDING_CHANGES.delete("pending:" + id);
+}
+
+// The only place in this file that still calls ghCommitFile/ghRenameFile/
+// ghDeleteFile for review-gated paths — this is what a Publish click runs.
+async function publishPendingChange(env, id) {
+  const item = await getPendingChange(env, id);
+  if (!item) throw new Error("Pending change not found — it may already have been published or rejected.");
+  let result = {};
+  if (item.kind === "commit") {
+    result = await ghCommitFile(env, item.path, item.contentBase64, item.message);
+  } else if (item.kind === "rename") {
+    await ghRenameFile(env, item.oldPath, item.newPath, item.message);
+  } else if (item.kind === "delete") {
+    result = await ghDeleteFile(env, item.path, item.message);
+  } else {
+    throw new Error("Unknown pending change kind: " + item.kind);
+  }
+  await deletePendingChange(env, id);
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // Join Us / Become a Sponsor submissions — server-side CSV helpers
 // ---------------------------------------------------------------------------
 
@@ -1223,6 +1290,10 @@ const BASE_STYLE = `
   table.xlsx-table th { background:#f5f4f0; position:sticky; top:0; font-weight:600; }
   table.xlsx-table td[contenteditable="true"]:focus, table.xlsx-table th[contenteditable="true"]:focus { outline:2px solid #8c2f39; outline-offset:-2px; background:#fff8ee; }
   .editor-controls { display:flex; gap:8px; margin-top:10px; }
+  .pending-card-meta { font-size:12px; color:#6b6558; margin:0 0 10px; }
+  .pending-preview { display:none; margin-top:12px; border-top:1px dashed #e4e0d8; padding-top:12px; }
+  .pending-preview img { max-width:240px; max-height:240px; border-radius:6px; border:1px solid #e4e0d8; display:block; }
+  .badge-count { background:#8c2f39; color:#fff; border-radius:10px; padding:1px 7px; font-size:11px; margin-left:6px; }
 `;
 
 function loginPage(error) {
@@ -1322,6 +1393,15 @@ function pageSectionHtml(page, idx) {
   </section>`;
 }
 
+function pendingSectionHtml() {
+  return `<section class="page-section" id="page-pending">
+    <h2 class="section">Pending Changes</h2>
+    <p style="font-size:13px;color:#6b6558;margin:0 0 14px;">Nothing you save goes live by itself anymore — every edit lands here first. Preview it, then Publish to push it to the live site (or Reject to discard it). Nothing here affects the live site until Publish is clicked.</p>
+    <div id="pending-list"><p style="color:#999;font-size:13px;">Loading…</p></div>
+    <div class="row" style="margin-top:12px;"><button class="secondary" onclick="loadPending()">Refresh</button></div>
+  </section>`;
+}
+
 function logSectionHtml(isShalaRole) {
   const desc = isShalaRole
     ? "Every change made to Shala page content (Banner, Events, Guidelines, Team, FAQ) is a real GitHub commit — this list is pulled live from GitHub, filtered to just Shala's own files, so it can never fall out of sync. Click a row to see the exact before/after diff on GitHub."
@@ -1367,10 +1447,11 @@ function adminPage(role) {
   const tabs = pages.map(
     (p, i) => `<button class="page-tab${i === 0 ? " active" : ""}" data-page="${p.key}" onclick="showPage('${p.key}')">${p.label}</button>`
   ).join("\n")
+    + `\n<button class="page-tab" data-page="pending" onclick="showPage('pending')">Pending Changes<span class="badge-count" id="pending-badge" style="display:none"></span></button>`
     + `\n<button class="page-tab" data-page="log" onclick="showPage('log')">Activity Log</button>`
     + (isShalaRole ? "" : `\n<button class="page-tab" data-page="submissions" onclick="showPage('submissions')">Inquiries</button>`)
     + (isShalaRole ? "" : `\n<a href="/flyer" target="_blank" class="page-tab" style="text-decoration:none;display:inline-block;">🎨 Flyer Builder</a>`);
-  const sections = pages.map(pageSectionHtml).join("\n") + "\n" + logSectionHtml(isShalaRole)
+  const sections = pages.map(pageSectionHtml).join("\n") + "\n" + pendingSectionHtml() + "\n" + logSectionHtml(isShalaRole)
     + (isShalaRole ? "" : "\n" + submissionsSectionHtml());
   // Folder listing is gated server-side by isAllowedPath too, but only
   // wiring up the folders this role can actually see keeps the page's own
@@ -1388,8 +1469,8 @@ function adminPage(role) {
   </header>
   <main>
     <p style="font-size:13px;color:#6b6558">${isShalaRole
-      ? "Shala team login — you can edit the Shala page's team, FAQs, guidelines, and calendar. Uploads and edits commit directly to the live site's GitHub repo — changes go live within a minute or two."
-      : "Pick the page you want to change below. Uploads and edits commit directly to the live site's GitHub repo — changes go live within a minute or two."}</p>
+      ? "Shala team login — you can edit the Shala page's team, FAQs, guidelines, and calendar. Saves are queued for review — nothing goes live until it's approved and published from the Pending Changes tab."
+      : "Pick the page you want to change below. Saves are queued for review — nothing goes live until it's approved and published from the Pending Changes tab."}</p>
 
     <div class="page-tabs">
       ${tabs}
@@ -1483,10 +1564,11 @@ function adminPage(role) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Upload failed');
-      setStatus(card, 'Updated. Live in a minute or two.', true);
+      setStatus(card, 'Submitted for review — see Pending Changes.', true);
       input.value = '';
       const editor = document.getElementById('editor-' + path.replace(/[^a-zA-Z0-9]/g, '-'));
       if (editor) { editor.dataset.loaded = ''; editor.innerHTML = ''; editor.style.display = 'none'; }
+      loadPending();
     } catch (e) {
       setStatus(card, e.message, false);
     } finally {
@@ -1603,7 +1685,8 @@ function adminPage(role) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Save failed');
-      setStatus(card, 'Saved. Live in a minute or two.', true);
+      setStatus(card, 'Submitted for review — see Pending Changes.', true);
+      loadPending();
     } catch (e) {
       setStatus(card, e.message, false);
     } finally {
@@ -1714,15 +1797,15 @@ function adminPage(role) {
         return;
       }
     }
-    setStatus(card, 'Uploaded. Live in a minute or two.', true);
+    setStatus(card, 'Submitted for review — see Pending Changes.', true);
     input.value = '';
     document.getElementById('pending-' + folder.replace(/[^a-zA-Z0-9]/g, '-')).innerHTML = '';
     btn.disabled = false;
-    reloadFolderSoon(folder);
+    loadPending();
   }
 
   async function deleteFromFolder(path, folder) {
-    if (!confirm('Delete ' + path + '?')) return;
+    if (!confirm('Submit "' + path + '" for removal? It will still show here (and on the live site) until the removal is published.')) return;
     try {
       const res = await fetch('/api/delete', {
         method: 'POST',
@@ -1731,7 +1814,8 @@ function adminPage(role) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Delete failed');
-      reloadFolderSoon(folder);
+      alert('Submitted for review — see Pending Changes.');
+      loadPending();
     } catch (e) {
       alert(e.message);
     }
@@ -1761,7 +1845,8 @@ function adminPage(role) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Rename failed');
-      reloadFolderSoon(folder);
+      alert('Submitted for review — see Pending Changes.');
+      loadPending();
     } catch (e) {
       alert(e.message);
     }
@@ -1770,6 +1855,8 @@ function adminPage(role) {
   // GitHub's list-directory API can briefly lag right after a commit, so a
   // single immediate reload sometimes still shows the old state. Reload now
   // and again shortly after — on top of the manual "Refresh list" button.
+  // (Still used after a Publish click, which is the point content actually
+  // changes on GitHub.)
   function reloadFolderSoon(folder) {
     loadFolder(folder);
     setTimeout(function() { loadFolder(folder); }, 1800);
@@ -1938,8 +2025,9 @@ function adminPage(role) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Save failed');
-      statusEl.textContent = 'Saved. Live on the homepage in a minute or two.';
+      statusEl.textContent = 'Submitted for review — see Pending Changes.';
       statusEl.className = 'status ok';
+      loadPending();
     } catch (e) {
       statusEl.textContent = e.message;
       statusEl.className = 'status err';
@@ -2044,10 +2132,222 @@ function adminPage(role) {
     }
   }
 
+  // ---- pending changes queue -------------------------------------------------
+
+  function formatWhen(iso) {
+    try { return new Date(iso).toLocaleString(); } catch (e) { return iso; }
+  }
+
+  function pendingKindLabel(item) {
+    if (item.kind === 'rename') return 'Rename: ' + item.oldPath + ' → ' + item.newPath;
+    if (item.kind === 'delete') return 'Delete: ' + item.path;
+    return 'Update: ' + item.path;
+  }
+
+  async function loadPending() {
+    const list = document.getElementById('pending-list');
+    const badge = document.getElementById('pending-badge');
+    if (!list) return;
+    try {
+      const res = await fetch('/api/pending');
+      const items = await res.json();
+      if (!res.ok) throw new Error((items && items.error) || 'Failed to load');
+      if (badge) {
+        if (items.length) { badge.style.display = 'inline-block'; badge.textContent = items.length; }
+        else { badge.style.display = 'none'; }
+      }
+      if (!items.length) {
+        list.innerHTML = '<p style="color:#999;font-size:13px;">Nothing pending right now.</p>';
+        return;
+      }
+      list.innerHTML = '';
+      items.forEach(function(item) { list.appendChild(renderPendingCard(item)); });
+    } catch (e) {
+      list.innerHTML = '<p class="status err">' + e.message + '</p>';
+    }
+  }
+
+  function renderPendingCard(item) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const title = document.createElement('h3');
+    title.style.marginBottom = '2px';
+    title.textContent = pendingKindLabel(item);
+    card.appendChild(title);
+
+    const meta = document.createElement('p');
+    meta.className = 'pending-card-meta';
+    meta.textContent = 'Submitted ' + formatWhen(item.submittedAt) + ' · ' + (item.submittedRole === 'shala' ? 'Shala login' : 'Full login');
+    card.appendChild(meta);
+
+    const previewArea = document.createElement('div');
+    previewArea.className = 'pending-preview';
+
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const previewBtn = document.createElement('button');
+    previewBtn.className = 'secondary';
+    previewBtn.textContent = 'Preview';
+    previewBtn.onclick = function() { togglePendingPreview(previewBtn, previewArea, item); };
+
+    const publishBtn = document.createElement('button');
+    publishBtn.textContent = 'Publish';
+    publishBtn.onclick = function() { publishPending(item.id, publishBtn, card); };
+
+    const rejectBtn = document.createElement('button');
+    rejectBtn.className = 'danger';
+    rejectBtn.textContent = 'Reject';
+    rejectBtn.onclick = function() { rejectPending(item.id, rejectBtn, card); };
+
+    row.appendChild(previewBtn);
+    row.appendChild(publishBtn);
+    row.appendChild(rejectBtn);
+    card.appendChild(row);
+    card.appendChild(previewArea);
+
+    const status = document.createElement('div');
+    status.className = 'status';
+    card.appendChild(status);
+
+    return card;
+  }
+
+  async function togglePendingPreview(btn, area, item) {
+    if (area.style.display === 'block') { area.style.display = 'none'; btn.textContent = 'Preview'; return; }
+    area.style.display = 'block';
+    btn.textContent = 'Hide preview';
+    if (area.dataset.loaded === '1') return;
+    area.innerHTML = 'Loading preview…';
+    try {
+      await renderPendingPreview(area, item);
+      area.dataset.loaded = '1';
+    } catch (e) {
+      area.innerHTML = '<p class="status err">' + e.message + '</p>';
+    }
+  }
+
+  function renderReadOnlyTable(container, aoa) {
+    container.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    const table = document.createElement('table');
+    table.className = 'xlsx-table';
+    if (!aoa.length) aoa = [['']];
+    const colCount = aoa.reduce(function(m, r) { return Math.max(m, r.length); }, 1);
+    aoa.forEach(function(row, ri) {
+      const tr = document.createElement('tr');
+      for (let ci = 0; ci < colCount; ci++) {
+        const cellEl = document.createElement(ri === 0 ? 'th' : 'td');
+        cellEl.textContent = row[ci] !== undefined ? row[ci] : '';
+        tr.appendChild(cellEl);
+      }
+      table.appendChild(tr);
+    });
+    wrap.appendChild(table);
+    container.appendChild(wrap);
+  }
+
+  async function renderPendingPreview(area, item) {
+    if (item.kind === 'rename') {
+      area.innerHTML = '<p style="font-size:13px;">Renaming <code>' + item.oldPath + '</code> to <code>' + item.newPath + '</code>. Nothing else about the file changes.</p>';
+      return;
+    }
+    if (item.kind === 'delete') {
+      area.innerHTML = '<p style="font-size:13px;color:#a33;">This will permanently remove <code>' + item.path + '</code> from the live site once published.</p>';
+      if (/\\.(png|jpe?g|gif|webp|svg)$/i.test(item.path)) {
+        try {
+          const res = await fetch('/api/file?path=' + encodeURIComponent(item.path));
+          const data = await res.json();
+          if (res.ok) {
+            const img = document.createElement('img');
+            img.src = 'data:image/*;base64,' + data.contentBase64;
+            area.appendChild(img);
+          }
+        } catch (e) { /* preview is best-effort */ }
+      }
+      return;
+    }
+
+    // kind === 'commit' — list responses omit content, fetch the full item.
+    const res = await fetch('/api/pending/' + item.id);
+    const full = await res.json();
+    if (!res.ok) throw new Error(full.error || 'Could not load proposed content');
+
+    if (item.path.endsWith('.xlsx')) {
+      const buf = base64ToArrayBuffer(full.contentBase64);
+      const wb = XLSX.read(buf, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      renderReadOnlyTable(area, aoa);
+    } else if (item.path === 'data/marquee.json') {
+      const cfg = JSON.parse(base64ToUtf8(full.contentBase64) || '{}');
+      area.innerHTML = '<p style="font-size:13px;"><strong>Show banner:</strong> ' + (cfg.active ? 'Yes' : 'No')
+        + '<br><strong>Text:</strong> ' + (cfg.text || '(empty)')
+        + '<br><strong>Link:</strong> ' + (cfg.link || '(none)') + '</p>';
+    } else if (/\\.(png|jpe?g|gif|webp|svg)$/i.test(item.path)) {
+      area.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = 'data:image/*;base64,' + full.contentBase64;
+      area.appendChild(img);
+    } else if (item.path.endsWith('.pdf')) {
+      area.innerHTML = '';
+      const openBtn = document.createElement('button');
+      openBtn.className = 'secondary';
+      openBtn.textContent = 'Open PDF preview';
+      openBtn.onclick = function() {
+        const blob = new Blob([base64ToArrayBuffer(full.contentBase64)], { type: 'application/pdf' });
+        window.open(URL.createObjectURL(blob), '_blank');
+      };
+      area.appendChild(openBtn);
+    } else {
+      area.innerHTML = '<p style="font-size:13px;color:#999;">No inline preview available for this file type.</p>';
+    }
+  }
+
+  async function publishPending(id, btn, card) {
+    btn.disabled = true;
+    const status = card.querySelector('.status');
+    status.textContent = 'Publishing…';
+    status.className = 'status ok';
+    try {
+      const res = await fetch('/api/pending/' + id + '/publish', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Publish failed');
+      status.textContent = 'Published — live in a minute or two.';
+      setTimeout(function() { loadPending(); }, 900);
+    } catch (e) {
+      status.textContent = e.message;
+      status.className = 'status err';
+      btn.disabled = false;
+    }
+  }
+
+  async function rejectPending(id, btn, card) {
+    if (!confirm('Discard this pending change? This cannot be undone.')) return;
+    btn.disabled = true;
+    const status = card.querySelector('.status');
+    status.textContent = 'Rejecting…';
+    status.className = 'status ok';
+    try {
+      const res = await fetch('/api/pending/' + id + '/reject', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Reject failed');
+      card.remove();
+      loadPending();
+    } catch (e) {
+      status.textContent = e.message;
+      status.className = 'status err';
+      btn.disabled = false;
+    }
+  }
+
   JSON.parse('${allFolderPaths}').forEach(loadFolder);
   loadLogs();
   loadMarquee();
   loadSubmissions();
+  loadPending();
   </script>
   </body></html>`;
 }
@@ -2154,8 +2454,65 @@ export default {
         if (url.pathname === "/api/commit" && request.method === "POST") {
           const body = await request.json();
           if (!isAllowedPath(body.path, role)) return json({ error: "Path not allowed" }, 400);
-          const result = await ghCommitFile(env, body.path, body.contentBase64, body.message || `Admin update: ${body.path}`);
+          const message = body.message || `Admin update: ${body.path}`;
+          if (!needsReview(body.path)) {
+            // Submission-log housekeeping (e.g. clearing a reviewed Inquiries
+            // row) — not reviewed content, commits immediately as before.
+            const result = await ghCommitFile(env, body.path, body.contentBase64, message);
+            return json({ ok: true, commit: result.commit?.sha });
+          }
+          const record = await queuePendingChange(env, {
+            kind: "commit",
+            path: body.path,
+            contentBase64: body.contentBase64,
+            message,
+            submittedRole: role,
+          });
+          return json({ ok: true, queued: true, id: record.id });
+        }
+
+        if (url.pathname === "/api/pending" && request.method === "GET") {
+          const items = await listPendingChanges(env, role);
+          // Content (contentBase64) can be large and isn't needed just to
+          // list the queue — the dashboard fetches it on demand when Preview
+          // is clicked, via GET /api/pending/:id below.
+          const summaries = items
+            .map(({ contentBase64, ...meta }) => meta)
+            .sort((a, b) => (a.submittedAt < b.submittedAt ? 1 : -1));
+          return json(summaries);
+        }
+
+        if (url.pathname.startsWith("/api/pending/") && url.pathname.endsWith("/publish") && request.method === "POST") {
+          const id = url.pathname.split("/")[3];
+          const item = await getPendingChange(env, id);
+          if (!item) return json({ error: "Not found" }, 404);
+          if (!isAllowedPath(item.kind === "rename" ? item.newPath : item.path, role)) {
+            return json({ error: "Path not allowed" }, 400);
+          }
+          const result = await publishPendingChange(env, id);
           return json({ ok: true, commit: result.commit?.sha });
+        }
+
+        if (url.pathname.startsWith("/api/pending/") && url.pathname.endsWith("/reject") && request.method === "POST") {
+          const id = url.pathname.split("/")[3];
+          const item = await getPendingChange(env, id);
+          if (!item) return json({ error: "Not found" }, 404);
+          if (!isAllowedPath(item.kind === "rename" ? item.newPath : item.path, role)) {
+            return json({ error: "Path not allowed" }, 400);
+          }
+          await deletePendingChange(env, id);
+          return json({ ok: true });
+        }
+
+        // Single queued item, content included — used by the Preview button.
+        if (/^\/api\/pending\/[^/]+$/.test(url.pathname) && request.method === "GET") {
+          const id = url.pathname.split("/")[3];
+          const item = await getPendingChange(env, id);
+          if (!item) return json({ error: "Not found" }, 404);
+          if (!isAllowedPath(item.kind === "rename" ? item.newPath : item.path, role)) {
+            return json({ error: "Path not allowed" }, 400);
+          }
+          return json(item);
         }
 
         if (url.pathname === "/api/logs" && request.method === "GET") {
@@ -2182,15 +2539,31 @@ export default {
           if (!isAllowedPath(body.oldPath, role) || !isAllowedPath(body.newPath, role)) {
             return json({ error: "Path not allowed" }, 400);
           }
-          await ghRenameFile(env, body.oldPath, body.newPath, body.message || `Admin: rename ${body.oldPath} -> ${body.newPath}`);
-          return json({ ok: true });
+          const record = await queuePendingChange(env, {
+            kind: "rename",
+            oldPath: body.oldPath,
+            newPath: body.newPath,
+            message: body.message || `Admin: rename ${body.oldPath} -> ${body.newPath}`,
+            submittedRole: role,
+          });
+          return json({ ok: true, queued: true, id: record.id });
         }
 
         if (url.pathname === "/api/delete" && request.method === "POST") {
           const body = await request.json();
           if (!isAllowedPath(body.path, role)) return json({ error: "Path not allowed" }, 400);
-          const result = await ghDeleteFile(env, body.path, body.message || `Admin delete: ${body.path}`);
-          return json({ ok: true, commit: result.commit?.sha });
+          const message = body.message || `Admin delete: ${body.path}`;
+          if (!needsReview(body.path)) {
+            const result = await ghDeleteFile(env, body.path, message);
+            return json({ ok: true, commit: result.commit?.sha });
+          }
+          const record = await queuePendingChange(env, {
+            kind: "delete",
+            path: body.path,
+            message,
+            submittedRole: role,
+          });
+          return json({ ok: true, queued: true, id: record.id });
         }
 
         return json({ error: "Not found" }, 404);
