@@ -79,7 +79,8 @@ main { flex: 1; }
   padding: 0 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 24px;
   height: 56px;
 }
 
@@ -160,13 +161,70 @@ main { flex: 1; }
   background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
   padding: 8px 18px;
   border-radius: 980px;
-  margin-left: 8px;
+  margin-left: auto;
   transition: filter 0.2s ease;
 }
 .nav-cta:hover { filter: brightness(1.1); }
 
+/* Marathi Shala dropdown (desktop: hover/focus flyout; mobile: always-expanded inline) */
+.nav-dropdown { position: relative; }
+
+.nav-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-dropdown-caret {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown-menu {
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  min-width: 180px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  z-index: 950;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown:hover .nav-dropdown-caret,
+.nav-dropdown:focus-within .nav-dropdown-caret {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--apple-dark);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-dropdown-menu a:hover { background: rgba(0,0,0,0.06); }
+
 @media (max-width: 900px) {
-  .nav-toggle { display: block; }
+  .nav-toggle { display: block; margin-left: auto; }
   .nav-links {
     display: none;
     position: absolute;
@@ -186,6 +244,21 @@ main { flex: 1; }
   .nav-links.open { display: flex; }
   .nav-links a { padding: 12px 16px; font-size: 16px; text-align: center; }
   .nav-cta { display: none; }
+
+  /* Dropdown becomes a permanently-expanded, indented sub-list in the mobile menu */
+  .nav-dropdown-toggle { justify-content: center; }
+  .nav-dropdown-caret { display: none; }
+  .nav-dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+    margin-top: 0;
+    padding: 0 0 0 16px;
+  }
+  .nav-dropdown-menu a { text-align: center; font-size: 14px; padding: 10px 16px; }
 }
 
 /* =====================================================
