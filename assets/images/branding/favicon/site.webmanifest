@@ -1,0 +1,11 @@
+{
+  "name": "Sankalp Marathi Mandal",
+  "short_name": "Sankalp",
+  "icons": [
+    { "src": "/assets/images/branding/favicon/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/images/branding/favicon/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#B5171D",
+  "background_color": "#FDFAF4",
+  "display": "standalone"
+}
